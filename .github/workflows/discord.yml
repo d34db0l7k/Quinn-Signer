@@ -1,55 +1,216 @@
 name: Discord notifications
 
 on:
-  push:
-  pull_request:
+  # TESTING (manual)
   workflow_dispatch:
+    inputs:
+      test_message:
+        description: "Custom message for TESTING"
+        required: false
+        default: "Manual test run"
+
+  # Pushing to main
+  push:
+    branches: [ main ]
+
+  # Pulling *into* main (PRs targeting main)
+  pull_request:
+    branches: [ main ]
+    types: [opened, reopened, synchronize, closed]
+
+  # New / deleted branch
+  create:
+  delete:
+
+  # New collaborator
+  member:
+    types: [added]
 
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Compose & send message to Discord
+      - name: Compose & send message to Discord (no emojis)
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+
+          # Common context
           REPO: ${{ github.repository }}
           ACTOR: ${{ github.actor }}
           REF: ${{ github.ref_name }}
-          SHA: ${{ github.sha }}
+          FULL_REF: ${{ github.ref }}
           SERVER_URL: ${{ github.server_url }}
           EVENT_NAME: ${{ github.event_name }}
+
+          # Push
+          SHA: ${{ github.sha }}
+
+          # PR (pulling into main)
           PR_NUM: ${{ github.event.pull_request.number }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_MERGED: ${{ github.event.pull_request.merged }}
+          PR_BASE: ${{ github.event.pull_request.base.ref }}
+
+          # Create/Delete
+          REF_TYPE: ${{ github.event.ref_type }}   # 'branch' or 'tag'
+          REF_NAME: ${{ github.event.ref }}        # e.g. refs/heads/feature-x
+
+          # Member (new collaborator)
+          MEMBER_LOGIN: ${{ github.event.member.login }}
+          MEMBER_HTML_URL: ${{ github.event.member.html_url }}
+
+          # Manual test
+          INPUT_MSG: ${{ github.event.inputs.test_message }}
         run: |
           set -euo pipefail
 
-          if [ "$EVENT_NAME" = "push" ]; then
-            MSG="**$REPO**: $ACTOR pushed to \`$REF\` — [${SHA:0:7}]($SERVER_URL/$REPO/commit/$SHA)"
-          elif [ "$EVENT_NAME" = "pull_request" ]; then
-            MSG="**$REPO**: PR #$PR_NUM *$PR_TITLE* by $ACTOR — [view PR]($PR_URL)"
-          else
-            MSG="**$REPO**: Event \`$EVENT_NAME\` triggered by $ACTOR"
+          # ---- Color palette (Discord expects decimal ints) ----
+          COLOR_INFO=3447003      # blue
+          COLOR_SUCCESS=3066993   # green
+          COLOR_WARN=15105570     # orange
+          COLOR_ERROR=15158332    # red
+          COLOR_PURPLE=10027263   # purple
+          COLOR_GRAY=9807270      # gray
+
+          SHORT_SHA="${SHA:0:7}"
+          REPO_URL="$SERVER_URL/$REPO"
+          ACTOR_URL="$SERVER_URL/$ACTOR"
+          AVATAR_URL="https://avatars.githubusercontent.com/${ACTOR}"
+
+          # Branch name helper
+          BRANCH="${REF:-}"
+          if [[ -z "$BRANCH" && "${FULL_REF:-}" == refs/heads/* ]]; then
+            BRANCH="${FULL_REF#refs/heads/}"
           fi
 
+          TITLE=""
+          DESC=""
+          COLOR="$COLOR_INFO"
+
+          case "$EVENT_NAME" in
+            workflow_dispatch)
+              # ===== CASE: TESTING =====
+              TITLE="TESTING"
+              DESC="${INPUT_MSG:-Manual test run}"
+              COLOR="$COLOR_PURPLE"
+              ;;
+
+            push)
+              # ===== CASE: Pushing to main =====
+              # (this job only runs for main because of on.push.branches)
+              TITLE="Push to main"
+              DESC="**$REPO**: [$SHORT_SHA]($REPO_URL/commit/$SHA) pushed to **main** by [$ACTOR]($ACTOR_URL)"
+              COLOR="$COLOR_SUCCESS"
+              ;;
+
+            pull_request)
+              # ===== CASE: Pulling into main =====
+              # We only care about PRs *targeting* main (enforced by on.pull_request.branches).
+              if [[ "${PR_MERGED:-false}" == "true" ]]; then
+                TITLE="Pull request merged into main"
+                COLOR="$COLOR_SUCCESS"
+              else
+                # opened / reopened / synchronize; ignore closed-unmerged
+                if [[ "${{ github.event.action }}" == "closed" ]]; then
+                  # Skip closed-but-not-merged
+                  echo "PR closed without merge; skipping notification."
+                  exit 0
+                fi
+                TITLE="Pull request to main"
+                COLOR="$COLOR_INFO"
+              fi
+              DESC="**$REPO**: #$PR_NUM *$PR_TITLE* — [View PR]($PR_URL) by [$ACTOR]($ACTOR_URL)"
+              ;;
+
+            create)
+              # ===== CASE: New branch =====
+              if [[ "${REF_TYPE:-}" != "branch" ]]; then
+                echo "Create event is not a branch; skipping."
+                exit 0
+              fi
+              RAW="${REF_NAME:-}"
+              RAW="${RAW#refs/heads/}"
+              BRANCH="${RAW:-$BRANCH}"
+              TITLE="New branch"
+              DESC="**$REPO**: Branch \`$BRANCH\` created by [$ACTOR]($ACTOR_URL)"
+              COLOR="$COLOR_INFO"
+              ;;
+
+            delete)
+              # ===== CASE: Delete branch =====
+              if [[ "${REF_TYPE:-}" != "branch" ]]; then
+                echo "Delete event is not a branch; skipping."
+                exit 0
+              fi
+              RAW="${REF_NAME:-}"
+              RAW="${RAW#refs/heads/}"
+              BRANCH="${RAW:-$BRANCH}"
+              TITLE="Branch deleted"
+              DESC="**$REPO**: Branch \`$BRANCH\` deleted by [$ACTOR]($ACTOR_URL)"
+              COLOR="$COLOR_ERROR"
+              ;;
+
+            member)
+              # ===== CASE: New collaborator =====
+              if [[ "${{ github.event.action }}" != "added" ]]; then
+                echo "Member event is not 'added'; skipping."
+                exit 0
+              fi
+              TITLE="New collaborator added"
+              # Fallback link if html_url missing
+              MEMBER_URL="${MEMBER_HTML_URL:-https://github.com/${MEMBER_LOGIN}}"
+              DESC="**$REPO**: [${MEMBER_LOGIN}](${MEMBER_URL}) was granted access by [$ACTOR]($ACTOR_URL)"
+              COLOR="$COLOR_WARN"
+              # Use new collaborator avatar if available
+              if [[ -n "${MEMBER_LOGIN:-}" ]]; then
+                AVATAR_URL="https://avatars.githubusercontent.com/${MEMBER_LOGIN}"
+              fi
+              ;;
+
+            *)
+              echo "Event $EVENT_NAME not in allowed set; skipping."
+              exit 0
+              ;;
+          esac
+
+          # Build the embed JSON and send
           jq -n \
-            --arg title "GitHub Notification" \
-            --arg desc "$MSG" \
+            --arg title "$TITLE" \
+            --arg desc "$DESC" \
             --arg repo "$REPO" \
+            --arg url "$REPO_URL" \
             --arg actor "$ACTOR" \
-            --arg ref "$REF" \
-            --arg url "$SERVER_URL/$REPO" \
+            --arg actor_url "$ACTOR_URL" \
+            --arg ref "${BRANCH:-$REF}" \
+            --arg avatar "$AVATAR_URL" \
             --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg commit_url "$REPO_URL/commit/$SHA" \
+            --arg short_sha "$SHORT_SHA" \
+            --arg pr_url "${PR_URL:-}" \
+            --arg pr_num "${PR_NUM:-}" \
+            --arg pr_title "${PR_TITLE:-}" \
+            --arg pr_base "${PR_BASE:-}" \
+            --argjson color "$COLOR" \
             '{
               embeds: [{
                 title: $title,
                 description: $desc,
                 url: $url,
                 timestamp: $ts,
+                color: $color,
+                thumbnail: { url: $avatar },
+                footer: { text: "GitHub → Discord · " + $repo },
                 fields: [
-                  { "name": "Repository", "value": $repo, "inline": true },
-                  { "name": "Actor", "value": $actor, "inline": true },
-                  { "name": "Ref", "value": $ref }
+                  { "name": "Repository", "value": "[" + $repo + "](" + $url + ")", "inline": true },
+                  { "name": "Actor", "value": "[" + $actor + "](" + $actor_url + ")", "inline": true },
+                  { "name": "Ref", "value": ($ref // "—") },
+                  if $short_sha != "" then
+                    { "name": "Commit", "value": "[" + $short_sha + "](" + $commit_url + ")", "inline": true }
+                  else empty end,
+                  if $pr_num != "" then
+                    { "name": "PR", "value": "#" + $pr_num + ": " + $pr_title + "\n" + $pr_url }
+                  else empty end
                 ]
               }]
             }' \
