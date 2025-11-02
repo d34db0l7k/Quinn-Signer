@@ -1,7 +1,6 @@
 name: Discord notifications
 
 on:
-  # TESTING (manual)
   workflow_dispatch:
     inputs:
       test_message:
@@ -9,20 +8,16 @@ on:
         required: false
         default: "Manual test run"
 
-  # Pushing to main
   push:
     branches: [ main ]
 
-  # Pulling *into* main (PRs targeting main)
   pull_request:
     branches: [ main ]
     types: [opened, reopened, synchronize, closed]
 
-  # New / deleted branch
   create:
   delete:
 
-  # New collaborator
   member:
     types: [added]
 
@@ -53,7 +48,7 @@ jobs:
 
           # Create/Delete
           REF_TYPE: ${{ github.event.ref_type }}   # 'branch' or 'tag'
-          REF_NAME: ${{ github.event.ref }}        # usually just the branch/tag name
+          REF_NAME: ${{ github.event.ref }}        # usually the branch/tag name
 
           # Member (new collaborator)
           MEMBER_LOGIN: ${{ github.event.member.login }}
@@ -88,7 +83,7 @@ jobs:
             BRANCH="${FULL_REF#refs/heads/}"
           fi
 
-          # Create/Delete payloads usually give plain names (no refs/heads/)
+          # Create/Delete payloads usually give plain names
           CLEAN_REF_NAME="${REF_NAME:-}"
           CLEAN_REF_NAME="${CLEAN_REF_NAME#refs/heads/}"
           CLEAN_REF_NAME="${CLEAN_REF_NAME#refs/tags/}"
@@ -99,27 +94,23 @@ jobs:
 
           case "$EVENT_NAME" in
             workflow_dispatch)
-              # ===== CASE: TESTING =====
               TITLE="TESTING"
               DESC="${INPUT_MSG:-Manual test run}"
               COLOR="$COLOR_PURPLE"
               ;;
 
             push)
-              # ===== CASE: Pushing to main =====
               TITLE="Push to main"
               DESC="**$REPO**: [$SHORT_SHA]($REPO_URL/commit/$SHA) pushed to **main** by [$ACTOR]($ACTOR_URL)"
               COLOR="$COLOR_SUCCESS"
               ;;
 
             pull_request)
-              # ===== CASE: Pull request targeting main =====
-              # Ignore closed-but-not-merged
+              # Skip closed-but-not-merged
               if [[ "${{ github.event.action }}" == "closed" && "${PR_MERGED:-false}" != "true" ]]; then
                 echo "PR closed without merge; skipping notification."
                 exit 0
               fi
-
               if [[ "${PR_MERGED:-false}" == "true" ]]; then
                 TITLE="Pull request merged into main"
                 COLOR="$COLOR_SUCCESS"
@@ -131,7 +122,6 @@ jobs:
               ;;
 
             create)
-              # ===== CASE: New branch =====
               if [[ "${REF_TYPE:-}" != "branch" ]]; then
                 echo "Create event is not a branch; skipping."
                 exit 0
@@ -143,7 +133,6 @@ jobs:
               ;;
 
             delete)
-              # ===== CASE: Delete branch =====
               if [[ "${REF_TYPE:-}" != "branch" ]]; then
                 echo "Delete event is not a branch; skipping."
                 exit 0
@@ -155,7 +144,6 @@ jobs:
               ;;
 
             member)
-              # ===== CASE: New collaborator =====
               if [[ "${{ github.event.action }}" != "added" ]]; then
                 echo "Member event is not 'added'; skipping."
                 exit 0
@@ -164,7 +152,6 @@ jobs:
               MEMBER_URL="${MEMBER_HTML_URL:-https://github.com/${MEMBER_LOGIN}}"
               DESC="**$REPO**: [${MEMBER_LOGIN}](${MEMBER_URL}) was granted access by [$ACTOR]($ACTOR_URL)"
               COLOR="$COLOR_WARN"
-              # Show the new collaborator's avatar if available
               if [[ -n "${MEMBER_LOGIN:-}" ]]; then
                 AVATAR_URL="https://avatars.githubusercontent.com/${MEMBER_LOGIN}"
               fi
@@ -176,7 +163,7 @@ jobs:
               ;;
           esac
 
-          # Build the embed JSON and send
+          # Build the embed JSON and send (jq interpolation)
           jq -n \
             --arg title "$TITLE" \
             --arg desc "$DESC" \
@@ -201,17 +188,17 @@ jobs:
                 timestamp: $ts,
                 color: $color,
                 thumbnail: { url: $avatar },
-                footer: { text: "GitHub → Discord · " + $repo },
+                footer: { text: "GitHub -> Discord · \($repo)" },
                 fields: [
-                  { "name": "Repository", "value": "[" + $repo + "](" + $url + ")", "inline": true },
-                  { "name": "Actor", "value": "[" + $actor + "](" + $actor_url + ")", "inline": true },
+                  { "name": "Repository", "value": "[\($repo)](\($url))", "inline": true },
+                  { "name": "Actor", "value": "[\($actor)](\($actor_url))", "inline": true },
                   { "name": "Ref", "value": ($ref // "—") },
-                  if $short_sha != "" then
-                    { "name": "Commit", "value": "[" + $short_sha + "](" + $commit_url + ")", "inline": true }
-                  else empty end,
-                  if $pr_num != "" then
-                    { "name": "PR", "value": "#" + $pr_num + ": " + $pr_title + "\n" + $pr_url }
-                  else empty end
+                  (if $short_sha != "" then
+                    { "name": "Commit", "value": "[\($short_sha)](\($commit_url))", "inline": true }
+                  else empty end),
+                  (if $pr_num != "" then
+                    { "name": "PR", "value": "#\($pr_num): \($pr_title)\n\($pr_url)" }
+                  else empty end)
                 ]
               }]
             }' \
