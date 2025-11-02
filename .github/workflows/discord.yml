@@ -1,0 +1,56 @@
+name: Discord notifications
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compose & send message to Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+          REF: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+          SERVER_URL: ${{ github.server_url }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          set -euo pipefail
+
+          if [ "$EVENT_NAME" = "push" ]; then
+            MSG="**$REPO**: $ACTOR pushed to \`$REF\` — [${SHA:0:7}]($SERVER_URL/$REPO/commit/$SHA)"
+          elif [ "$EVENT_NAME" = "pull_request" ]; then
+            MSG="**$REPO**: PR #$PR_NUM *$PR_TITLE* by $ACTOR — [view PR]($PR_URL)"
+          else
+            MSG="**$REPO**: Event \`$EVENT_NAME\` triggered by $ACTOR"
+          fi
+
+          jq -n \
+            --arg title "GitHub Notification" \
+            --arg desc "$MSG" \
+            --arg repo "$REPO" \
+            --arg actor "$ACTOR" \
+            --arg ref "$REF" \
+            --arg url "$SERVER_URL/$REPO" \
+            --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            '{
+              embeds: [{
+                title: $title,
+                description: $desc,
+                url: $url,
+                timestamp: $ts,
+                fields: [
+                  { "name": "Repository", "value": $repo, "inline": true },
+                  { "name": "Actor", "value": $actor, "inline": true },
+                  { "name": "Ref", "value": $ref }
+                ]
+              }]
+            }' \
+          | curl -fsS -H "Content-Type: application/json" -d @- "$DISCORD_WEBHOOK"
