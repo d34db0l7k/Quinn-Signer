@@ -50,11 +50,10 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_URL: ${{ github.event.pull_request.html_url }}
           PR_MERGED: ${{ github.event.pull_request.merged }}
-          PR_BASE: ${{ github.event.pull_request.base.ref }}
 
           # Create/Delete
           REF_TYPE: ${{ github.event.ref_type }}   # 'branch' or 'tag'
-          REF_NAME: ${{ github.event.ref }}        # e.g. refs/heads/feature-x
+          REF_NAME: ${{ github.event.ref }}        # usually just the branch/tag name
 
           # Member (new collaborator)
           MEMBER_LOGIN: ${{ github.event.member.login }}
@@ -64,6 +63,11 @@ jobs:
           INPUT_MSG: ${{ github.event.inputs.test_message }}
         run: |
           set -euo pipefail
+
+          # Bail early if secret is missing
+          if [[ -z "${DISCORD_WEBHOOK:-}" ]]; then
+            echo "DISCORD_WEBHOOK secret is not set"; exit 1
+          fi
 
           # ---- Color palette (Discord expects decimal ints) ----
           COLOR_INFO=3447003      # blue
@@ -78,11 +82,16 @@ jobs:
           ACTOR_URL="$SERVER_URL/$ACTOR"
           AVATAR_URL="https://avatars.githubusercontent.com/${ACTOR}"
 
-          # Branch name helper
+          # Branch name helpers
           BRANCH="${REF:-}"
           if [[ -z "$BRANCH" && "${FULL_REF:-}" == refs/heads/* ]]; then
             BRANCH="${FULL_REF#refs/heads/}"
           fi
+
+          # Create/Delete payloads usually give plain names (no refs/heads/)
+          CLEAN_REF_NAME="${REF_NAME:-}"
+          CLEAN_REF_NAME="${CLEAN_REF_NAME#refs/heads/}"
+          CLEAN_REF_NAME="${CLEAN_REF_NAME#refs/tags/}"
 
           TITLE=""
           DESC=""
@@ -98,25 +107,23 @@ jobs:
 
             push)
               # ===== CASE: Pushing to main =====
-              # (this job only runs for main because of on.push.branches)
               TITLE="Push to main"
               DESC="**$REPO**: [$SHORT_SHA]($REPO_URL/commit/$SHA) pushed to **main** by [$ACTOR]($ACTOR_URL)"
               COLOR="$COLOR_SUCCESS"
               ;;
 
             pull_request)
-              # ===== CASE: Pulling into main =====
-              # We only care about PRs *targeting* main (enforced by on.pull_request.branches).
+              # ===== CASE: Pull request targeting main =====
+              # Ignore closed-but-not-merged
+              if [[ "${{ github.event.action }}" == "closed" && "${PR_MERGED:-false}" != "true" ]]; then
+                echo "PR closed without merge; skipping notification."
+                exit 0
+              fi
+
               if [[ "${PR_MERGED:-false}" == "true" ]]; then
                 TITLE="Pull request merged into main"
                 COLOR="$COLOR_SUCCESS"
               else
-                # opened / reopened / synchronize; ignore closed-unmerged
-                if [[ "${{ github.event.action }}" == "closed" ]]; then
-                  # Skip closed-but-not-merged
-                  echo "PR closed without merge; skipping notification."
-                  exit 0
-                fi
                 TITLE="Pull request to main"
                 COLOR="$COLOR_INFO"
               fi
@@ -129,9 +136,7 @@ jobs:
                 echo "Create event is not a branch; skipping."
                 exit 0
               fi
-              RAW="${REF_NAME:-}"
-              RAW="${RAW#refs/heads/}"
-              BRANCH="${RAW:-$BRANCH}"
+              BRANCH="${CLEAN_REF_NAME:-$BRANCH}"
               TITLE="New branch"
               DESC="**$REPO**: Branch \`$BRANCH\` created by [$ACTOR]($ACTOR_URL)"
               COLOR="$COLOR_INFO"
@@ -143,9 +148,7 @@ jobs:
                 echo "Delete event is not a branch; skipping."
                 exit 0
               fi
-              RAW="${REF_NAME:-}"
-              RAW="${RAW#refs/heads/}"
-              BRANCH="${RAW:-$BRANCH}"
+              BRANCH="${CLEAN_REF_NAME:-$BRANCH}"
               TITLE="Branch deleted"
               DESC="**$REPO**: Branch \`$BRANCH\` deleted by [$ACTOR]($ACTOR_URL)"
               COLOR="$COLOR_ERROR"
@@ -158,11 +161,10 @@ jobs:
                 exit 0
               fi
               TITLE="New collaborator added"
-              # Fallback link if html_url missing
               MEMBER_URL="${MEMBER_HTML_URL:-https://github.com/${MEMBER_LOGIN}}"
               DESC="**$REPO**: [${MEMBER_LOGIN}](${MEMBER_URL}) was granted access by [$ACTOR]($ACTOR_URL)"
               COLOR="$COLOR_WARN"
-              # Use new collaborator avatar if available
+              # Show the new collaborator's avatar if available
               if [[ -n "${MEMBER_LOGIN:-}" ]]; then
                 AVATAR_URL="https://avatars.githubusercontent.com/${MEMBER_LOGIN}"
               fi
@@ -190,7 +192,6 @@ jobs:
             --arg pr_url "${PR_URL:-}" \
             --arg pr_num "${PR_NUM:-}" \
             --arg pr_title "${PR_TITLE:-}" \
-            --arg pr_base "${PR_BASE:-}" \
             --argjson color "$COLOR" \
             '{
               embeds: [{
