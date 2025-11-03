@@ -140,6 +140,11 @@ public class MenuLogic : MonoBehaviour
         if (manageTimeScale) Time.timeScale = 1f;
         SceneManager.LoadScene("InfiniteRunner");
     }
+    public void Shop()
+    {
+        if (manageTimeScale) Time.timeScale = 1f;
+        SceneManager.LoadScene("Shop");
+    }
 
     public void QuitGame()
     {
