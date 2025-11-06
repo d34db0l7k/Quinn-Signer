@@ -45,8 +45,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f520b72c1d102ce4db906046676740d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  yRotationSpeed: 0.75
-  xRotationSpeed: 0.2
+  xRot: 0
+  yRot: -0.5
+  zRot: 0.2
 --- !u!1001 &7271548185429942978
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -194,4 +195,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb6fbc3dad3606f4ea15b4df43e49793, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  coinClip: {fileID: 8300000, guid: 902880290505f704fa18ee696e72a475, type: 3}
+  crystalClip: {fileID: 8300000, guid: 902880290505f704fa18ee696e72a475, type: 3}

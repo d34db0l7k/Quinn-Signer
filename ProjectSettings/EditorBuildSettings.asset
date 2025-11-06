@@ -6,22 +6,22 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/MainMenu.unity
+    path: Assets/Scenes/TitleScene.unity
     guid: bb61d2ebfdce8413b90cfddb6f2043ee
   - enabled: 1
-    path: Assets/Scenes/FlyingScene/MainSceneMobile.unity
+    path: Assets/Scenes/Archived Scenes/FlyingScene/MainSceneMobile.unity
     guid: f3c9f6986ca1e474b93cf308b62f7258
   - enabled: 1
-    path: Assets/Scenes/InfiniteRunner.unity
+    path: Assets/Scenes/GlyphwayScene.unity
     guid: a51071cd5b8d8894b979ce13a00e4f9a
   - enabled: 1
-    path: Assets/Scenes/Shop.unity
+    path: Assets/Scenes/ShopScene.unity
     guid: 0467c73adc9943b40b020f5947a69231
   - enabled: 1
     path: Assets/Scenes/WinScene.unity
     guid: 881179ec7e4a941809df7351e35863b7
   - enabled: 1
-    path: Assets/Scenes/GameOver.unity
+    path: Assets/Scenes/GameOverScene.unity
     guid: 641751a123cc843d7ad9c028731692fc
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
