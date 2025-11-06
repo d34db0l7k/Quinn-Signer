@@ -3,45 +3,47 @@ using UnityEngine.UI;
 
 public class MasterInfo : MonoBehaviour
 {
-    public static int coinCount = 0;
-    public static int score = 0;
+    public static int CrystalCount = 0;
+    private static int _distanceScore;
 
-    [SerializeField] Text coinDisplay;
-    [SerializeField] Text scoreDisplay;
-    [SerializeField] Transform player;          // assign your Player here
-    [SerializeField] float pointsPerMeter = 1f; // how many points per unit
+    [SerializeField]
+        private Text crystalDisplay;
+    [SerializeField]
+        private Text scoreDisplay;
+    [SerializeField]
+        private Transform player;
+    [SerializeField]
+        private float pointsPerMeter = 1f;
 
-    float startZ;
+    private float _startZ;
 
-    void Start()
+    private void Start()
     {
-        if (player != null)
-            startZ = player.position.z; // assumes forward is +Z
+        if (player)
+            _startZ = player.position.z; // assumes forward is +Z
 
         UpdateUI();
     }
 
-    void Update()
+    private void Update()
     {
-        if (player == null) return;
+        if (!player) return;
 
         // calculate distance since start
-        float distance = Mathf.Max(0f, player.position.z - startZ);
-        int newScore = Mathf.FloorToInt(distance * pointsPerMeter);
+        var distance = Mathf.Max(0f, player.position.z - _startZ);
+        var newScore = Mathf.FloorToInt(distance * pointsPerMeter);
 
-        if (newScore != score)
-        {
-            score = newScore;
-            UpdateUI();
-        }
+        if (newScore == _distanceScore) return;
+        _distanceScore = newScore;
+        UpdateUI();
     }
 
-    void UpdateUI()
+    private void UpdateUI()
     {
-        if (coinDisplay)
-            coinDisplay.text = "CRYSTALS: " + coinCount;
+        if (crystalDisplay)
+            crystalDisplay.text = "CRYSTALS: " + CrystalCount;
 
         if (scoreDisplay)
-            scoreDisplay.text = "DISTANCE: " + score;
+            scoreDisplay.text = "DISTANCE: " + _distanceScore;
     }
 }
