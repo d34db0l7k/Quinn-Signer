@@ -129,24 +129,26 @@ namespace Features.UI.Menus
             if (manageTimeScale) Time.timeScale = 1f;
             SceneManager.LoadScene("TitleScene");
         }
-
         public void StartGame()
         {
             if (manageTimeScale) Time.timeScale = 1f;
             SceneManager.LoadScene("MainSceneMobile");
         }
-
         public void StartGlyphway()
         {
             if (manageTimeScale) Time.timeScale = 1f;
             SceneManager.LoadScene("GlyphwayScene");
+        }
+        public void StartTraining()
+        {
+            if (manageTimeScale) Time.timeScale = 1f;
+            SceneManager.LoadScene("TrainingScene");
         }
         public void EnterShop()
         {
             if (manageTimeScale) Time.timeScale = 1f;
             SceneManager.LoadScene("ShopScene");
         }
-
         public void QuitGame()
         {
             #if UNITY_EDITOR

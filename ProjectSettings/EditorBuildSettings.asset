@@ -9,8 +9,8 @@ EditorBuildSettings:
     path: Assets/Scenes/TitleScene.unity
     guid: bb61d2ebfdce8413b90cfddb6f2043ee
   - enabled: 1
-    path: Assets/Scenes/Archived Scenes/FlyingScene/MainSceneMobile.unity
-    guid: f3c9f6986ca1e474b93cf308b62f7258
+    path: Assets/Scenes/TrainingScene.unity
+    guid: d0a340a2876c945408b24e73c80dc621
   - enabled: 1
     path: Assets/Scenes/GlyphwayScene.unity
     guid: a51071cd5b8d8894b979ce13a00e4f9a

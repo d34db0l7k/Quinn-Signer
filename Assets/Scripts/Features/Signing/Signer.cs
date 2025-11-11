@@ -15,14 +15,14 @@ namespace Features.Signing
         [Header("SLRTK Overhead")]
         public SimpleExecutionEngine engine;
 
-        [Space]
-
         [Header("Plug in")]
         public WordBank wordBank;
         public Text scoreText;
         public Text inferenceText;
         public Image background;
-
+        
+        [SerializeField] private SessionSelection sessionSelection;
+        
         [Header("Win vars")]
         [SerializeField] private string winSceneName = "WinScene";
         [SerializeField] private float winDelaySeconds = 2;

@@ -331,7 +331,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2656783728877674504}
+      - m_Target: {fileID: 4004433513224824588}
         m_TargetAssemblyTypeName: UnityEngine.CanvasGroup, UnityEngine
         m_MethodName: set_alpha
         m_Mode: 4
@@ -343,7 +343,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2656783728877674504}
+      - m_Target: {fileID: 4004433513224824588}
         m_TargetAssemblyTypeName: UnityEngine.CanvasGroup, UnityEngine
         m_MethodName: set_blocksRaycasts
         m_Mode: 6
@@ -355,9 +355,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2656783728877674504}
+      - m_Target: {fileID: 4004433513224824588}
         m_TargetAssemblyTypeName: UnityEngine.CanvasGroup, UnityEngine
-        m_MethodName: set_interactable
+        m_MethodName: set_enabled
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -366,6 +366,45 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 7858251980731011070, guid: 158c302ac3e0e403799fc56c92cede54,
+          type: 3}
+        m_TargetAssemblyTypeName: UnityEngine.CanvasGroup, UnityEngine
+        m_MethodName: set_alpha
+        m_Mode: 4
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 1
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 7858251980731011070, guid: 158c302ac3e0e403799fc56c92cede54,
+          type: 3}
+        m_TargetAssemblyTypeName: UnityEngine.CanvasGroup, UnityEngine
+        m_MethodName: set_blocksRaycasts
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 7858251980731011070, guid: 158c302ac3e0e403799fc56c92cede54,
+          type: 3}
+        m_TargetAssemblyTypeName: UnityEngine.CanvasGroup, UnityEngine
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
         m_CallState: 2
 --- !u!1 &2217131655059610429
 GameObject:
@@ -521,6 +560,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1359918916954645618}
+  - component: {fileID: 4004433513224824588}
+  - component: {fileID: 257751799965134256}
   m_Layer: 0
   m_Name: InstructionsOverlay
   m_TagString: Untagged
@@ -544,6 +585,37 @@ Transform:
   - {fileID: 2983065630149657288}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!225 &4004433513224824588
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3698099592530344622}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &257751799965134256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3698099592530344622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89429f62b871548b0bff803ed15e66c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Features.UI.Menus.MenuController
+  target: {fileID: 0}
+  autoHideOnStart: 1
+  listenForPauseInputs: 1
+  manageTimeScale: 1
+  enableDoubleTapToPause: 0
+  doubleTapMaxDelay: 0.2
+  doubleTapMaxMove: 0
 --- !u!1 &3701700400665955378
 GameObject:
   m_ObjectHideFlags: 0
@@ -860,8 +932,6 @@ GameObject:
   - component: {fileID: 7926293757968752084}
   - component: {fileID: 8336110130269940288}
   - component: {fileID: 2340729102954346577}
-  - component: {fileID: 2656783728877674504}
-  - component: {fileID: 6614383153148229878}
   m_Layer: 5
   m_Name: InstructionsMenu Canvas
   m_TagString: Untagged
@@ -955,37 +1025,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!225 &2656783728877674504
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7014013555618546276}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
---- !u!114 &6614383153148229878
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7014013555618546276}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89429f62b871548b0bff803ed15e66c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  autoHideOnStart: 1
-  listenForPauseInputs: 1
-  manageTimeScale: 1
-  enableDoubleTapToPause: 0
-  doubleTapMaxDelay: 0.2
-  doubleTapMaxMove: 0
 --- !u!1 &7624641364782635151
 GameObject:
   m_ObjectHideFlags: 0

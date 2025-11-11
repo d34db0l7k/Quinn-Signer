@@ -1,3 +1,4 @@
+using Features.UI;
 using UnityEngine;
 
 namespace Features.Gameplay.Collectibles
@@ -16,6 +17,7 @@ namespace Features.Gameplay.Collectibles
                 AudioSource.PlayClipAtPoint(crystalClip, transform.position);
         
             MasterInfo.CrystalCount += 1;
+            CrystalWallet.Add(1);
             gameObject.SetActive(false); // maybe use Destroy(game object)?
         }
     }

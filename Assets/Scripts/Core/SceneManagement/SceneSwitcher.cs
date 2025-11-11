@@ -1,4 +1,5 @@
 using System.Collections;
+using Features.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -27,9 +28,10 @@ namespace Core.SceneManagement
             StartCoroutine(LoadSceneAfterDelay(buildIdx, delay));
         }
 
-        private IEnumerator LoadSceneAfterDelay(int buildIdx, float delay)
+        private static IEnumerator LoadSceneAfterDelay(int buildIdx, float delay)
         {
             yield return new WaitForSeconds(delay);
+            CrystalWallet.Save(MasterInfo.CrystalCount);
             SceneManager.LoadScene(buildIdx);
         }
     }
