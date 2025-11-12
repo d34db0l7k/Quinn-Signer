@@ -832,6 +832,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1317040787541626911, guid: 158c302ac3e0e403799fc56c92cede54,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5617491764957603618, guid: 158c302ac3e0e403799fc56c92cede54,
         type: 3}
       propertyPath: m_Name
@@ -950,8 +955,46 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7829690011244495248, guid: 158c302ac3e0e403799fc56c92cede54,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1378522186}
   m_SourcePrefab: {fileID: 100100000, guid: 158c302ac3e0e403799fc56c92cede54, type: 3}
+--- !u!114 &1378522184 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8041234062717966428, guid: 158c302ac3e0e403799fc56c92cede54,
+    type: 3}
+  m_PrefabInstance: {fileID: 1378522183}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
+--- !u!1 &1378522185 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7829690011244495248, guid: 158c302ac3e0e403799fc56c92cede54,
+    type: 3}
+  m_PrefabInstance: {fileID: 1378522183}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1378522186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1378522185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcfc9a37ca54da947b387f9042e64fe9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MasterInfo
+  crystalDisplay: {fileID: 1378522184}
+  scoreDisplay: {fileID: 0}
+  player: {fileID: 0}
+  pointsPerMeter: 1
 --- !u!225 &1400142742 stripped
 CanvasGroup:
   m_CorrespondingSourceObject: {fileID: 4004433513224824588, guid: f85e974473b834115baa20e79664d1d2,
