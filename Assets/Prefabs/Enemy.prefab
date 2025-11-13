@@ -42,7 +42,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: acb257d9d220d48cab78f512172dbd85, type: 3}
+  m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: acb257d9d220d48cab78f512172dbd85, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
@@ -207,7 +207,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Word to Sign
+  m_Text: Word
 --- !u!1 &5139449080139762985
 GameObject:
   m_ObjectHideFlags: 0
@@ -419,7 +419,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   label: {fileID: 3049525801725219112}
   targetWord: 
-  defaultText: Word to Sign
+  defaultText: Word
 --- !u!1001 &8941823153892655479
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -519,10 +519,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1224872743800089805}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}

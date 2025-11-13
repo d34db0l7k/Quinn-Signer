@@ -9,7 +9,6 @@ namespace Core.SceneManagement
     {
         public WordBank wordBank;
         public SimpleExecutionEngine engine;
-        public Text scoreText;
         public Text inferenceText;
         public Image background;
     }

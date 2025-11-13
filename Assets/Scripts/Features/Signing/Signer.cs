@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Common;
 using Core.SceneManagement;
 using Engine;
 using Features.Gameplay.Entities.Enemy;
+using Features.Gameplay.Entities.Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -17,147 +19,138 @@ namespace Features.Signing
 
         [Header("Plug in")]
         public WordBank wordBank;
-        public Text scoreText;
         public Text inferenceText;
         public Image background;
-        
+
         [SerializeField] private SessionSelection sessionSelection;
-        
-        [Header("Win vars")]
+
+        [Header("Win")]
         [SerializeField] private string winSceneName = "WinScene";
-        [SerializeField] private float winDelaySeconds = 2;
+        [SerializeField] private float winDelaySeconds = 2f;
+        
+        [Header("Player Data")]
+        [SerializeField] private PlayerHealth playerHealth;
 
-        // Local vars
-        private int _score = 0;
-        // variable for filters and callbacks to execute only once
-        private bool _hasExecuted;
+        // internals
+        private bool _hasExecuted = false;
         private SceneBindings _bindings;
-        private List<string> _filterWords = new List<string>();
-
+        private readonly List<string> _filterWords = new();
         private bool _signingActive = false;
 
         private void Awake()
         {
             if (background) background.color = Color.black;
-            if (engine) engine.Toggle();
+            if (engine) engine.Toggle(); // hide preview if engine shows on Start
         }
 
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
         private void Start()
         {
-            // set score to be "score: " initially on start up
-            UpdateScoreText();
-            // set up text fields of enemies
             StartCoroutine(AssignEnemyLabelsWhenReady());
             StartCoroutine(ForceEngineIdleAtLaunch());
         }
 
-        // Update is called once per frame
         private void Update()
         {
             if (!_hasExecuted && engine)
             {
-                // where initialization goes
                 engine.recognizer.AddCallback("check", OnSignRecognized);
                 engine.recognizer.outputFilters.Clear();
-
                 _hasExecuted = true;
             }
-            UserSigning();
+
+            if (Input.GetKeyDown(KeyCode.Alpha1)) SimulateCorrectSign();
+            if (Input.GetKeyDown(KeyCode.Alpha2)) SimulateIncorrectSign();
+            
+            UserSigning(); // desktop (Enter/Return); mobile calls are public below
         }
 
-        private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
+        private void OnEnable()  => SceneManager.sceneLoaded += OnSceneLoaded;
         private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
+
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             _bindings = FindFirstObjectByType<SceneBindings>(FindObjectsInactive.Include);
 
             if (!_bindings)
             {
-                // Not every scene will have bindings (e.g., defeat screen). That's OK.
-                Debug.Log($"[Signer] No SceneBindings found in scene '{scene.name}' (mode={mode}). Skipping rebind.");
-                _hasExecuted = false;        // so we re-init next time there *is* a scene with bindings
+                // Win/defeat/etc. scenes may not have bindings—just reset for next scene with bindings
+                _hasExecuted = false;
                 _filterWords.Clear();
                 return;
             }
 
-            wordBank = _bindings.wordBank;
-            engine = _bindings.engine;
-            scoreText = _bindings.scoreText;
+            // Rebind scene references
+            wordBank      = _bindings.wordBank;
+            engine        = _bindings.engine;
             inferenceText = _bindings.inferenceText;
-            background = _bindings.background;
+            background    = _bindings.background;
 
             _hasExecuted = false;
 
-            if (wordBank) wordBank.ResetWorkingWords(); // FRESH POOL OF WORDS FOR EACH SCENE
-
-            // UI/engine initial state
             if (background) background.color = Color.black;
             if (engine && !engine.enabled) engine.enabled = false;
 
-            InitializeHUDAndWord();
             StartCoroutine(AssignEnemyLabelsWhenReady());
-            // StartCoroutine(ForceEngineIdleAtLaunch());
         }
-        private void InitializeHUDAndWord()
-        {
-            UpdateScoreText();
-        }
+
         private IEnumerator AssignEnemyLabelsWhenReady()
         {
-            // Wait a couple frames to let spawners finish
-            yield return null;
+            // let spawners place enemies first
             yield return null;
 
-            // Grab whatever is in-scene right now
             var enemyLabels = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
+            if (enemyLabels == null || enemyLabels.Length == 0) yield break;
 
-            if (enemyLabels == null || enemyLabels.Length == 0)
+            // Prefer preflight-picked words; fallback to WordBank
+            List<string> chosen;
+            if (sessionSelection && sessionSelection.HasWords)
             {
-                yield break;
+                chosen = new List<string>(sessionSelection.Words)
+                    .Take(enemyLabels.Length)
+                    .Select(w => (w ?? "").Trim().ToLowerInvariant())
+                    .ToList();
+            }
+            else if (wordBank)
+            {
+                chosen = wordBank.GetRandomWords(enemyLabels.Length, unique: true);
+            }
+            else
+            {
+                chosen = new List<string>();
             }
 
-            // Pull a set of unique words (or allow repeats if you prefer)
-            _filterWords = wordBank.GetRandomWords(enemyLabels.Length, unique: true);
-            engine.recognizer.outputFilters.Add(new FocusSublistFilter<string>(_filterWords));
-            for (var i = 0; i < enemyLabels.Length && i < _filterWords.Count; i++)
-            {
-                SafeSetEnemyWord(enemyLabels[i], _filterWords[i]);
-            }
+            _filterWords.Clear();
+            _filterWords.AddRange(chosen);
 
             if (engine)
             {
                 engine.recognizer.outputFilters.Clear();
-                engine.recognizer.outputFilters.Add(new FocusSublistFilter<string>(_filterWords));
+                if (_filterWords.Count > 0)
+                    engine.recognizer.outputFilters.Add(new FocusSublistFilter<string>(_filterWords));
             }
+
+            // Set visible words above enemies
+            for (int i = 0; i < enemyLabels.Length && i < _filterWords.Count; i++)
+                SafeSetEnemyWord(enemyLabels[i], _filterWords[i]);
         }
+
         private static void SafeSetEnemyWord(EnemyLabel label, string word)
         {
-            if (!label) return;
-            if (!label.label) return;
-            
+            if (!label || !label.label) return;
             label.SetWord(word);
         }
+
         private IEnumerator ForceEngineIdleAtLaunch()
         {
-            yield return null;                 // let SimpleExecutionEngine.Start() run
+            yield return null; // let SimpleExecutionEngine.Start() run once
             if (!engine) yield break;
 
-            engine.Toggle();                   // hide preview (engine showed it in Start)
+            engine.Toggle();                   // ensure hidden
             _signingActive = false;
             if (background) background.color = Color.black;
+        }
 
-        }
-        // Functions to handle scoring behavior
-        public void AddScore(int points)
-        {
-            _score += points;
-            UpdateScoreText();
-        }
-        private void UpdateScoreText()
-        {
-            scoreText.text = "Score: " + _score;
-        }
+        // --- Desktop key handling (for testing) ---
         private void UserSigning()
         {
             if (Input.GetKeyDown(KeyCode.Return))
@@ -167,15 +160,15 @@ namespace Features.Signing
                     engine.enabled = true;
                     _signingActive = true;
                 }
-                background.color = Color.white;
+                if (background) background.color = Color.white;
                 engine.Toggle();
             }
 
             if (Input.GetKeyUp(KeyCode.Return))
             {
-                engine.buffer.TriggerCallbacks();
+                if (engine) engine.buffer.TriggerCallbacks();
                 engine.Toggle();
-                background.color = Color.black;
+                if (background) background.color = Color.black;
 
                 if (engine && _signingActive)
                 {
@@ -184,6 +177,55 @@ namespace Features.Signing
                 }
             }
         }
+
+        // --- Mobile button hooks (wire your UI buttons or HoldToSignButtonRelay here) ---
+        public void BeginMobileSign()
+        {
+            if (engine && !_signingActive)
+            {
+                engine.enabled = true;
+                _signingActive = true;
+            }
+            if (background) background.color = Color.white;
+            if (engine) engine.Toggle();
+        }
+
+        public void EndMobileSign()
+        {
+            if (engine) engine.buffer.TriggerCallbacks();
+            if (engine) engine.Toggle();
+            if (background) background.color = Color.black;
+
+            if (engine && _signingActive)
+            {
+                _signingActive = false;
+                engine.enabled = false;
+            }
+        }
+
+        // --- DEV HELPERS --- \\
+        void SimulateCorrectSign()
+        {
+            // Grab any active enemy word
+            var labels = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
+            foreach (var l in labels)
+            {
+                if (!string.IsNullOrEmpty(l.targetWord))
+                {
+                    OnSignRecognized(l.targetWord);
+                    return;
+                }
+            }
+            // fallback if none present
+            OnSignRecognized("dev_correct_missing");
+        }
+
+        void SimulateIncorrectSign()
+        {
+            // Choose a token that won't match anything
+            OnSignRecognized("__dev_wrong__");
+        }
+        
         private void OnSignRecognized(string rawInput)
         {
             var signed = (rawInput ?? "").Trim().ToLowerInvariant();
@@ -193,7 +235,7 @@ namespace Features.Signing
                 return;
             }
 
-            // find a matching enemy label by word (case-insensitive)
+            // find a matching enemy label by word
             var labels = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
             EnemyLabel match = null;
             foreach (var label in labels)
@@ -209,54 +251,25 @@ namespace Features.Signing
             if (!match)
             {
                 if (inferenceText) { inferenceText.text = signed; inferenceText.color = Color.red; }
+                if (playerHealth) playerHealth.Damage(1);
                 return;
             }
 
-            // explode that enemy + award points based on the matched word length
-            var pts = Mathf.Max(1, (match.targetWord.Length / 3) + 1);
-            AddScore(pts);
-
+            // explode that enemy
             var controller = match.GetComponentInParent<EnemyController>() ?? match.GetComponent<EnemyController>();
-            if (controller) controller.Explode();
-            else Destroy(match.gameObject);
+            if (controller) controller.Explode(); else Destroy(match.gameObject);
 
             if (inferenceText) { inferenceText.text = signed; inferenceText.color = Color.green; }
 
-            // remove signed word
             RemoveWordFromList(signed);
             StartCoroutine(CheckForWinNextFrame());
         }
-        /*for mobile signing button usage*/
-        public void BeginMobileSign()
-        {
-            if (engine != null && !_signingActive)
-            {
-                engine.enabled = true;
-                _signingActive = true;
-            }
 
-            background.color = Color.white;
-            engine.Toggle();
-        }
-        public void EndMobileSign()
-        {
-            engine.buffer.TriggerCallbacks();
-            engine.Toggle();
-            background.color = Color.black;
-
-            if (engine != null && _signingActive)
-            {
-                _signingActive = false;
-                engine.enabled = false;
-            }
-        }
-        
         private void RemoveWordFromList(string word)
         {
             if (string.IsNullOrEmpty(word)) return;
             var key = word.Trim().ToLowerInvariant();
 
-            // Remove one instance of the word from filterWords (they were unique anyway)
             for (int i = 0; i < _filterWords.Count; i++)
             {
                 if (_filterWords[i] == key)
@@ -266,7 +279,6 @@ namespace Features.Signing
                 }
             }
 
-            // Rebuild recognizer filter with the remaining words
             if (engine)
             {
                 engine.recognizer.outputFilters.Clear();
@@ -277,36 +289,30 @@ namespace Features.Signing
 
         private IEnumerator CheckForWinNextFrame()
         {
-            // wait one frame so destroyed enemies are actually gone
-            yield return null;
+            yield return null; // wait for destroys to complete
 
-            // If nothing left to check (filterWords empty OR wordBank out) AND no EnemyLabels remain → win
-            bool noWordsLeft = (_filterWords == null || _filterWords.Count == 0) || (wordBank && wordBank.GetWordList().Count == 0);
-
+            bool noWordsLeft = _filterWords == null || _filterWords.Count == 0;
             var enemyLabels = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
             bool noEnemiesLeft = enemyLabels == null || enemyLabels.Length == 0;
 
-            if (noWordsLeft && noEnemiesLeft)
-                TriggerWin();
+            if (noWordsLeft && noEnemiesLeft) TriggerWin();
         }
 
         private void TriggerWin()
         {
             if (engine) engine.enabled = false;
             if (background) background.color = Color.black;
-
             StartCoroutine(LoadWinAfterDelay());
         }
 
         private IEnumerator LoadWinAfterDelay()
         {
             yield return new WaitForSeconds(winDelaySeconds);
-
             if (!string.IsNullOrEmpty(winSceneName))
                 SceneManager.LoadScene(winSceneName, LoadSceneMode.Single);
         }
 
-        // dev kill key helper
+        // external helper for other scripts to notify a kill
         public void HandleEnemyKilled(EnemyLabel label)
         {
             if (label && !string.IsNullOrEmpty(label.targetWord))

@@ -49,7 +49,6 @@ namespace DevTools
             if (addScore && signer && !string.IsNullOrEmpty(target.targetWord))
             {
                 int pts = Mathf.Max(1, (target.targetWord.Length / 3) + 1);
-                signer.AddScore(pts);
             }
 
             // Explode / destroy
