@@ -1,81 +1,109 @@
 namespace Features.Signing
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-    using UnityEngine.SceneManagement;
+// Features/Signing/PreflightScrollUI.cs  (UNIFIED)
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
+namespace Features.Signing
+{
     public class PreflightScrollUI : MonoBehaviour
     {
         [Header("Data")]
-        [SerializeField] private WordBank wordBank;  // ok if null (we can fall back)
-        [SerializeField] private SessionSelection sessionSelection;    // asset; preferred source
+        [SerializeField] private WordBank wordBank;
+        [SerializeField] private SessionSelection sessionSelection; // asset
         [SerializeField] private int wordsNeeded = 5;
         [SerializeField] private string videosSubfolder = "Reference Videos";
         [SerializeField] private string mainSceneName = "GlyphwayScene";
+        [Tooltip("If true, clears any leftover words in SessionSelection at play.")]
         [SerializeField] private bool forceRepickOnPlay = true;
 
         [Header("UI")]
-        [SerializeField] Transform contentParent;   // MUST be ScrollView/Viewport/Content
-        [SerializeField] VideoTile videoTilePrefab; // MUST be assigned
-
-        private List<string> _words = new();
+        [SerializeField] private Transform contentParent;   // ScrollView/Viewport/Content
+        [SerializeField] private VideoTile videoTilePrefab; // Panel-root prefab
 
         void OnValidate()
         {
-            if (!contentParent) Debug.LogWarning("[PreflightScrollUI] contentParent is not assigned (ScrollView/Viewport/Content).");
-            if (!videoTilePrefab) Debug.LogWarning("[PreflightScrollUI] videoTilePrefab is not assigned.");
+            if (!contentParent) Debug.LogWarning("[Preflight] contentParent not assigned.");
+            if (!videoTilePrefab) Debug.LogWarning("[Preflight] videoTilePrefab not assigned.");
         }
 
         void Start()
         {
-            Debug.Log($"[PreflightScrollUI] streamingAssetsPath = {Application.streamingAssetsPath}");
+            Debug.Log($"[Preflight] streamingAssetsPath = {Application.streamingAssetsPath}");
             var allVideoWords = VideoCatalog.ListAllVideoWords(videosSubfolder);
-            Debug.Log($"[PreflightScrollUI] Found {allVideoWords.Count} video files in '{videosSubfolder}'.");
-            if (forceRepickOnPlay)
-            {
-                if (sessionSelection) sessionSelection.SetWords(System.Array.Empty<string>());
-            }
-            // Preferred: session words (picked in the prior step)
+            Debug.Log($"[Preflight] Found {allVideoWords.Count} video files in '{videosSubfolder}'.");
+
+            if (forceRepickOnPlay && sessionSelection)
+                sessionSelection.SetWords(Array.Empty<string>());
+
+            List<string> words;
             if (!forceRepickOnPlay && sessionSelection && sessionSelection.HasWords)
             {
-                _words = new List<string>(sessionSelection.Words);
-                Debug.Log($"[PreflightScrollUI] Using SessionSelection words: {_words.Count}");
+                words = new List<string>(sessionSelection.Words);
+                Debug.Log($"[Preflight] Using existing SessionSelection words: {words.Count}");
             }
             else
             {
-                // Secondary: pick N words that also exist in videos (requires a bank)
-                if (wordBank)
+                words = PickWordsWithVideos_Random(wordBank, wordsNeeded, videosSubfolder, allVideoWords);
+                if (sessionSelection)
                 {
-                    _words = SessionWordPicker.PickWordsWithVideos(wordBank, wordsNeeded, videosSubfolder);
-                    Debug.Log($"[PreflightScrollUI] Picked {_words.Count} words with videos (requested {wordsNeeded}).");
-                    if (sessionSelection) sessionSelection.SetWords(_words);
+                    sessionSelection.SetWords(words);
+                    sessionSelection.ResetRuntimeBag();
                 }
-
-                // Ultimate fallback: if still empty, just show *all* video words (so you SEE something)
-                if (_words.Count == 0 && allVideoWords.Count > 0)
-                {
-                    _words = (allVideoWords.Count > wordsNeeded)
-                        ? allVideoWords.GetRange(0, wordsNeeded)
-                        : new List<string>(allVideoWords);
-                    Debug.Log($"[PreflightScrollUI] Falling back to video filenames only: showing {_words.Count}.");
-                }
+                Debug.Log($"[Preflight] Picked {words.Count} words with videos.");
             }
 
-            if (_words.Count == 0)
+            if (words.Count == 0)
+                Debug.LogError("[Preflight] No words to show. Check video folder name, WordBank assignment, or filename matches.");
+
+            BuildList(words);
+        }
+
+        // Inlined picker (formerly SessionWordPicker)
+        static List<string> PickWordsWithVideos_Random(WordBank bank, int count, string subfolder, List<string> allVideoWords)
+        {
+            var rng = new System.Random(unchecked(
+                Environment.TickCount ^ Guid.NewGuid().GetHashCode() ^ (int)DateTime.Now.Ticks));
+
+            if (!bank)
             {
-                Debug.LogError("[PreflightScrollUI] No words to show. Likely causes:\n" +
-                               " - 'Reference Videos' folder name mismatch or empty\n" +
-                               " - SessionSelection has no words and WordBank not assigned\n" +
-                               " - Word names don’t match video filenames");
+                // Fallback to any video filenames (still random) so UI shows something
+                var fallback = new List<string>(allVideoWords);
+                Shuffle(fallback, rng);
+                return fallback.Take(Mathf.Min(count, fallback.Count)).ToList();
             }
-            BuildList(_words);
+
+            var videoSet = new HashSet<string>(VideoCatalog.IndexWordsWithVideos(subfolder));
+            var pool = bank.GetWordList()
+                           .Select(w => (w ?? "").Trim().ToLowerInvariant())
+                           .Where(w => videoSet.Contains(w))
+                           .Distinct()
+                           .ToList();
+
+            Shuffle(pool, rng);
+            if (pool.Count < count)
+                Debug.LogWarning($"[Preflight] Only {pool.Count} words have videos; requested {count}.");
+
+            return pool.Take(Mathf.Min(count, pool.Count)).ToList();
+        }
+
+        static void Shuffle<T>(IList<T> list, System.Random rng)
+        {
+            for (int i = list.Count - 1; i > 0; i--)
+            {
+                int j = rng.Next(i + 1);
+                (list[i], list[j]) = (list[j], list[i]);
+            }
         }
 
         void BuildList(List<string> list)
         {
             if (!contentParent || !videoTilePrefab)
             {
-                Debug.LogError("[PreflightScrollUI] Missing contentParent or videoTilePrefab. Cannot build UI.");
+                Debug.LogError("[Preflight] Missing contentParent or videoTilePrefab.");
                 return;
             }
 
@@ -87,19 +115,35 @@ namespace Features.Signing
                 var url = VideoCatalog.GetVideoUrlForWord(w, videosSubfolder);
                 if (string.IsNullOrEmpty(url))
                 {
-                    Debug.LogWarning($"[PreflightScrollUI] No URL for '{w}' (check filename). Skipping.");
+                    Debug.LogWarning($"[Preflight] No URL for '{w}' (filename mismatch?).");
                     continue;
                 }
 
-                var tile = Instantiate(videoTilePrefab, contentParent);
+                var tile = Instantiate(videoTilePrefab, contentParent, false);
+                // normalize rect (protect against zero scale)
+                var rt = tile.GetComponent<RectTransform>();
+                if (rt)
+                {
+                    rt.localScale = Vector3.one;
+                    rt.anchorMin = new Vector2(0f, 1f);
+                    rt.anchorMax = new Vector2(1f, 1f);
+                    rt.pivot     = new Vector2(0.5f, 1f);
+                    rt.offsetMin = new Vector2(0f, rt.offsetMin.y);
+                    rt.offsetMax = new Vector2(0f, rt.offsetMax.y);
+                }
+
                 tile.Setup(w, url, autoplay: false);
-                Debug.Log($"[PreflightScrollUI] Spawned tile: {w} → {url}");
                 made++;
             }
 
-            Debug.Log($"[PreflightScrollUI] Built {made} tiles under Content.");
+            var contentRT = contentParent as RectTransform;
+            if (contentRT) UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(contentRT);
+
+            Debug.Log($"[Preflight] Built {made} tiles.");
         }
 
         public void ContinueToMain() => SceneManager.LoadScene(mainSceneName);
     }
+}
+
 }
