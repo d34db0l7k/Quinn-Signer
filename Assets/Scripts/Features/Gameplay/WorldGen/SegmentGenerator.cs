@@ -11,6 +11,8 @@ namespace Features.Gameplay.WorldGen
         [Header("Segment Prefabs")]
         public GameObject[] segmentPrefabs;
 
+        [Tooltip("Segment prefab with no obstacles, used for the first few seconds")]
+        public GameObject safeIntroPrefab;
         [Header("Layout")]
         [Tooltip("Exact world length of each segment along +Z.")]
         public float segmentLength = 50f;
@@ -18,12 +20,16 @@ namespace Features.Gameplay.WorldGen
         [Tooltip("How many segments should always be ahead of the player.")]
         public int segmentsAhead = 6;
 
-        [Header("Player / Cleanup")]
+        [Header("Intro")]
+        [Tooltip("Duration of safe/no-obstacle runway at the start")]
+        public float safeIntroSeconds = 4f;
+        
+        [Header("Runtime Control")]
+        [Tooltip("When true, only safe (no obstacles) segments will be spawned.")]
+        public bool forceSafeSegments = false;
+        
         public Transform player;
-        [Tooltip("Delete a segment after player is this far past the segment END.")]
         public float deleteBuffer = 100f;
-
-        [Header("Hierarchy (optional)")]
         [Tooltip("Parent object that holds all spawned segments. If empty, this.transform will be used.")]
         public Transform segmentsParent;
 
@@ -31,7 +37,8 @@ namespace Features.Gameplay.WorldGen
         private readonly Queue<GameObject> _activeSegments = new Queue<GameObject>();
         private float _nextSpawnZ = 0f;
         private bool _initialized = false;
-
+        
+        private int _introSegmentsRemaining = 0;
         private void OnEnable()
         {
             SceneManager.sceneLoaded += OnSceneLoaded;
@@ -48,13 +55,14 @@ namespace Features.Gameplay.WorldGen
 
         private void Update()
         {
-            if (!player || segmentPrefabs == null || segmentPrefabs.Length == 0)
+            if (!player)
             {
                 // Try to recover player mid-play if it was recreated
-                if (!player) AutoFindPlayer();
+                AutoFindPlayer();
                 if (!player) return; // still nothing; skip this frame
             }
             EnsureSegmentsAhead();
+            
             // Cleanup: remove segments far behind
             while (_activeSegments.Count > 0)
             {
@@ -110,9 +118,28 @@ namespace Features.Gameplay.WorldGen
                 var playerZ = player ? player.position.z : 0f;
                 _nextSpawnZ = Mathf.Floor(playerZ / segmentLength + 1f) * segmentLength;
             }
-
+            
+            _introSegmentsRemaining = ComputeIntroSegments();
+            
             EnsureSegmentsAhead();   // prewarm
             _initialized = true;
+        }
+
+        private int ComputeIntroSegments()
+        {
+            if (safeIntroSeconds <= 0f) return 0;
+
+            var speed = 0f;
+            if (player)
+            {
+                var mover = player.GetComponent<Features.Gameplay.Entities.Player.InfinitePlayerMovement>();
+                if (mover) speed = Mathf.Max(0f, mover.forwardSpeed); // public in your mover
+            }
+            // Fallback if no player/mover found
+            if (speed <= 0f) speed = segmentLength; // ~1 segment/sec as a safe default
+
+            var meters = speed * safeIntroSeconds;
+            return Mathf.Max(0, Mathf.CeilToInt(meters / segmentLength));
         }
 
         private void AutoFindPlayer()
@@ -140,14 +167,27 @@ namespace Features.Gameplay.WorldGen
                 SpawnNext();
         }
 
+        public void SetForceSafeSegments(bool on) => forceSafeSegments = on;
         private void SpawnNext()
         {
-            if (segmentPrefabs == null || segmentPrefabs.Length == 0) return;
+            if ((segmentPrefabs == null || segmentPrefabs.Length == 0) && !safeIntroPrefab) return;
 
-            var idx = Random.Range(0, segmentPrefabs.Length);
+            GameObject prefabToUse;
+            
+            
+            if (_introSegmentsRemaining > 0 && safeIntroPrefab || (forceSafeSegments && safeIntroPrefab))
+            {
+                prefabToUse = safeIntroPrefab;
+                _introSegmentsRemaining--;
+            }
+            else
+            {
+                var idx = Random.Range(0, segmentPrefabs.Length);
+                prefabToUse = segmentPrefabs[idx];
+            }
+            
             var pos = new Vector3(0f, 0f, _nextSpawnZ);
-
-            var seg = Instantiate(segmentPrefabs[idx], pos, Quaternion.identity, segmentsParent);
+            var seg = Instantiate(prefabToUse, pos, Quaternion.identity, segmentsParent);
             _activeSegments.Enqueue(seg);
             _nextSpawnZ += segmentLength;
         }
