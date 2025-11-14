@@ -42,7 +42,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3611004173048804527}
   m_Layer: 0
-  m_Name: Player
+  m_Name: Red Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -358,6 +358,11 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 2853552324373980592, guid: 8b898808edd434f27bcdb6dde999ee5e,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 3be1cb5e0bce9e243b4c3a1aae537a23, type: 2}
     - target: {fileID: 3659014213767705003, guid: 8b898808edd434f27bcdb6dde999ee5e,
         type: 3}
       propertyPath: m_Color.b
