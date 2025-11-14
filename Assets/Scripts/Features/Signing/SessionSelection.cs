@@ -8,13 +8,39 @@ namespace Features.Signing
     public class SessionSelection : ScriptableObject
     {
         [SerializeField] private List<string> words = new();
+        [SerializeField] private List<string> dictionaryCandidates = new();
         public IReadOnlyList<string> Words => words;
         public bool HasWords => words != null && words.Count > 0;
 
         // runtime-only bag (not saved)
         [NonSerialized] private List<string> _bag;
         [NonSerialized] private int _bagIndex = 0;
+        
+        public IReadOnlyList<string> Candidates20 => dictionaryCandidates;
+        public bool HasCandidates20 => dictionaryCandidates != null && dictionaryCandidates.Count > 0;
 
+        public void SetCandidates20(IEnumerable<string> words)
+        {
+            if (dictionaryCandidates == null) dictionaryCandidates = new List<string>();
+            dictionaryCandidates.Clear();
+
+            if (words == null) return;
+
+            // normalize to lowercase, de-dup, and keep order
+            var seen = new HashSet<string>();
+            foreach (var w in words)
+            {
+                var k = (w ?? "").Trim().ToLowerInvariant();
+                if (k.Length == 0 || !seen.Add(k)) continue;
+                dictionaryCandidates.Add(k);
+            }
+        }
+
+        public void ClearCandidates20()
+        {
+            dictionaryCandidates?.Clear();
+        }
+        
         static string Norm(string s) => (s ?? "").Trim().ToLowerInvariant();
 
         public void SetWords(IEnumerable<string> src)

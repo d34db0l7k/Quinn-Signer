@@ -32,36 +32,87 @@ namespace Features.Signing
 
         void Start()
         {
-            Debug.Log($"[Preflight] streamingAssetsPath = {Application.streamingAssetsPath}");
-            var allVideoWords = VideoCatalog.ListAllVideoWords(videosSubfolder);
-            Debug.Log($"[Preflight] Found {allVideoWords.Count} video files in '{videosSubfolder}'.");
-
-            if (forceRepickOnPlay && sessionSelection)
-                sessionSelection.SetWords(Array.Empty<string>());
-
-            List<string> words;
-            if (!forceRepickOnPlay && sessionSelection && sessionSelection.HasWords)
+            // STRICT: if words exist in SessionSelection, use them exactly
+            if (sessionSelection && sessionSelection.HasWords)
             {
-                words = new List<string>(sessionSelection.Words);
-                Debug.Log($"[Preflight] Using existing SessionSelection words: {words.Count}");
+                var words = new System.Collections.Generic.List<string>();
+                foreach (var w in sessionSelection.Words)
+                {
+                    var k = (w ?? "").Trim().ToLowerInvariant();
+                    if (!string.IsNullOrEmpty(k)) words.Add(k);
+                }
+
+                Debug.Log($"[Preflight] Using session words ({words.Count}): [{string.Join(",", words)}]");
+
+                if (words.Count == 0)
+                {
+                    Debug.LogError("[Preflight] SessionSelection has no usable words (after normalization).");
+                    return;
+                }
+
+                BuildList(words); // your existing method signature
+                return;
+            }
+
+            // If no session words exist, fall back to your existing picker:
+            var wordsFallback = PickWordsWithVideos(wordsNeeded); // helper we added earlier in this class
+            if (sessionSelection) { sessionSelection.SetWords(wordsFallback); sessionSelection.ResetRuntimeBag(); }
+
+            Debug.Log($"[Preflight] Fallback words ({wordsFallback.Count}): [{string.Join(",", wordsFallback)}]");
+            BuildList(wordsFallback);
+        }
+        
+        private List<string> PickWordsWithVideos(int count)
+        {
+            // Build the set of words that actually have videos on disk
+            HashSet<string> videoSet = null;
+
+            // Prefer IndexWordsWithVideos if your VideoCatalog has it; otherwise fallback to ListAllVideoWords
+            try
+            {
+                videoSet = VideoCatalog.IndexWordsWithVideos(videosSubfolder);
+            }
+            catch
+            {
+                var all = VideoCatalog.ListAllVideoWords(videosSubfolder);
+                videoSet = new HashSet<string>(all);
+            }
+
+            // Pool = WordBank ∩ video-backed words (lowercased & distinct)
+            var pool = new List<string>();
+            if (wordBank != null)
+            {
+                foreach (var w in wordBank.GetWordList())
+                {
+                    var k = (w ?? "").Trim().ToLowerInvariant();
+                    if (k.Length == 0) continue;
+                    if (videoSet.Contains(k) && !pool.Contains(k)) pool.Add(k);
+                }
             }
             else
             {
-                words = PickWordsWithVideos_Random(wordBank, wordsNeeded, videosSubfolder, allVideoWords);
-                if (sessionSelection)
-                {
-                    sessionSelection.SetWords(words);
-                    sessionSelection.ResetRuntimeBag();
-                }
-                Debug.Log($"[Preflight] Picked {words.Count} words with videos.");
+                // If no WordBank, use the video set directly
+                pool.AddRange(videoSet);
             }
 
-            if (words.Count == 0)
-                Debug.LogError("[Preflight] No words to show. Check video folder name, WordBank assignment, or filename matches.");
+            // Shuffle and take up to 'count'
+            Shuffle(pool);
+            if (pool.Count > count) pool.RemoveRange(count, pool.Count - count);
 
-            BuildList(words);
+            Debug.Log($"[PreflightScrollUI] PickWordsWithVideos -> {pool.Count} (requested {count})");
+            return pool;
         }
 
+        private void Shuffle<T>(IList<T> list)
+        {
+            var rng = new System.Random(unchecked(System.Environment.TickCount ^ GetHashCode()));
+            for (int i = list.Count - 1; i > 0; i--)
+            {
+                int j = rng.Next(i + 1);
+                (list[i], list[j]) = (list[j], list[i]);
+            }
+        }
+        
         // Inlined picker (formerly SessionWordPicker)
         static List<string> PickWordsWithVideos_Random(WordBank bank, int count, string subfolder, List<string> allVideoWords)
         {

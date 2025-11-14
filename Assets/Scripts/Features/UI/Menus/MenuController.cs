@@ -144,6 +144,12 @@ namespace Features.UI.Menus
             if (manageTimeScale) Time.timeScale = 1f;
             SceneManager.LoadScene("TrainingScene");
         }
+
+        public void StartDictionary()
+        {
+            if (manageTimeScale) Time.timeScale = 1f;
+            SceneManager.LoadScene("DictionaryScene");
+        }
         public void EnterShop()
         {
             if (manageTimeScale) Time.timeScale = 1f;
