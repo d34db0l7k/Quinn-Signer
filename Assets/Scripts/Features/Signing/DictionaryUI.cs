@@ -1,0 +1,201 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+namespace Features.Signing
+{
+    public class DictionaryUI : MonoBehaviour
+    {
+        [Header("Data")]
+        [SerializeField] private WordBank wordBank;
+        [SerializeField] private SessionSelection sessionSelection;
+        [SerializeField] private string videosSubfolder = "Reference Videos";
+
+        [Header("Counts")]
+        [SerializeField] private int showCount = 20;   // show 20 candidates
+        [SerializeField] private int selectLimit = 5;  // allow up to 5
+
+        [Header("UI")]
+        [SerializeField] private Transform contentParent;           // ScrollView Content
+        [SerializeField] private DictionaryWordItem wordItemPrefab; // prefab above
+        [SerializeField] private Button saveAndExitButton;
+        [SerializeField] private Text selectionCounterText;
+        [SerializeField] private string mainMenuSceneName = "MainMenu";
+
+        private readonly HashSet<string> _selected = new();
+
+        void Start()
+        {
+            if (!contentParent || !wordItemPrefab || !sessionSelection)
+            {
+                Debug.LogError("[DictionaryUI] Missing references.");
+                return;
+            }
+
+            // Build/obtain the 20-word candidate list once and persist it on SessionSelection
+            List<string> twenty;
+
+            if (sessionSelection.HasCandidates20)
+            {
+                twenty = new List<string>(sessionSelection.Candidates20);
+                Debug.Log($"[DictionaryUI] Using persisted 20 candidates from SessionSelection ({twenty.Count}).");
+            }
+            else
+            {
+                var videoSet = VideoCatalog.IndexWordsWithVideos(videosSubfolder);
+                var pool = BuildPool(wordBank, videoSet);     // your existing helper
+                twenty = TakeRandom(pool, showCount);         // your existing helper (showCount = 20)
+                sessionSelection.SetCandidates20(twenty);
+                Debug.Log($"[DictionaryUI] Generated and persisted {twenty.Count} candidates.");
+            }
+            
+            _selected.Clear();
+            if (sessionSelection && sessionSelection.HasWords)
+            {
+                foreach (var w in sessionSelection.Words)
+                {
+                    var k = (w ?? "").Trim().ToLowerInvariant();
+                    if (!string.IsNullOrEmpty(k)) _selected.Add(k);
+                }
+            }
+            
+            BuildList(twenty);
+
+            if (saveAndExitButton)
+            {
+                saveAndExitButton.onClick.RemoveAllListeners();
+                saveAndExitButton.onClick.AddListener(SaveAndExit);
+                saveAndExitButton.interactable = false;
+            }
+            UpdateSelectionUI();
+        }
+        
+        public void RegenerateCandidates()
+        {
+            var videoSet = VideoCatalog.IndexWordsWithVideos(videosSubfolder);
+            var pool = BuildPool(wordBank, videoSet);
+            var twenty = TakeRandom(pool, showCount);
+
+            // Persist candidates
+            sessionSelection.SetCandidates20(twenty);
+
+            // Keep only selections that are still visible
+            _selected.RemoveWhere(w => !twenty.Contains(w));
+
+            BuildList(twenty);
+        }
+
+
+        static List<string> BuildPool(WordBank bank, HashSet<string> videoSet)
+        {
+            if (bank)
+            {
+                return bank.GetWordList()
+                           .Select(w => (w ?? "").Trim().ToLowerInvariant())
+                           .Where(w => videoSet.Contains(w))
+                           .Distinct()
+                           .ToList();
+            }
+            // fallback if WordBank is missing: just use all video-backed words
+            return videoSet.ToList();
+        }
+
+        static List<string> TakeRandom(List<string> list, int count)
+        {
+            var rng = new System.Random(unchecked(Environment.TickCount ^ list.Count));
+            for (int i = list.Count - 1; i > 0; i--)
+            {
+                int j = rng.Next(i + 1);
+                (list[i], list[j]) = (list[j], list[i]);
+            }
+            if (list.Count > count) list.RemoveRange(count, list.Count - count);
+            return list;
+        }
+
+        void BuildList(List<string> words)
+        {
+            foreach (Transform c in contentParent) Destroy(c.gameObject);
+
+            foreach (var w in words)
+            {
+                var item = Instantiate(wordItemPrefab, contentParent, false);
+                var rt = item.transform as RectTransform;
+                if (rt)
+                {
+                    rt.localScale = Vector3.one;
+                    rt.anchorMin = new Vector2(0f, 1f);
+                    rt.anchorMax = new Vector2(1f, 1f);
+                    rt.pivot     = new Vector2(0.5f, 1f);
+                }
+
+                // keep toggled if previously selected
+                item.Setup(w, isOn: _selected.Contains(w));
+                item.onToggled += HandleItemToggled;
+            }
+
+            var contentRT = contentParent as RectTransform;
+            if (contentRT)
+            {
+                Canvas.ForceUpdateCanvases();
+                UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(contentRT);
+                Canvas.ForceUpdateCanvases();
+            }
+
+            UpdateSelectionUI(); // refresh button state/counter
+        }
+
+        void HandleItemToggled(DictionaryWordItem item, bool isOn)
+        {
+            if (!item) return;
+            var w = item.Word; if (string.IsNullOrEmpty(w)) return;
+
+            if (isOn)
+            {
+                if (_selected.Count >= selectLimit)
+                {
+                    // revert toggle if at cap
+                    item.onToggled -= HandleItemToggled;
+                    item.GetComponent<Toggle>()?.SetIsOnWithoutNotify(false); // in case prefab used Toggle on root
+                    // safer: directly flip via component
+                    var t = item.GetComponentInChildren<Toggle>();
+                    if (t) t.isOn = false;
+                    item.onToggled += HandleItemToggled;
+                    return;
+                }
+                _selected.Add(w);
+            }
+            else
+            {
+                _selected.Remove(w);
+            }
+            UpdateSelectionUI();
+        }
+
+        void UpdateSelectionUI()
+        {
+            if (selectionCounterText) selectionCounterText.text = $"Selected: {_selected.Count}/{selectLimit}";
+            if (saveAndExitButton)     saveAndExitButton.interactable = _selected.Count > 0 && _selected.Count <= selectLimit;
+        }
+
+        void SaveAndExit()
+        {
+            // normalize + cap to 5
+            var picks = _selected
+                .Select(w => (w ?? "").Trim().ToLowerInvariant())
+                .Where(w => !string.IsNullOrEmpty(w))
+                .Take(selectLimit)
+                .ToList();
+
+            Debug.Log($"[DictionaryUI] Saving {picks.Count} picks to SessionSelection: [{string.Join(",", picks)}]");
+
+            sessionSelection.SetWords(picks);
+            sessionSelection.ResetRuntimeBag();
+
+            if (!string.IsNullOrEmpty(mainMenuSceneName))
+                UnityEngine.SceneManagement.SceneManager.LoadScene(mainMenuSceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
+        }
+    }
+}

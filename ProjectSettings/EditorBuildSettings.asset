@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/TitleScene.unity
     guid: bb61d2ebfdce8413b90cfddb6f2043ee
   - enabled: 1
+    path: Assets/Scenes/DictionaryScene.unity
+    guid: 472ee5834a73738489fcfc847fb47ef0
+  - enabled: 1
     path: Assets/Scenes/TrainingScene.unity
     guid: d0a340a2876c945408b24e73c80dc621
   - enabled: 1
