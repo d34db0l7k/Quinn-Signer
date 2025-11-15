@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 183c0c4423364bd4e82af1b0e29ddfeb, type: 3}
+  m_Name: Original
+  m_EditorClassIdentifier: Assembly-CSharp::Skin
+  id: ship_default
+  displayName: Green
+  price: 0
+  skinMaterial: {fileID: 2100000, guid: 8a0365ca0320a9f47bcd9a5b5fe7e94f, type: 2}
+  runnerPrefab: {fileID: 4113162210362195747, guid: 1835165732ec2774c916b82c4f8895cf,
+    type: 3}

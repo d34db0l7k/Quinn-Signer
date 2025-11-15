@@ -1,113 +1,112 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Features.UI;
 
 public class ShopItemUI : MonoBehaviour
 {
     [Header("Data")]
-    public Skin skin;                 // assign the Skin asset for THIS item
+    public Skin skin;
 
     [Header("UI")]
-    public Button actionButton;       // the button on the item
-    public Text actionLabel;          // the Text inside that button
+    [SerializeField] private Text nameText;
+    [SerializeField] private Text priceText;
+    [SerializeField] private Button buyButton;
+    [SerializeField] private Button selectButton;
+    [SerializeField] private GameObject equippedBadge;
+    [SerializeField] private RawImage icon; // used by ShopItemPreview
 
-    private string DefaultId => SkinManager.Instance ? SkinManager.Instance.defaultId : "ship_default";
+    private SkinManager _manager;
 
-    void Start()
+    void OnEnable()
     {
-        if (actionButton != null)
-        {
-            actionButton.onClick.RemoveAllListeners();
-            actionButton.onClick.AddListener(OnClick);
-        }
-        Refresh();
+        CrystalWallet.OnChanged += HandleWalletChanged;
     }
 
-    void OnEnable() => Refresh();
-
-    void OnClick()
+    void OnDisable()
     {
-        var sm = SkinManager.Instance;
-        if (sm == null || skin == null) return;
+        CrystalWallet.OnChanged -= HandleWalletChanged;
+    }
 
-        // Default skin: just equip, never buy
-        if (skin.id == DefaultId)
+    void HandleWalletChanged(int _)
+    {
+        Refresh(); // re-check affordability & states
+    }
+    
+    public void Bind(Skin s, SkinManager manager)
+    {
+        skin = s;
+        _manager = manager;
+
+        if (nameText) nameText.text = s.displayName;
+        if (priceText) priceText.text = s.price.ToString() + " Shards";
+
+        if (buyButton)
         {
-            sm.Equip(skin);
-            Refresh();
-            return;
+            buyButton.onClick.RemoveAllListeners();
+            buyButton.onClick.AddListener(Buy);
         }
-
-        // Not owned → attempt to buy
-        if (!sm.IsUnlocked(skin))
+        if (selectButton)
         {
-            int price = Mathf.Max(0, skin.price);
-
-            // If cannot afford, bail (even if button was somehow clickable)
-            if (!MasterInfo.TrySpendCrystals(price))
-            {
-                // Optional: visual feedback here
-                return;
-            }
-
-            // Purchase OK → unlock + equip
-            sm.Equip(skin);
-            Refresh();
-            return;
+            selectButton.onClick.RemoveAllListeners();
+            selectButton.onClick.AddListener(Select);
         }
-
-        // Owned
-        if (sm.IsEquipped(skin))
+        
+        var preview = GetComponent<ShopItemPreview>();
+        if (preview)
         {
-            // Unequip → back to default
-            sm.Unequip(skin);
-            var def = sm.knownSkins.Find(s => s && s.id == DefaultId);
-            if (def) sm.Equip(def);
-        }
-        else
-        {
-            sm.Equip(skin);
+            // Make sure the RawImage on the card is assigned in the preview inspector.
+            preview.RebuildFor(skin);
         }
 
         Refresh();
+        _manager.OnOwnershipChanged += HandleOwnedChanged;
+        _manager.OnSkinChanged += HandleSkinChanged;
     }
+
+    void OnDestroy()
+    {
+        if (_manager != null)
+        {
+            _manager.OnOwnershipChanged -= HandleOwnedChanged;
+            _manager.OnSkinChanged -= HandleSkinChanged;
+        }
+    }
+
+    void HandleOwnedChanged(Skin s) { if (s == skin) Refresh(); }
+    void HandleSkinChanged(Skin s)  { Refresh(); }
 
     void Refresh()
     {
-        var sm = SkinManager.Instance;
-        if (sm == null || skin == null || actionButton == null || actionLabel == null) return;
+        if (!_manager || !skin) return;
 
-        // Default skin UX
-        if (skin.id == DefaultId)
-        {
-            if (sm.IsEquipped(skin))
-            {
-                actionLabel.text = "EQUIPPED";
-                actionButton.interactable = false;
-            }
-            else
-            {
-                actionLabel.text = "EQUIP";
-                actionButton.interactable = true;
-            }
-            return;
-        }
+        bool owned = _manager.IsOwned(skin);
+        bool equipped = (_manager.CurrentSkin == skin);
+        bool affordable = CrystalWallet.CanAfford(skin.price);
 
-        // Non-default skins
-        if (!sm.IsUnlocked(skin))
+        if (buyButton)
         {
-            int price = Mathf.Max(0, skin.price);
-            actionLabel.text = $"BUY ({price})";
-            actionButton.interactable = (MasterInfo.CrystalCount >= price);
+            buyButton.gameObject.SetActive(!owned);
+            buyButton.interactable = !owned && affordable; // 🔒 disable when too poor
         }
-        else if (sm.IsEquipped(skin))
+        if (priceText)
         {
-            actionLabel.text = "UNEQUIP";
-            actionButton.interactable = true;
+            priceText.gameObject.SetActive(!owned);
+            // Optional: tint red if unaffordable
+            priceText.color = affordable ? Color.white : new Color(1f, 0.4f, 0.4f);
         }
-        else
-        {
-            actionLabel.text = "EQUIP";
-            actionButton.interactable = true;
-        }
+        if (selectButton) selectButton.gameObject.SetActive(owned && !equipped);
+        if (equippedBadge) equippedBadge.SetActive(equipped);
+    }
+
+    void Buy()
+    {
+        if (_manager.TryPurchase(skin))
+            Refresh();
+    }
+
+    void Select()
+    {
+        _manager.SetCurrentSkin(skin);
+        Refresh();
     }
 }

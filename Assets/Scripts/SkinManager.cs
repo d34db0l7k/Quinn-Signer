@@ -1,77 +1,96 @@
 using System.Collections.Generic;
-using System.Linq;
+using Features.UI;
 using UnityEngine;
 
-[DefaultExecutionOrder(-1000)]
 public class SkinManager : MonoBehaviour
 {
-    public static SkinManager Instance { get; private set; }
+    [SerializeField] private List<Skin> allSkins;
+    [SerializeField] private Skin defaultSkin;
 
-    [Header("Catalog")]
-    public List<Skin> knownSkins = new List<Skin>(); // assign in Inspector
+    public IReadOnlyList<Skin> AllSkins => allSkins;
+    public Skin CurrentSkin { get; private set; }
 
-    [Header("IDs")]
-    [Tooltip("ID of the always-available default skin (e.g., \"ship_default\").")]
-    public string defaultId = "ship_default";
+    public System.Action<Skin> OnSkinChanged;
+    public System.Action<Skin> OnOwnershipChanged;
 
-    // runtime state (no persistence)
-    private readonly HashSet<string> _unlocked = new HashSet<string>();
-    private string _equippedId;
+    const string OwnedKey = "SKIN_OWNED";
+    const string CurrentKey = "SKIN_CURRENT";
 
-    // --- lifecycle ---
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStaticsForDomainReload()
+    void Awake()
     {
-        // ensures a clean state if Enter Play Mode Options keep domain alive
-        Instance = null;
-    }
+        // Load currently equipped skin id (may be empty on first run)
+        var curId = PlayerPrefs.GetString(CurrentKey, string.Empty);
+        CurrentSkin = allSkins.Find(s => s.id == curId);
 
-    private void Awake()
-    {
-        if (Instance && Instance != this) { Destroy(gameObject); return; }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
+        // Do NOT auto-own anything on first run.
+        // Ownership is only set by TryPurchase(...) or your editor tools.
 
-        InitializeRuntimeState();
-    }
-
-    private void InitializeRuntimeState()
-    {
-        _unlocked.Clear();
-
-        // Make sure default skin exists and is unlocked/equipped
-        if (!knownSkins.Any(s => s && s.id == defaultId))
+        // If the saved current skin is missing or no longer owned, clear it.
+        if (CurrentSkin != null && !IsOwned(CurrentSkin))
         {
-            Debug.LogWarning($"SkinManager: defaultId '{defaultId}' not found in knownSkins. Using first skin.");
-            if (knownSkins.Count > 0) defaultId = knownSkins[0].id;
+            CurrentSkin = null;
+            PlayerPrefs.DeleteKey(CurrentKey);
+            PlayerPrefs.Save();
         }
 
-        _unlocked.Add(defaultId);
-        _equippedId = defaultId;
+        // Optional: log what’s owned (for sanity)
+#if UNITY_EDITOR
+        foreach (var s in allSkins)
+            Debug.Log($"[SkinManager] Owned[{s.displayName}] = {IsOwned(s)}");
+#endif
     }
 
-    // --- API ---
+    public bool IsOwned(Skin s) => PlayerPrefs.GetInt(OwnedKey + s.id, 0) == 1;
 
-    public bool IsUnlocked(Skin skin) => skin != null && _unlocked.Contains(skin.id);
-
-    public bool IsEquipped(Skin skin) => skin != null && skin.id == _equippedId;
-
-    public Skin EquippedSkin => knownSkins.FirstOrDefault(s => s && s.id == _equippedId)
-                                ?? knownSkins.FirstOrDefault(s => s && s.id == defaultId);
-
-    public void Equip(Skin skin)
+    void SetOwned(Skin s, bool owned)
     {
-        if (skin == null) return;
-        _unlocked.Add(skin.id);        // buying or equipping unlocks
-        _equippedId = skin.id;
-        // (spawn code in your Runner scene will read EquippedSkin)
+        PlayerPrefs.SetInt(OwnedKey + s.id, owned ? 1 : 0);
+        PlayerPrefs.Save();
+        OnOwnershipChanged?.Invoke(s);
     }
 
-    public void Unequip(Skin skin)
+    public bool TryPurchase(Skin s)
     {
-        if (skin == null) return;
-        if (skin.id == defaultId) return; // cannot unequip default
-        _equippedId = defaultId;
+        if (s == null) return false;
+        if (IsOwned(s)) return true;
+
+        var price = Mathf.Max(0, s.price);
+        if (!CrystalWallet.CanAfford(price))
+            return false;
+
+        if (!CrystalWallet.Spend(price))
+            return false;
+
+        SetOwned(s, true);
+        OnOwnershipChanged?.Invoke(s);
+        return true;
+    }
+
+    public void SetCurrentSkin(Skin s)
+    {
+        if (!IsOwned(s)) return;
+        CurrentSkin = s;
+        PlayerPrefs.SetString(CurrentKey, s.id);
+        PlayerPrefs.Save();
+        OnSkinChanged?.Invoke(s);
+    }
+
+    public List<Skin> GetOwnedSkins()
+    {
+        var list = new List<Skin>();
+        foreach (var s in allSkins) if (IsOwned(s)) list.Add(s);
+        return list;
+    }
+    
+    [ContextMenu("Reset Ownership (Own None)")]
+    public void ResetOwnershipOwnNone()
+    {
+        foreach (var s in allSkins)
+            PlayerPrefs.DeleteKey(OwnedKey + s.id);
+        PlayerPrefs.DeleteKey(CurrentKey);
+        PlayerPrefs.Save();
+        CurrentSkin = null;
+        OnSkinChanged?.Invoke(null);
+        Debug.Log("[SkinManager] Ownership reset: none owned, nothing equipped.");
     }
 }

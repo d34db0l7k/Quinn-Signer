@@ -19,7 +19,17 @@ namespace Features.UI
 
         private int _lastShown = -1;
 
-        private void OnEnable() => Refresh(true);
+        private void OnEnable()
+        {
+            CrystalWallet.OnChanged += HandleWalletChanged;
+            Refresh(true);
+        }
+        private void OnDisable()
+        {
+            CrystalWallet.OnChanged -= HandleWalletChanged;
+        }
+
+        private void HandleWalletChanged(int _) => Refresh(true);
         
         private void Refresh(bool force = false)
         {

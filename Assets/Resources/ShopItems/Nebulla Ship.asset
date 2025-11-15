@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 183c0c4423364bd4e82af1b0e29ddfeb, type: 3}
-  m_Name: Red Ship
+  m_Name: Nebulla Ship
   m_EditorClassIdentifier: Assembly-CSharp::Skin
-  id: ship_red
-  displayName: Red Ship
-  shopIcon: {fileID: 0}
-  runnerPrefab: {fileID: 5507264887693745115, guid: 7589358a6c2e11e4ba5af61d80cf121d,
+  id: ship_nebulla
+  displayName: Nebulla Ship
+  price: 15
+  skinMaterial: {fileID: 2100000, guid: 35ec32e7f12a48d49aac4ea53367d227, type: 2}
+  runnerPrefab: {fileID: 5507264887693745115, guid: 9870752f0c713634196765e9222f2a31,
     type: 3}
-  price: 2

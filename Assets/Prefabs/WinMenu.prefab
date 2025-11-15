@@ -238,9 +238,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Keep up
+  m_Text: 'Keep
 
-    the fight'
+    Practicing'
 --- !u!1 &4684654873834991713
 GameObject:
   m_ObjectHideFlags: 0
@@ -452,7 +452,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: The Galaxy Is Safe
+  m_Text: 'End of
+
+    Demo'
 --- !u!1 &6457550466358155504
 GameObject:
   m_ObjectHideFlags: 0
@@ -487,8 +489,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -730}
-  m_SizeDelta: {x: 100, y: 20}
+  m_AnchoredPosition: {x: 0, y: -831}
+  m_SizeDelta: {x: 170, y: 40}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &5938395021697859690
 CanvasRenderer:
@@ -511,7 +513,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8490566, g: 0.06007475, b: 0.20126104, a: 1}
+  m_Color: {r: 0.07186722, g: 0.8962264, b: 0.40962008, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -531,7 +533,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: For now...
+  m_Text: 'Quinn will
+
+    return...'
 --- !u!1 &7464519804666905972
 GameObject:
   m_ObjectHideFlags: 0

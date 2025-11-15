@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 namespace Audio
 {
@@ -10,7 +11,7 @@ namespace Audio
 
         [Header("Music tracks")]
         public AudioClip titleTheme;
-        public AudioClip gameplayTheme;
+        public AudioClip tutorialTheme;
         public AudioClip glyphwayTheme;
         public AudioClip shopTheme;
         public AudioClip winTheme;
@@ -40,7 +41,7 @@ namespace Audio
                     PlayTheme(titleTheme);
                     break;
                 case 1:
-                    PlayTheme(gameplayTheme);
+                    PlayTheme(tutorialTheme);
                     break;
                 case 2:
                     PlayTheme(glyphwayTheme);

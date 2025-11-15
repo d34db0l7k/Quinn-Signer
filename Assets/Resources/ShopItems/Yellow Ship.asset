@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 183c0c4423364bd4e82af1b0e29ddfeb, type: 3}
-  m_Name: Original
+  m_Name: Yellow Ship
   m_EditorClassIdentifier: Assembly-CSharp::Skin
-  id: ship_default
-  displayName: Original
-  shopIcon: {fileID: 0}
-  runnerPrefab: {fileID: 5507264887693745115, guid: 707b838e64428c04aa71bcb0b4bf2a80,
+  id: ship_yellow
+  displayName: Yellow Ship
+  price: 10
+  skinMaterial: {fileID: 2100000, guid: db04174fb9dc5fa47820fedbd5638a68, type: 2}
+  runnerPrefab: {fileID: 5507264887693745115, guid: 99d97c29a6cd78a489152bccfac9b8c4,
     type: 3}
