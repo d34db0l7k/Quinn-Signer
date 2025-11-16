@@ -10132,7 +10132,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Features.Gameplay.Entities.Player.PlayerDeathHook
   health: {fileID: 613343211099340301}
-  shipCollision: {fileID: 0}
+  shipCollision: {fileID: 1745371067644500896}
   playerRoot: {fileID: 4113162210362195747}
   explosionPrefab: {fileID: 553440415411691865, guid: 7e3e1990ec65b4077a2c5ee2b32b6cf7,
     type: 3}

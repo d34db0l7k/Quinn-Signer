@@ -96,7 +96,7 @@ namespace Features.Gameplay.Encounters
 
         void SpawnEnemy()
         {
-            if (!enemyPrefab || !player) return;
+            if (!enemyPrefab || !player || sessionSelection.words.Count == 0) return;
 
             var pos = player.position;
             pos.z += spawnAheadZ;

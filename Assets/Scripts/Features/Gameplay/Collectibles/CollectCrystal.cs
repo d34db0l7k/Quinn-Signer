@@ -15,8 +15,7 @@ namespace Features.Gameplay.Collectibles
             // play the crystal collection sound if assigned
             if (crystalClip != null)
                 AudioSource.PlayClipAtPoint(crystalClip, transform.position);
-        
-            MasterInfo.CrystalCount += 1;
+
             CrystalWallet.Add(1);
             gameObject.SetActive(false); // maybe use Destroy(game object)?
         }

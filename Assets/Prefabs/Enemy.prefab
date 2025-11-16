@@ -479,8 +479,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e07a18236a1d14351a6a6806a65c262e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explosionEffect: {fileID: 553440415411691865, guid: b11b4ffbd37f54721b6ac07bb4d3b61d,
+  explodeVfx: {fileID: 2737289882313198826, guid: b11b4ffbd37f54721b6ac07bb4d3b61d,
     type: 3}
+  explodeSfx: {fileID: 8300000, guid: acb257d9d220d48cab78f512172dbd85, type: 3}
+  despawnDelay: 2
 --- !u!114 &1544972394085677974
 MonoBehaviour:
   m_ObjectHideFlags: 0

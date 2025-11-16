@@ -185,6 +185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkinManager
   allSkins:
+  - {fileID: 11400000, guid: 90fa54e5b6e8b314faa5b3a417dbbd44, type: 2}
   - {fileID: 11400000, guid: 9c4f323c673cf4442a043de77da9087f, type: 2}
   - {fileID: 11400000, guid: d695843547138d84d9fdc8eb1857abdd, type: 2}
   - {fileID: 11400000, guid: a9d450c3e68d03c4fabd9bec52ea64f7, type: 2}

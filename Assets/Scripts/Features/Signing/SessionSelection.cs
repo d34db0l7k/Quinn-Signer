@@ -7,7 +7,7 @@ namespace Features.Signing
     [CreateAssetMenu(menuName = "QuinnSigner/SessionSelection")]
     public class SessionSelection : ScriptableObject
     {
-        [SerializeField] private List<string> words = new();
+        [SerializeField] public List<string> words = new();
         [SerializeField] private List<string> dictionaryCandidates = new();
         public IReadOnlyList<string> Words => words;
         public bool HasWords => words != null && words.Count > 0;

@@ -256,6 +256,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkinManager
   allSkins:
+  - {fileID: 11400000, guid: 90fa54e5b6e8b314faa5b3a417dbbd44, type: 2}
   - {fileID: 11400000, guid: 9c4f323c673cf4442a043de77da9087f, type: 2}
   - {fileID: 11400000, guid: d695843547138d84d9fdc8eb1857abdd, type: 2}
   - {fileID: 11400000, guid: a9d450c3e68d03c4fabd9bec52ea64f7, type: 2}
@@ -472,6 +473,12 @@ MonoBehaviour:
   - position: {x: -13.228605, y: -5.2393427, z: -19.76881}
     tangent: {x: 10.080866, y: 0.47417402, z: 1.9203129}
     roll: 0
+--- !u!1 &1376947278 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5035302349320648009, guid: 158c302ac3e0e403799fc56c92cede54,
+    type: 3}
+  m_PrefabInstance: {fileID: 1378522183}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1378522183
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -619,6 +626,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[5].m_MethodName
       value: set_interactable
+      objectReference: {fileID: 0}
+    - target: {fileID: 7858251980731011070, guid: 158c302ac3e0e403799fc56c92cede54,
+        type: 3}
+      propertyPath: m_BlocksRaycasts
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8650713708298658848, guid: 158c302ac3e0e403799fc56c92cede54,
         type: 3}
@@ -949,7 +961,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_FirstSelected: {fileID: 0}
+  m_FirstSelected: {fileID: 1376947278}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
 --- !u!4 &1996261879

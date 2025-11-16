@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: SessionSelection
   m_EditorClassIdentifier: Assembly-CSharp::Features.Signing.SessionSelection
   words: []
+  dictionaryCandidates: []

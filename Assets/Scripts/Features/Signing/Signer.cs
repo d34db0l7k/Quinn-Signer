@@ -55,6 +55,7 @@ namespace Features.Signing
             {
                 engine.recognizer.AddCallback("check", OnSignRecognized);
                 engine.recognizer.outputFilters.Clear();
+                ApplyRecognizerFilterToDictionaryWords();
                 _hasExecuted = true;
             }
 
@@ -90,6 +91,8 @@ namespace Features.Signing
             if (background) background.color = Color.black;
             if (engine && !engine.enabled) engine.enabled = false;
 
+            ApplyRecognizerFilterToDictionaryWords();
+
             StartCoroutine(AssignEnemyLabelsWhenReady());
         }
 
@@ -121,6 +124,7 @@ namespace Features.Signing
 
             _filterWords.Clear();
             _filterWords.AddRange(chosen);
+            ApplyRecognizerFilterToDictionaryWords();
 
             if (engine)
             {
@@ -270,12 +274,12 @@ namespace Features.Signing
             if (string.IsNullOrEmpty(word)) return;
             var key = word.Trim().ToLowerInvariant();
 
-            for (int i = 0; i < _filterWords.Count; i++)
+            for (int i = sessionSelection.words.Count - 1; i >= 0; i--)
             {
-                if (_filterWords[i] == key)
+                var s = sessionSelection.words[i];
+                if (string.Equals(s?.Trim(), key, System.StringComparison.OrdinalIgnoreCase))
                 {
-                    _filterWords.RemoveAt(i);
-                    break;
+                    sessionSelection.words.RemoveAt(i);
                 }
             }
 
@@ -295,7 +299,7 @@ namespace Features.Signing
             var enemyLabels = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
             bool noEnemiesLeft = enemyLabels == null || enemyLabels.Length == 0;
 
-            if (noWordsLeft && noEnemiesLeft) TriggerWin();
+            if (noEnemiesLeft) TriggerWin();
         }
 
         private void TriggerWin()
@@ -320,5 +324,41 @@ namespace Features.Signing
 
             StartCoroutine(CheckForWinNextFrame());
         }
+        private List<string> GetDictionaryWords()
+        {
+            // Use your real API only: HasWords + Words
+            if (sessionSelection != null && sessionSelection.HasWords && sessionSelection.Words != null)
+                return Normalize(sessionSelection.Words);
+
+            return new List<string>();
+        }
+
+        private static List<string> Normalize(IEnumerable<string> raw)
+        {
+            if (raw == null) return new List<string>();
+            var list = new List<string>();
+            foreach (var w in raw)
+            {
+                var s = (w ?? "").Trim().ToLowerInvariant();
+                if (!string.IsNullOrEmpty(s) && !list.Contains(s))
+                    list.Add(s);
+            }
+            return list;
+        }
+
+        private void ApplyRecognizerFilterToDictionaryWords()
+        {
+            if (engine == null) return;
+
+            var focus = GetDictionaryWords();
+            engine.recognizer.outputFilters.Clear();
+            if (focus.Count > 0)
+                engine.recognizer.outputFilters.Add(new FocusSublistFilter<string>(focus));
+
+            // Optional: keep a local copy if you also match enemies by this list
+            _filterWords.Clear();
+            _filterWords.AddRange(focus);
+        }
+
     }
 }
