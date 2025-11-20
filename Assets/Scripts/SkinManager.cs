@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SkinManager : MonoBehaviour
 {
-    [SerializeField] private List<Skin> allSkins;
+    [SerializeField] public List<Skin> allSkins;
     [SerializeField] private Skin defaultSkin;
 
     public IReadOnlyList<Skin> AllSkins => allSkins;
@@ -13,8 +13,8 @@ public class SkinManager : MonoBehaviour
     public System.Action<Skin> OnSkinChanged;
     public System.Action<Skin> OnOwnershipChanged;
 
-    const string OwnedKey = "SKIN_OWNED";
-    const string CurrentKey = "SKIN_CURRENT";
+    public const string OwnedKey = "SKIN_OWNED";
+    public const string CurrentKey = "SKIN_CURRENT";
 
     void Awake()
     {
@@ -42,11 +42,20 @@ public class SkinManager : MonoBehaviour
 
     public bool IsOwned(Skin s) => PlayerPrefs.GetInt(OwnedKey + s.id, 0) == 1;
 
-    void SetOwned(Skin s, bool owned)
+    public void SetOwned(Skin s, bool owned)
     {
+        if (s == null) return;
         PlayerPrefs.SetInt(OwnedKey + s.id, owned ? 1 : 0);
         PlayerPrefs.Save();
         OnOwnershipChanged?.Invoke(s);
+    }
+
+    public void ClearCurrentSkin()
+    {
+        CurrentSkin = null;
+        PlayerPrefs.DeleteKey(CurrentKey);
+        PlayerPrefs.Save();
+        OnSkinChanged?.Invoke(null);
     }
 
     public bool TryPurchase(Skin s)

@@ -630,7 +630,7 @@ PrefabInstance:
     - target: {fileID: 7858251980731011070, guid: 158c302ac3e0e403799fc56c92cede54,
         type: 3}
       propertyPath: m_BlocksRaycasts
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8650713708298658848, guid: 158c302ac3e0e403799fc56c92cede54,
         type: 3}
@@ -642,6 +642,60 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 158c302ac3e0e403799fc56c92cede54, type: 3}
+--- !u!1 &1537380752
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1537380753}
+  - component: {fileID: 1537380754}
+  m_Layer: 0
+  m_Name: AppResetOnQuit
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1537380753
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537380752}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1537380754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537380752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cc17a84c8ae49929e7c875a5a5d8975, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AppResetOnQuit
+  sessionSelection: {fileID: 11400000, guid: ffd61076f409d0a4fb50f7b442684b7f, type: 2}
+  skinManager: {fileID: 542471519}
+  fallbackAllSkins:
+  - {fileID: 11400000, guid: 90fa54e5b6e8b314faa5b3a417dbbd44, type: 2}
+  - {fileID: 11400000, guid: 9c4f323c673cf4442a043de77da9087f, type: 2}
+  - {fileID: 11400000, guid: d695843547138d84d9fdc8eb1857abdd, type: 2}
+  - {fileID: 11400000, guid: a9d450c3e68d03c4fabd9bec52ea64f7, type: 2}
+  - {fileID: 11400000, guid: c6e4827d59f78bf4ab29b2b4f03fb20b, type: 2}
+  - {fileID: 11400000, guid: 9cc5b753ea33c23439f53c5c8d2178f1, type: 2}
+  persistAcrossScenes: 1
 --- !u!1 &1846133102
 GameObject:
   m_ObjectHideFlags: 0
@@ -1002,3 +1056,4 @@ SceneRoots:
   - {fileID: 1141349642}
   - {fileID: 1860092020}
   - {fileID: 542471518}
+  - {fileID: 1537380753}

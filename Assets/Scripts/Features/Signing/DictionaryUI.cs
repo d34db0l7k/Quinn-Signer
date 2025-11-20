@@ -35,7 +35,6 @@ namespace Features.Signing
                 return;
             }
 
-            // Build/obtain the 20-word candidate list once and persist it on SessionSelection
             List<string> twenty;
 
             if (sessionSelection.HasCandidates20)
@@ -46,12 +45,11 @@ namespace Features.Signing
             else
             {
                 var videoSet = VideoCatalog.IndexWordsWithVideos(videosSubfolder);
-                var pool = BuildPool(wordBank, videoSet);     // your existing helper
-                twenty = TakeRandom(pool, showCount);         // your existing helper (showCount = 20)
-                sessionSelection.SetCandidates20(twenty);
-                Debug.Log($"[DictionaryUI] Generated and persisted {twenty.Count} candidates.");
+                var pool     = BuildPool(wordBank, videoSet);
+                twenty       = TakeRandom(pool, showCount);
+                Debug.Log($"[DictionaryUI] Generated {twenty.Count} initial candidates.");
             }
-            
+
             _selected.Clear();
             if (sessionSelection && sessionSelection.HasWords)
             {
@@ -61,7 +59,10 @@ namespace Features.Signing
                     if (!string.IsNullOrEmpty(k)) _selected.Add(k);
                 }
             }
-            
+
+            EnsureSelectedInCandidates(twenty);
+            sessionSelection.SetCandidates20(twenty);
+
             BuildList(twenty);
 
             if (saveAndExitButton)
@@ -73,21 +74,69 @@ namespace Features.Signing
             UpdateSelectionUI();
         }
         
+        /// <summary>
+        /// Ensures that all currently selected words (from _selected / SessionSelection.Words)
+        /// are present in the candidate list, and trims extra non-selected words
+        /// so the final list does not exceed showCount.
+        /// </summary>
+        void EnsureSelectedInCandidates(List<string> candidates)
+        {
+            if (candidates == null) return;
+            for (int i = 0; i < candidates.Count; i++)
+                candidates[i] = (candidates[i] ?? "").Trim().ToLowerInvariant();
+
+            var required = new HashSet<string>(_selected);
+            if (sessionSelection && sessionSelection.HasWords)
+            {
+                foreach (var w in sessionSelection.Words)
+                {
+                    var k = (w ?? "").Trim().ToLowerInvariant();
+                    if (!string.IsNullOrEmpty(k)) required.Add(k);
+                }
+            }
+            
+            foreach (var r in required)
+            {
+                if (!candidates.Contains(r))
+                    candidates.Add(r);
+            }
+
+            if (candidates.Count > showCount)
+            {
+                var extras = candidates.Where(w => !required.Contains(w)).ToList();
+                var rng = new System.Random(unchecked(Environment.TickCount ^ candidates.Count));
+                for (int i = extras.Count - 1; i > 0; i--)
+                {
+                    int j = rng.Next(i + 1);
+                    (extras[i], extras[j]) = (extras[j], extras[i]);
+                }
+
+                var final = new List<string>(required);
+                foreach (var e in extras)
+                {
+                    if (final.Count >= showCount) break;
+                    if (!final.Contains(e)) final.Add(e);
+                }
+                candidates.Clear();
+                candidates.AddRange(final);
+            }
+        }
+        
         public void RegenerateCandidates()
         {
             var videoSet = VideoCatalog.IndexWordsWithVideos(videosSubfolder);
-            var pool = BuildPool(wordBank, videoSet);
-            var twenty = TakeRandom(pool, showCount);
+            var pool     = BuildPool(wordBank, videoSet);
+            var twenty   = TakeRandom(pool, showCount);
+
+            // ensure existing selections (from _selected / SessionSelection.Words) are in the 20
+            EnsureSelectedInCandidates(twenty);
 
             // Persist candidates
             sessionSelection.SetCandidates20(twenty);
 
-            // Keep only selections that are still visible
-            _selected.RemoveWhere(w => !twenty.Contains(w));
-
+            // No need to remove selections here, since we just guaranteed they’re present
             BuildList(twenty);
         }
-
 
         static List<string> BuildPool(WordBank bank, HashSet<string> videoSet)
         {
