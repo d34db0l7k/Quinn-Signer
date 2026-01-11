@@ -1,5 +1,5 @@
 using UnityEngine;
-using Features.CameraManagement; // your CameraFollow namespace
+using Features.CameraManagement;
 using System;
 
 public class PlayerSpawner : MonoBehaviour
@@ -28,8 +28,6 @@ public class PlayerSpawner : MonoBehaviour
 
     private static GameObject s_currentPlayer;
     private static PlayerSpawner s_instance;
-
-    // cache the delegate so we can unsubscribe correctly
     private Action<Skin> _onSkinChangedHandler;
 
     void Awake()
@@ -83,15 +81,8 @@ public class PlayerSpawner : MonoBehaviour
             ? skinManager.CurrentSkin.runnerPrefab
             : fallbackPrefab;
 
-        if (!prefab)
-        {
-            Debug.LogError("[PlayerSpawner] No prefab to spawn (missing CurrentSkin.runnerPrefab and fallbackPrefab).");
-            return;
-        }
-
         var p = spawnPoint ? spawnPoint : transform;
 
-        // Quiet camera for one frame to prevent the ground-look flicker
         CameraFollow camFollow = null;
         if (attachCameraFollow)
         {
@@ -101,17 +92,14 @@ public class PlayerSpawner : MonoBehaviour
 
         s_currentPlayer = Instantiate(prefab, p.position + spawnOffset, p.rotation);
 
-        // Tag / Layer
         if (!string.IsNullOrEmpty(playerTag)) s_currentPlayer.tag = playerTag;
         if (playerLayer >= 0) SetLayerRecursive(s_currentPlayer, playerLayer);
 
-        // Choose the best camera target: CameraAnchor if present, otherwise the root
         var anchor = s_currentPlayer.GetComponentInChildren<CameraAnchor>(true);
         Transform camTarget = (anchor != null) ? anchor.transform : s_currentPlayer.transform;
 
         if (camFollow)
         {
-            // Prefer a SetTarget method if your CameraFollow has one; otherwise assign the field directly
             var t = camFollow.GetType();
             var m = t.GetMethod("SetTarget", new Type[] { typeof(Transform), typeof(bool) })
                      ?? t.GetMethod("SetTarget", new Type[] { typeof(Transform) });
@@ -123,7 +111,6 @@ public class PlayerSpawner : MonoBehaviour
             }
             else
             {
-                // fall back to public field/property named 'target'
                 var f = t.GetField("target");
                 if (f != null) f.SetValue(camFollow, camTarget);
                 else
@@ -143,7 +130,6 @@ public class PlayerSpawner : MonoBehaviour
         yield return null; // wait one frame so player/rig initialize
         if (!camFollow) yield break;
 
-        // If your CameraFollow exposes a snap/instant method, call it; else just re-enable.
         var t = camFollow.GetType();
         var m = t.GetMethod("SnapToTarget") ?? t.GetMethod("SnapNow") ?? t.GetMethod("SyncImmediate");
         if (m != null)

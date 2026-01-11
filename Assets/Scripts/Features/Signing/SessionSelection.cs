@@ -12,7 +12,6 @@ namespace Features.Signing
         public IReadOnlyList<string> Words => words;
         public bool HasWords => words != null && words.Count > 0;
 
-        // runtime-only bag (not saved)
         [NonSerialized] private List<string> _bag;
         [NonSerialized] private int _bagIndex = 0;
         
@@ -26,7 +25,6 @@ namespace Features.Signing
 
             if (words == null) return;
 
-            // normalize to lowercase, de-dup, and keep order
             var seen = new HashSet<string>();
             foreach (var w in words)
             {
@@ -54,7 +52,6 @@ namespace Features.Signing
             ResetRuntimeBag();
         }
 
-        /// Call this once after setting words (e.g., in Preflight) or to reshuffle mid-run.
         public void ResetRuntimeBag()
         {
             _bag = new List<string>(words);
@@ -67,7 +64,6 @@ namespace Features.Signing
             _bagIndex = 0;
         }
 
-        /// Pops a single word from the runtime bag (non-repeating until the bag cycles).
         public bool TryPop(out string word)
         {
             word = null;
@@ -76,7 +72,6 @@ namespace Features.Signing
 
             if (_bagIndex >= _bag.Count)
             {
-                // cycle: reshuffle for a fresh round
                 ResetRuntimeBag();
             }
 
@@ -84,7 +79,6 @@ namespace Features.Signing
             return true;
         }
 
-        /// Returns up to N distinct words (does NOT consume the bag).
         public List<string> GetRandomDistinct(int count)
         {
             var result = new List<string>();

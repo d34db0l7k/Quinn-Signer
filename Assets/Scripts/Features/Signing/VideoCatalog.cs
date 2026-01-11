@@ -7,7 +7,6 @@ namespace Features.Signing
 
     public static class VideoCatalog
     {
-        // Normalize tokens the same way your WordBank lowercases:
         static string Norm(string s) => (s ?? "").Trim().ToLowerInvariant();
 
         public static HashSet<string> IndexWordsWithVideos(string subfolder = "Reference Videos")
@@ -16,7 +15,6 @@ namespace Features.Signing
             var root = Path.Combine(Application.streamingAssetsPath, subfolder);
             if (!Directory.Exists(root)) { Debug.LogWarning($"[VideoCatalog] Missing: {root}"); return set; }
 
-            // Common video extensions
             var exts = new HashSet<string> { ".mp4", ".mov", ".m4v", ".webm", ".avi" };
             foreach (var path in Directory.GetFiles(root))
             {
@@ -37,19 +35,16 @@ namespace Features.Signing
             foreach (var file in Directory.GetFiles(root))
             {
                 var nameNoExt = Norm(Path.GetFileNameWithoutExtension(file));
-                if (nameNoExt == norm) return file; // full OS path
+                if (nameNoExt == norm) return file;
             }
             return null;
         }
-        // Add this next to GetVideoPathForWord(...)
         public static string GetVideoUrlForWord(string word, string subfolder = "Reference Videos")
         {
             var path = GetVideoPathForWord(word, subfolder);
             if (string.IsNullOrEmpty(path)) return null;
-            return new Uri(path).AbsoluteUri; // robust file:// URL for VideoPlayer
+            return new Uri(path).AbsoluteUri;
         }
-
-        // Also handy for debugging:
         public static List<string> ListAllVideoWords(string subfolder = "Reference Videos")
         {
             var set = IndexWordsWithVideos(subfolder);

@@ -61,7 +61,6 @@ namespace Features.UI.Menus
                 HandleDoubleTapToPause();
         }
 
-        /* ---------- Public actions (use these from buttons) ---------- */
         private void Open()  { ShowMenu(); if (manageTimeScale) Time.timeScale = 0f; }
         private void Close() { HideMenu(); if (manageTimeScale) Time.timeScale = 1f; }
 
@@ -123,7 +122,7 @@ namespace Features.UI.Menus
             if (_tapArmed && (now - _lastTapTime) > doubleTapMaxDelay) _tapArmed = false;
         }
 
-        /* ---------- Scene buttons (optional) ---------- */
+        /* ---------- Scene buttons ---------- */
         public void RestartGame()
         {
             if (manageTimeScale) Time.timeScale = 1f;

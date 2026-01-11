@@ -13,7 +13,7 @@ public class ShopItemUI : MonoBehaviour
     [SerializeField] private Button buyButton;
     [SerializeField] private Button selectButton;
     [SerializeField] private GameObject equippedBadge;
-    [SerializeField] private RawImage icon; // used by ShopItemPreview
+    [SerializeField] private RawImage icon;
 
     private SkinManager _manager;
 
@@ -29,7 +29,7 @@ public class ShopItemUI : MonoBehaviour
 
     void HandleWalletChanged(int _)
     {
-        Refresh(); // re-check affordability & states
+        Refresh();
     }
     
     public void Bind(Skin s, SkinManager manager)
@@ -54,7 +54,6 @@ public class ShopItemUI : MonoBehaviour
         var preview = GetComponent<ShopItemPreview>();
         if (preview)
         {
-            // Make sure the RawImage on the card is assigned in the preview inspector.
             preview.RebuildFor(skin);
         }
 
@@ -86,12 +85,11 @@ public class ShopItemUI : MonoBehaviour
         if (buyButton)
         {
             buyButton.gameObject.SetActive(!owned);
-            buyButton.interactable = !owned && affordable; // 🔒 disable when too poor
+            buyButton.interactable = !owned && affordable;
         }
         if (priceText)
         {
             priceText.gameObject.SetActive(!owned);
-            // Optional: tint red if unaffordable
             priceText.color = affordable ? Color.white : new Color(1f, 0.4f, 0.4f);
         }
         if (selectButton) selectButton.gameObject.SetActive(owned && !equipped);

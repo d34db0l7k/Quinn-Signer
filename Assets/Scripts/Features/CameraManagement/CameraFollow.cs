@@ -19,7 +19,6 @@ namespace Features.CameraManagement
 
         private void LateUpdate()
         {
-            // If we have no target, freeze and try to pick up the next Player
             if (!target)
             {
                 if (!_lostTarget) { _lostTarget = true; _velocity = Vector3.zero; }
@@ -28,8 +27,7 @@ namespace Features.CameraManagement
                 if (p) { target = p.transform; _lostTarget = false; }
                 else return; // nothing to follow yet
             }
-
-            // Normal follow
+            
             var rot = Quaternion.Euler(target.eulerAngles.x, target.eulerAngles.y, 0f);
             var desiredPos = target.position + rot * offset;
 

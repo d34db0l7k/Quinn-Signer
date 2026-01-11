@@ -5,35 +5,34 @@ using UnityEngine.UI;
 public class ShopItemPreview : MonoBehaviour
 {
     [Header("Data")]
-    [SerializeField] private Skin skin;                  // optional; if null, we’ll read from ShopItemUI.skin
+    [SerializeField] private Skin skin;
 
     [Header("UI")]
-    [SerializeField] private RawImage targetImage;       // RawImage on your card
+    [SerializeField] private RawImage targetImage;
 
     [Header("Skin Material Override (Preview Only)")]
-    [SerializeField] private bool replaceAllSlots = true;   // replace every material slot
-    [SerializeField] private int slotIndex = 0;             // or replace just one slot
-    [SerializeField] private Material fallbackMaterial;     // used if skin.skinMaterial is null
+    [SerializeField] private bool replaceAllSlots = true;
+    [SerializeField] private int slotIndex = 0;
+    [SerializeField] private Material fallbackMaterial;
 
     [Header("Preview")]
     [SerializeField] private Vector3 modelOffset = Vector3.zero;
     [SerializeField] private float modelScale = 1f;
     [SerializeField] private float camDistance = 6f;
     [SerializeField] private float camFov = 28f;
-    [SerializeField] private Color  clearColor = new Color(0,0,0,0); // transparent
+    [SerializeField] private Color  clearColor = new Color(0,0,0,0);
     [SerializeField] private Vector3 lightDir = new Vector3(0.3f, 0.8f, -0.6f);
     [SerializeField] private bool autoRotate = true;
     [SerializeField] private float rotateSpeed = 25f;
 
     [Header("RT (leave null for auto)")]
-    [SerializeField] private RenderTexture renderTexture; // optional override
+    [SerializeField] private RenderTexture renderTexture;
     [SerializeField] private int rtSize = 512;
 
-    // Internals
     const string PreviewLayerName = "ShopPreview";
     int _previewLayer = -1;
     UnityEngine.Camera _cam;
-    Transform _stage;        // parent for spawned model
+    Transform _stage;
     GameObject _spawned;
     Light _light;
 
@@ -73,11 +72,6 @@ public class ShopItemPreview : MonoBehaviour
     {
         // Layer setup
         _previewLayer = LayerMask.NameToLayer(PreviewLayerName);
-        if (_previewLayer < 0)
-        {
-            Debug.LogWarning($"[ShopItemPreview] Please add a layer named '{PreviewLayerName}' (Edit > Project Settings > Tags and Layers). Using default layer for now.");
-            _previewLayer = 0;
-        }
 
         // Stage
         if (!_stage)
@@ -158,7 +152,6 @@ public class ShopItemPreview : MonoBehaviour
     public void RebuildFor(Skin s)
     {
         skin = s;
-        // Clean old and rebuild
         CleanupSpawn();
         if (_cam) { _cam.targetTexture = null; DestroyImmediate(_cam.gameObject); _cam = null; }
         if (_light) { DestroyImmediate(_light.gameObject); _light = null; }
@@ -177,9 +170,6 @@ public class ShopItemPreview : MonoBehaviour
     void FreezeForPreview(GameObject root)
     {
         if (!root) return;
-
-        // 1) Disable common movement/AI scripts by type name
-        //    (add more names here if you have custom controllers)
         string[] typesToDisable =
         {
             "InfinitePlayerMovement",
@@ -191,7 +181,6 @@ public class ShopItemPreview : MonoBehaviour
         };
         DisableBehavioursByName(root, typesToDisable);
 
-        // 2) Stop physics from simulating
         foreach (var rb in root.GetComponentsInChildren<Rigidbody>(true))
         {
             rb.linearVelocity = Vector3.zero;
@@ -201,11 +190,9 @@ public class ShopItemPreview : MonoBehaviour
             rb.Sleep();
         }
 
-        // 3) Turn off colliders to avoid any physics callbacks
         foreach (var col in root.GetComponentsInChildren<Collider>(true))
             col.enabled = false;
 
-        // 4) Optional: mute audio in previews
         foreach (var au in root.GetComponentsInChildren<AudioSource>(true))
             au.mute = true;
     }
@@ -239,7 +226,6 @@ public class ShopItemPreview : MonoBehaviour
         foreach (var r in renderers)
         {
             if (!r) continue;
-            // Use .materials (not .sharedMaterials) so we don’t modify the original asset
             var mats = r.materials;
             if (replaceAllSlots)
             {

@@ -8,7 +8,7 @@ public class SkinCarousel : MonoBehaviour
     [SerializeField] private RawImage icon;
     [SerializeField] private Text nameText;
     [SerializeField] private Button leftBtn, rightBtn, equipBtn;
-    [SerializeField] private ShopItemPreview preview; // reuse our preview script (assign targetImage=icon)
+    [SerializeField] private ShopItemPreview preview;
 
     List<Skin> _owned;
     int _index;
@@ -36,15 +36,12 @@ public class SkinCarousel : MonoBehaviour
 
         if (preview)
         {
-            preview.enabled = false; // force rebuild
+            preview.enabled = false;
             preview.enabled = true;
-            // preview reads ShopItemUI.skin OR we set it directly:
             var ui = preview.GetComponent<ShopItemUI>();
             if (ui == null) ui = preview.gameObject.AddComponent<ShopItemUI>();
             ui.Bind(s, skinManager);
         }
-
-        // Show “Equipped” state by disabling Equip when already current (optional)
         if (equipBtn) equipBtn.interactable = (skinManager.CurrentSkin != s);
     }
 }

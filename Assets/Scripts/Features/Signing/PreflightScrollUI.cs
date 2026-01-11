@@ -12,7 +12,7 @@ namespace Features.Signing
     {
         [Header("Data")]
         [SerializeField] private WordBank wordBank;
-        [SerializeField] private SessionSelection sessionSelection; // asset
+        [SerializeField] private SessionSelection sessionSelection;
         [SerializeField] private int wordsNeeded = 5;
         [SerializeField] private string videosSubfolder = "Reference Videos";
         [SerializeField] private string mainSceneName = "GlyphwayScene";
@@ -20,8 +20,8 @@ namespace Features.Signing
         [SerializeField] private bool forceRepickOnPlay = true;
 
         [Header("UI")]
-        [SerializeField] private Transform contentParent;   // ScrollView/Viewport/Content
-        [SerializeField] private VideoTile videoTilePrefab; // Panel-root prefab
+        [SerializeField] private Transform contentParent;
+        [SerializeField] private VideoTile videoTilePrefab; // Panel-root
 
         void OnValidate()
         {
@@ -31,7 +31,6 @@ namespace Features.Signing
 
         void Start()
         {
-            // STRICT: if words exist in SessionSelection, use them exactly
             if (sessionSelection && sessionSelection.HasWords)
             {
                 var words = new System.Collections.Generic.List<string>();
@@ -49,12 +48,11 @@ namespace Features.Signing
                     return;
                 }
 
-                BuildList(words); // your existing method signature
+                BuildList(words);
                 return;
             }
 
-            // If no session words exist, fall back to your existing picker:
-            var wordsFallback = PickWordsWithVideos(wordsNeeded); // helper we added earlier in this class
+            var wordsFallback = PickWordsWithVideos(wordsNeeded);
             if (sessionSelection) { sessionSelection.SetWords(wordsFallback); sessionSelection.ResetRuntimeBag(); }
 
             Debug.Log($"[Preflight] Fallback words ({wordsFallback.Count}): [{string.Join(",", wordsFallback)}]");
@@ -63,10 +61,7 @@ namespace Features.Signing
         
         private List<string> PickWordsWithVideos(int count)
         {
-            // Build the set of words that actually have videos on disk
             HashSet<string> videoSet = null;
-
-            // Prefer IndexWordsWithVideos if your VideoCatalog has it; otherwise fallback to ListAllVideoWords
             try
             {
                 videoSet = VideoCatalog.IndexWordsWithVideos(videosSubfolder);
@@ -77,7 +72,6 @@ namespace Features.Signing
                 videoSet = new HashSet<string>(all);
             }
 
-            // Pool = WordBank ∩ video-backed words (lowercased & distinct)
             var pool = new List<string>();
             if (wordBank != null)
             {
@@ -90,11 +84,8 @@ namespace Features.Signing
             }
             else
             {
-                // If no WordBank, use the video set directly
                 pool.AddRange(videoSet);
             }
-
-            // Shuffle and take up to 'count'
             Shuffle(pool);
             if (pool.Count > count) pool.RemoveRange(count, pool.Count - count);
 
@@ -112,7 +103,6 @@ namespace Features.Signing
             }
         }
         
-        // Inlined picker (formerly SessionWordPicker)
         static List<string> PickWordsWithVideos_Random(WordBank bank, int count, string subfolder, List<string> allVideoWords)
         {
             var rng = new System.Random(unchecked(
@@ -120,7 +110,6 @@ namespace Features.Signing
 
             if (!bank)
             {
-                // Fallback to any video filenames (still random) so UI shows something
                 var fallback = new List<string>(allVideoWords);
                 Shuffle(fallback, rng);
                 return fallback.Take(Mathf.Min(count, fallback.Count)).ToList();
@@ -170,7 +159,6 @@ namespace Features.Signing
                 }
 
                 var tile = Instantiate(videoTilePrefab, contentParent, false);
-                // normalize rect (protect against zero scale)
                 var rt = tile.GetComponent<RectTransform>();
                 if (rt)
                 {

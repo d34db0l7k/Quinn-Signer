@@ -15,10 +15,9 @@ public class VideoTile : MonoBehaviour
     [SerializeField] private Button videoSpeedButton;
     [SerializeField] private Text videoSpeedText;
 
-    // NEW (optional) selection UI:
     [Header("Selection (Optional)")]
-    [SerializeField] private Button selectButton;          // assign to whole tile or a "Select" button
-    [SerializeField] private Image selectedHighlight;      // e.g., an outline/glow image; enable/disable
+    [SerializeField] private Button selectButton;
+    [SerializeField] private Image selectedHighlight;
 
     private VideoPlayer _player;
     private RenderTexture _renderTexture;

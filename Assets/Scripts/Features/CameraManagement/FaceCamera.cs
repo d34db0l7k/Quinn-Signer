@@ -14,7 +14,6 @@ namespace Features.CameraManagement
         private void LateUpdate()
         {
             if (!_cam) return;
-            // face the cameraS
             transform.rotation = Quaternion.LookRotation(
                 transform.position - _cam.transform.position,
                 Vector3.up

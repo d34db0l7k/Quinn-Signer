@@ -45,8 +45,6 @@ namespace Features
             foreach (var r in targets)
             {
                 if (!r) continue;
-
-                // Use .materials to get an instanced array we can modify per-object.
                 var mats = r.materials;
 
                 if (replaceAllSlots)

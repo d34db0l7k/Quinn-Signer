@@ -15,12 +15,12 @@ namespace Features.Signing
         [SerializeField] private string videosSubfolder = "Reference Videos";
 
         [Header("Counts")]
-        [SerializeField] private int showCount = 20;   // show 20 candidates
-        [SerializeField] private int selectLimit = 5;  // allow up to 5
+        [SerializeField] private int showCount = 20;
+        [SerializeField] private int selectLimit = 5;
 
         [Header("UI")]
-        [SerializeField] private Transform contentParent;           // ScrollView Content
-        [SerializeField] private DictionaryWordItem wordItemPrefab; // prefab above
+        [SerializeField] private Transform contentParent;
+        [SerializeField] private DictionaryWordItem wordItemPrefab;
         [SerializeField] private Button saveAndExitButton;
         [SerializeField] private Text selectionCounterText;
         [SerializeField] private string mainMenuSceneName = "MainMenu";
@@ -74,11 +74,6 @@ namespace Features.Signing
             UpdateSelectionUI();
         }
         
-        /// <summary>
-        /// Ensures that all currently selected words (from _selected / SessionSelection.Words)
-        /// are present in the candidate list, and trims extra non-selected words
-        /// so the final list does not exceed showCount.
-        /// </summary>
         void EnsureSelectedInCandidates(List<string> candidates)
         {
             if (candidates == null) return;
@@ -128,13 +123,8 @@ namespace Features.Signing
             var pool     = BuildPool(wordBank, videoSet);
             var twenty   = TakeRandom(pool, showCount);
 
-            // ensure existing selections (from _selected / SessionSelection.Words) are in the 20
             EnsureSelectedInCandidates(twenty);
-
-            // Persist candidates
             sessionSelection.SetCandidates20(twenty);
-
-            // No need to remove selections here, since we just guaranteed they’re present
             BuildList(twenty);
         }
 
@@ -148,7 +138,6 @@ namespace Features.Signing
                            .Distinct()
                            .ToList();
             }
-            // fallback if WordBank is missing: just use all video-backed words
             return videoSet.ToList();
         }
 
@@ -180,7 +169,6 @@ namespace Features.Signing
                     rt.pivot     = new Vector2(0.5f, 1f);
                 }
 
-                // keep toggled if previously selected
                 item.Setup(w, isOn: _selected.Contains(w));
                 item.onToggled += HandleItemToggled;
             }
@@ -193,7 +181,7 @@ namespace Features.Signing
                 Canvas.ForceUpdateCanvases();
             }
 
-            UpdateSelectionUI(); // refresh button state/counter
+            UpdateSelectionUI();
         }
 
         void HandleItemToggled(DictionaryWordItem item, bool isOn)
@@ -205,10 +193,8 @@ namespace Features.Signing
             {
                 if (_selected.Count >= selectLimit)
                 {
-                    // revert toggle if at cap
                     item.onToggled -= HandleItemToggled;
-                    item.GetComponent<Toggle>()?.SetIsOnWithoutNotify(false); // in case prefab used Toggle on root
-                    // safer: directly flip via component
+                    item.GetComponent<Toggle>()?.SetIsOnWithoutNotify(false);
                     var t = item.GetComponentInChildren<Toggle>();
                     if (t) t.isOn = false;
                     item.onToggled += HandleItemToggled;
@@ -231,7 +217,6 @@ namespace Features.Signing
 
         void SaveAndExit()
         {
-            // normalize + cap to 5
             var picks = _selected
                 .Select(w => (w ?? "").Trim().ToLowerInvariant())
                 .Where(w => !string.IsNullOrEmpty(w))

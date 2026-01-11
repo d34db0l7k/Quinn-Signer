@@ -18,14 +18,9 @@ public class SkinManager : MonoBehaviour
 
     void Awake()
     {
-        // Load currently equipped skin id (may be empty on first run)
         var curId = PlayerPrefs.GetString(CurrentKey, string.Empty);
         CurrentSkin = allSkins.Find(s => s.id == curId);
 
-        // Do NOT auto-own anything on first run.
-        // Ownership is only set by TryPurchase(...) or your editor tools.
-
-        // If the saved current skin is missing or no longer owned, clear it.
         if (CurrentSkin != null && !IsOwned(CurrentSkin))
         {
             CurrentSkin = null;
@@ -33,7 +28,6 @@ public class SkinManager : MonoBehaviour
             PlayerPrefs.Save();
         }
 
-        // Optional: log what’s owned (for sanity)
 #if UNITY_EDITOR
         foreach (var s in allSkins)
             Debug.Log($"[SkinManager] Owned[{s.displayName}] = {IsOwned(s)}");
