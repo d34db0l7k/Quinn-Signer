@@ -264,16 +264,26 @@ namespace Features.Signing
             if (string.IsNullOrEmpty(word)) return;
             var key = word.Trim().ToLowerInvariant();
 
-            for (int i = sessionSelection.words.Count - 1; i >= 0; i--)
+            // THIS is what actually tracks progress
+            for (int i = _filterWords.Count - 1; i >= 0; i--)
             {
-                var s = sessionSelection.words[i];
-                if (string.Equals(s?.Trim(), key, System.StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(_filterWords[i], key, System.StringComparison.OrdinalIgnoreCase))
+                    _filterWords.RemoveAt(i);
+            }
+
+            // Optional (safe) remove from session list too
+            if (sessionSelection != null && sessionSelection.words != null)
+            {
+                for (int i = sessionSelection.words.Count - 1; i >= 0; i--)
                 {
-                    sessionSelection.words.RemoveAt(i);
+                    var s = sessionSelection.words[i];
+                    if (string.Equals(s?.Trim().ToLowerInvariant(), key, System.StringComparison.OrdinalIgnoreCase))
+                        sessionSelection.words.RemoveAt(i);
                 }
             }
 
-            if (engine)
+            // Update recognizer so it only listens for remaining words
+            if (engine != null && engine.recognizer != null)
             {
                 engine.recognizer.outputFilters.Clear();
                 if (_filterWords.Count > 0)
@@ -281,16 +291,17 @@ namespace Features.Signing
             }
         }
 
+
         private IEnumerator CheckForWinNextFrame()
         {
             yield return null;
 
             bool noWordsLeft = _filterWords == null || _filterWords.Count == 0;
-            var enemyLabels = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
-            bool noEnemiesLeft = enemyLabels == null || enemyLabels.Length == 0;
 
-            if (noEnemiesLeft) TriggerWin();
+            if (noWordsLeft)
+                TriggerWin();
         }
+
 
         private void TriggerWin()
         {
@@ -337,14 +348,18 @@ namespace Features.Signing
         private void ApplyRecognizerFilterToDictionaryWords()
         {
             if (engine == null) return;
+            if (engine.recognizer == null) return; // <- THIS is the important fix
 
             var focus = GetDictionaryWords();
+
             engine.recognizer.outputFilters.Clear();
             if (focus.Count > 0)
                 engine.recognizer.outputFilters.Add(new FocusSublistFilter<string>(focus));
+
             _filterWords.Clear();
             _filterWords.AddRange(focus);
         }
+
 
     }
 }
