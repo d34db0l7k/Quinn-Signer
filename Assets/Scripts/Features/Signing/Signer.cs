@@ -210,19 +210,19 @@ namespace Features.Signing
             {
                 if (!string.IsNullOrEmpty(l.targetWord))
                 {
-                    OnSignRecognized(l.targetWord);
+                    OnSignRecognized(l.targetWord, 1.0f);
                     return;
                 }
             }
-            OnSignRecognized("dev_correct_missing");
+            OnSignRecognized("dev_correct_missing", 1.0f);
         }
 
         void SimulateIncorrectSign()
         {
-            OnSignRecognized("__dev_wrong__");
+            OnSignRecognized("__dev_wrong__", 1.0f);
         }
         
-        private void OnSignRecognized(string rawInput)
+        private void OnSignRecognized(string rawInput, float inputConfidence)
         {
             var signed = (rawInput ?? "").Trim().ToLowerInvariant();
             if (string.IsNullOrEmpty(signed))
