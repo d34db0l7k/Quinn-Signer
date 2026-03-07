@@ -10,9 +10,6 @@ public class Toast : MonoBehaviour
 
     [SerializeField] private float speed = 5f;
 
-    [SerializeField] private Vector2 onScreenPosition = new Vector2(0f, 0f);
-    [SerializeField] private Vector2 offScreenPosition = new Vector2(2000f, 0f);
-
     private Coroutine notifyCoroutine;
 
     // Ensure Toasts do not stack and interfere with each other
@@ -35,15 +32,15 @@ public class Toast : MonoBehaviour
         }
     }
 
-    public void ShowToast(string toastMessage, float duration)
+    public void ShowToast(string toastMessage, float duration, Vector2 onScreenPosition, Vector2 offScreenPosition)
     {
         content.text = toastMessage;
         gameObject.SetActive(true);
         if (notifyCoroutine != null) StopCoroutine(notifyCoroutine);
-        notifyCoroutine = StartCoroutine(Notify(duration));
+        notifyCoroutine = StartCoroutine(Notify(duration, onScreenPosition, offScreenPosition));
     }
 
-    IEnumerator Notify(float duration)
+    IEnumerator Notify(float duration, Vector2 onScreenPosition, Vector2 offScreenPosition)
     {
         rectTransform.anchoredPosition = offScreenPosition;
         while (Vector2.Distance(rectTransform.anchoredPosition, onScreenPosition) > 2f)
