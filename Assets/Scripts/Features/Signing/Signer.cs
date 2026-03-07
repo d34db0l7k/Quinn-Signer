@@ -20,6 +20,7 @@ namespace Features.Signing
         [Header("Plug in")]
         public WordBank wordBank;
         public Text inferenceText;
+        public Text confidenceScoreText;
         public Image background;
 
         [SerializeField] private SessionSelection sessionSelection;
@@ -79,10 +80,11 @@ namespace Features.Signing
                 return;
             }
 
-            wordBank      = _bindings.wordBank;
-            engine        = _bindings.engine;
-            inferenceText = _bindings.inferenceText;
-            background    = _bindings.background;
+            wordBank            = _bindings.wordBank;
+            engine              = _bindings.engine;
+            inferenceText       = _bindings.inferenceText;
+            confidenceScoreText = _bindings.condifenceScoreText;
+            background          = _bindings.background;
 
             _hasExecuted = false;
 
@@ -210,24 +212,25 @@ namespace Features.Signing
             {
                 if (!string.IsNullOrEmpty(l.targetWord))
                 {
-                    OnSignRecognized(l.targetWord);
+                    OnSignRecognized(l.targetWord, 1.0f);
                     return;
                 }
             }
-            OnSignRecognized("dev_correct_missing");
+            OnSignRecognized("dev_correct_missing", 1.0f);
         }
 
         void SimulateIncorrectSign()
         {
-            OnSignRecognized("__dev_wrong__");
+            OnSignRecognized("__dev_wrong__", 0.0f);
         }
         
-        private void OnSignRecognized(string rawInput)
+        private void OnSignRecognized(string rawInput, float confidenceScore)
         {
             var signed = (rawInput ?? "").Trim().ToLowerInvariant();
+            var normalizedScore = Mathf.RoundToInt(confidenceScore * 100f);
             if (string.IsNullOrEmpty(signed))
             {
-                if (inferenceText) { inferenceText.text = rawInput; inferenceText.color = Color.red; }
+                SetInferenceTextFields(signed, normalizedScore, Color.red);
                 return;
             }
 
@@ -245,7 +248,7 @@ namespace Features.Signing
 
             if (!match)
             {
-                if (inferenceText) { inferenceText.text = signed; inferenceText.color = Color.red; }
+                SetInferenceTextFields(signed, normalizedScore, Color.red);
                 if (playerHealth) playerHealth.Damage(1);
                 return;
             }
@@ -253,10 +256,24 @@ namespace Features.Signing
             var controller = match.GetComponentInParent<EnemyController>() ?? match.GetComponent<EnemyController>();
             if (controller) controller.Explode(); else Destroy(match.gameObject);
 
-            if (inferenceText) { inferenceText.text = signed; inferenceText.color = Color.green; }
+            SetInferenceTextFields(signed, normalizedScore, Color.green);
 
             RemoveWordFromList(signed);
             StartCoroutine(CheckForWinNextFrame());
+        }
+
+        private void SetInferenceTextFields(string signed, int score, Color textColor)
+        {
+            if (inferenceText)
+            {
+                inferenceText.text = signed;
+                inferenceText.color = textColor;
+                if (score >= 0f && score <= 100)
+                {
+                    confidenceScoreText.text = score.ToString() + "%";
+                    confidenceScoreText.color = textColor;
+                }
+            }
         }
 
         private void RemoveWordFromList(string word)

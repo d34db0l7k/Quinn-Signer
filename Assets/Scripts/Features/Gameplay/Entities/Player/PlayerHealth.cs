@@ -22,6 +22,8 @@ namespace Features.Gameplay.Entities.Player
             if (Current <= 0) return;
             Current = Mathf.Max(0, Current - Mathf.Max(1, amount));
             OnHealthChanged?.Invoke(Current, maxHealth);
+            //Debug.Log("Calling Toast");
+            Toast.Instance.ShowToast($"Took {amount} damage from enemy!", 1.5f, new Vector2(0f, 0f), new Vector2((Screen.width * 1.5f), 0f));
             if (Current <= 0) OnDeath?.Invoke();
         }
 
