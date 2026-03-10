@@ -19,6 +19,7 @@ namespace Features.Gameplay.Encounters
         [Header("Timing")]
         [SerializeField] private float encounterIntervalSec = 15f; // time between encounters
         [SerializeField] private float preSafeLeadSec = 3f;        // desired safe runway before spawn
+        [SerializeField] private float lifeDuration = 10f;
 
         [Header("Spawn placement (relative to PLAYER world +Z)")]
         [SerializeField] private float spawnAheadZ = 60f;
@@ -125,8 +126,8 @@ namespace Features.Gameplay.Encounters
             locker.lockLeadZ = lockLeadZ;
             locker.approachSpeed = 1.25f * (player ? player.GetComponent<Features.Gameplay.Entities.Player.InfinitePlayerMovement>()?.forwardSpeed ?? 40f : 40f);
 
-
             StartCoroutine(WaitEnemyDefeatedThenResume());
+            StartCoroutine(DespawnFromExpiration());
         }
 
         IEnumerator WaitEnemyDefeatedThenResume()
@@ -137,6 +138,17 @@ namespace Features.Gameplay.Encounters
             _safeArmed = false;
             if (segmentGen) segmentGen.SetForceSafeSegments(false);
             _timer = encounterIntervalSec;
+        }
+
+        IEnumerator DespawnFromExpiration()
+        {
+            Debug.Log($"Starting {lifeDuration} second countdown towards expiration of enemy.");
+            EnemyController controller = _currentEnemy.GetComponent<EnemyController>();
+            yield return new WaitForSeconds(lifeDuration);
+            controller.Expire();
+            _timer = encounterIntervalSec;
+            _currentEnemy = null;
+            Debug.Log("Successfully expired the enemy.");
         }
     }
 }
