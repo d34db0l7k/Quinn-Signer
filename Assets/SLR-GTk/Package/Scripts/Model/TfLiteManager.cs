@@ -47,7 +47,7 @@ namespace Model {
 		// NativeArray<float> modelOutputTensor;
 		// NativeArray<float> modelOutputTensor;
 		
-		private Dictionary<string, Action<T, float>> callbacks = new();
+		private Dictionary<string, Action<T>> callbacks = new();
 		public List<PredictionFilter<T>> outputFilters = new();
 		
 		private readonly float[] outputs = new float[563];
@@ -87,20 +87,18 @@ namespace Model {
 				output = filter.Filter(output);
 			}
 
-
 			foreach (var callback in callbacks) {
 				if (output.mapping.Count == 1) {
-					callbacks[callback.Key].Invoke(output.mapping[0], output.probabilities[0]);
+					callbacks[callback.Key].Invoke(output.mapping[0]);
 				}
 				else if (output.mapping.Count > 1) {
-					int argmaxIndex = MathUtil.Argmax(output.probabilities.ToList());
-					callbacks[callback.Key].Invoke(output.mapping[argmaxIndex], output.probabilities[argmaxIndex]);
+					callbacks[callback.Key].Invoke(output.mapping[MathUtil.Argmax(output.probabilities.ToList())]);
 				}
 			}
 			// modelOutputTensor.Dispose();
 		}
 		
-		public void AddCallback(string name, Action<T, float> callback) {
+		public void AddCallback(string name, Action<T> callback) {
 			if (callbacks.ContainsKey(name)) callbacks.Remove(name);
 			callbacks.Add(name, callback);
 		}

@@ -116,7 +116,7 @@ namespace Engine {
                 }
                 buffer.Clear();
             });
-            recognizer.AddCallback("default", (translation, score) => {
+            recognizer.AddCallback("default", (translation) => {
                // Debug.Log(translation);
             });
             if (inputCamera) inputCamera.AddCallback("default", image => {
