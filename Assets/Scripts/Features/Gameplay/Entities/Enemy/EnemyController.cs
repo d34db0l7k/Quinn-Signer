@@ -1,5 +1,7 @@
 namespace Features.Gameplay.Entities.Enemy
 {
+    using Features.Gameplay.Entities.Player;
+    using System.Collections;
     using UnityEngine;
 
     public class EnemyController : MonoBehaviour
@@ -34,13 +36,51 @@ namespace Features.Gameplay.Entities.Enemy
             _isDead = true;
 
             // 1) stop behaviours
+            StopBehaviors();
+
+            // 2) stop physics/collisions
+            StopPhysics();
+
+            // 3) hide renderers (so it looks gone even if we keep the root for VFX timing)
+            HideRenderer();
+
+            NotifySignerAndPruneWord();
+
+            // 4) nuke labels IMMEDIATELY so win checks no longer see this enemy
+            DestroyLabel();
+
+            //// 5) FX/SFX
+            TriggerDeathFX();
+
+            // 6) finally remove the whole enemy object
+            Destroy(gameObject, despawnDelay);
+        }
+
+        public void Expire()
+        {
+            if (_isDead) return;
+            _isDead = true;
+
+            StopBehaviors();
+            StopPhysics();
+            HideRenderer();
+            DestroyLabel();
+            TriggerDeathFX();
+            DamagePlayer(1);
+            Destroy(gameObject, despawnDelay);
+        }
+
+        private void StopBehaviors()
+        {
             foreach (var mb in GetComponentsInChildren<MonoBehaviour>(true))
             {
                 if (mb == this) continue;
                 mb.enabled = false;
             }
+        }
 
-            // 2) stop physics/collisions
+        private void StopPhysics()
+        {
             foreach (var rb in GetComponentsInChildren<Rigidbody>(true))
             {
                 rb.linearVelocity = Vector3.zero;
@@ -51,18 +91,22 @@ namespace Features.Gameplay.Entities.Enemy
             }
             foreach (var col in GetComponentsInChildren<Collider>(true))
                 col.enabled = false;
+        }
 
-            // 3) hide renderers (so it looks gone even if we keep the root for VFX timing)
+        private void HideRenderer()
+        {
             foreach (var r in GetComponentsInChildren<Renderer>(true))
                 r.enabled = false;
+        }
 
-            NotifySignerAndPruneWord();
-            
-            // 4) nuke labels IMMEDIATELY so win checks no longer see this enemy
+        private void DestroyLabel()
+        {
             var labels = GetComponentsInChildren<EnemyLabel>(true);
             foreach (var l in labels) Destroy(l.gameObject);
+        }
 
-            // 5) FX/SFX
+        private void TriggerDeathFX()
+        {
             if (explodeVfx)
             {
                 var v = Instantiate(explodeVfx, transform.position, transform.rotation);
@@ -70,9 +114,12 @@ namespace Features.Gameplay.Entities.Enemy
                 Destroy(v.gameObject, v.main.duration + v.main.startLifetime.constantMax + 0.25f);
             }
             if (explodeSfx) AudioSource.PlayClipAtPoint(explodeSfx, transform.position);
+        }
 
-            // 6) finally remove the whole enemy object
-            Destroy(gameObject, despawnDelay);
+        private void DamagePlayer(int damage)
+        {
+            PlayerHealth health = FindFirstObjectByType<PlayerHealth>();
+            health.Damage(damage);
         }
     }
 }
