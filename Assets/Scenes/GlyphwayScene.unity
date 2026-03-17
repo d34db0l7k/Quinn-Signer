@@ -5518,6 +5518,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SlowMotionHelper
   slowTimeScale: 0.2
+  trainingPanel: {fileID: 1662034371}
+  trainingPanelObject: {fileID: 947932553}
 --- !u!1 &1113803713
 GameObject:
   m_ObjectHideFlags: 0

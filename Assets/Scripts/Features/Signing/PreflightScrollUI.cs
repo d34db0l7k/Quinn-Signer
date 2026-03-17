@@ -180,7 +180,48 @@ namespace Features.Signing
             Debug.Log($"[Preflight] Built {made} tiles.");
         }
 
-        public void ContinueToMain() => SceneManager.LoadScene(mainSceneName);
+            public void BuildListWithPriorityWord(string priorityWord)
+            {
+                List<string> words = new List<string>();
+
+                string normalizedPriorityWord = priorityWord;
+                if (normalizedPriorityWord == null)
+                {
+                    normalizedPriorityWord = "";
+                }
+                normalizedPriorityWord = normalizedPriorityWord.Trim();
+                normalizedPriorityWord = normalizedPriorityWord.ToLowerInvariant();
+
+                if (normalizedPriorityWord != "")
+                {
+                    words.Add(normalizedPriorityWord);
+                }
+
+                if (sessionSelection != null && sessionSelection.HasWords)
+                {
+                    foreach (string word in sessionSelection.Words)
+                    {
+                        string cleanedWord = word;
+                        if (cleanedWord == null)
+                        {
+                            cleanedWord = "";
+                        }
+                        cleanedWord = cleanedWord.Trim();
+                        cleanedWord = cleanedWord.ToLowerInvariant();
+
+                        if (cleanedWord != "" && cleanedWord != normalizedPriorityWord)
+                        {
+                            words.Add(cleanedWord);
+                        }
+                    }
+                }
+
+                BuildList(words);
+            }
+
+
+
+            public void ContinueToMain() => SceneManager.LoadScene(mainSceneName);
     }
 }
 
