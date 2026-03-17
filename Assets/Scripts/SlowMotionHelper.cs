@@ -18,4 +18,6 @@ public class SlowMotionHelper : MonoBehaviour
             isSlowed = true;
         }
     }
+
+    
 }
