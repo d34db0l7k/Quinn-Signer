@@ -54,7 +54,7 @@ namespace Features.Signing
         {
             if (!_hasExecuted && engine)
             {
-                engine.recognizer.AddCallback("check", OnSignRecognized);
+                engine.recognizer.AddCallback("check", (word) => OnSignRecognized(word, 1.0f));
                 engine.recognizer.outputFilters.Clear();
                 ApplyRecognizerFilterToDictionaryWords();
                 _hasExecuted = true;
