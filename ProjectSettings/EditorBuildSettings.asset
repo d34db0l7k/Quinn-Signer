@@ -26,5 +26,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GameOverScene.unity
     guid: 641751a123cc843d7ad9c028731692fc
+  - enabled: 1
+    path: Assets/Scenes/MissionsScene.unity
+    guid: 6ae5919111cb97944bf54fff5c3142d7
+  - enabled: 1
+    path: Assets/Scenes/GarageScene.unity
+    guid: 730b861dcf459384aacb325ab4c4f521
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
