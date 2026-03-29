@@ -13,9 +13,16 @@ public class SplashManager : MonoBehaviour
     public Text gameLogo;
     public Text tapToPlayText;
 
+    [Header("Effects")]
+    public GameObject smokeEffect;
+
+    [Header("Camera")]
+    public UnityEngine.Camera splashCamera;
+    public Color companyBackgroundColor = Color.white;
+    public Color gameBackgroundColor = Color.white;
+
     [Header("Timing")]
     public float fadeSpeed = 1.5f;
-    public float holdDuration = 2f;
 
     private bool canTap = false;
 
@@ -25,6 +32,12 @@ public class SplashManager : MonoBehaviour
         SetAlpha(presentsText, 0);
         SetAlpha(gameLogo, 0);
         SetAlpha(tapToPlayText, 0);
+
+        if (smokeEffect != null)
+            smokeEffect.SetActive(false);
+
+        if (splashCamera != null)
+            splashCamera.backgroundColor = companyBackgroundColor;
 
         StartCoroutine(PlaySequence());
     }
@@ -39,14 +52,25 @@ public class SplashManager : MonoBehaviour
     {
         yield return StartCoroutine(Fade(companyLogo, 0, 1));
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.5f);
         yield return StartCoroutine(Fade(presentsText, 0, 1));
 
-        yield return new WaitForSeconds(holdDuration);
-        yield return StartCoroutine(FadeTogether(
-            new Graphic[] { companyLogo, presentsText }, 1, 0));
+        yield return new WaitForSeconds(1.5f);
 
-        yield return new WaitForSeconds(0.5f);
+        // Trigger smoke and instantly hide both
+        if (smokeEffect != null)
+            smokeEffect.SetActive(true);
+
+        SetAlpha(companyLogo, 0);
+        SetAlpha(presentsText, 0);
+
+        yield return new WaitForSeconds(1f); // let smoke play first
+
+        // Fade background color
+        if (splashCamera != null)
+            yield return StartCoroutine(FadeBackgroundColor(companyBackgroundColor, gameBackgroundColor, 1.5f));
+
+        yield return new WaitForSeconds(2f);
 
         yield return StartCoroutine(Fade(gameLogo, 0, 1));
         yield return StartCoroutine(Fade(tapToPlayText, 0, 1));
@@ -66,18 +90,16 @@ public class SplashManager : MonoBehaviour
         SetAlpha(element, to);
     }
 
-    IEnumerator FadeTogether(Graphic[] elements, float from, float to)
+    IEnumerator FadeBackgroundColor(Color from, Color to, float duration)
     {
         float t = 0;
         while (t < 1)
         {
-            t += Time.deltaTime * fadeSpeed;
-            foreach (var el in elements)
-                SetAlpha(el, Mathf.Lerp(from, to, t));
+            t += Time.deltaTime / duration;
+            splashCamera.backgroundColor = Color.Lerp(from, to, t);
             yield return null;
         }
-        foreach (var el in elements)
-            SetAlpha(el, to);
+        splashCamera.backgroundColor = to;
     }
 
     void SetAlpha(Graphic element, float alpha)
