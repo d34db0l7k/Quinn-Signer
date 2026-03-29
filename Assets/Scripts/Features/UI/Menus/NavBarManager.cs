@@ -7,15 +7,14 @@ public class NavBarManager : MonoBehaviour
     private static NavBarManager _instance;
 
     [Header("Hide On Scenes")]
-    private string[] hideOnScenes = { "GameOverScene", "GlyphwayScene", "TrainingScene", "WinScene"};
+    private string[] hideOnScenes = { "GameOverScene", "TrainingScene", "WinScene", "SplashScene" };
 
     [Header("Nav Buttons")]
     public Button homeButton;
     public Button missionsButton;
+    public Button glyphwayButton;
     public Button dictionaryButton;
-    public Button garageButton;
     public Button shopButton;
-    public Button settingsButton;
 
     [Header("Highlight Colors")]
     public Color activeColor = Color.white;
@@ -58,19 +57,35 @@ public class NavBarManager : MonoBehaviour
     {
         SetColor(homeButton, inactiveColor);
         SetColor(missionsButton, inactiveColor);
+        SetColor(glyphwayButton, inactiveColor);
         SetColor(dictionaryButton, inactiveColor);
-        SetColor(garageButton, inactiveColor);
         SetColor(shopButton, inactiveColor);
-        SetColor(settingsButton, inactiveColor);
 
         switch (sceneName)
         {
-            case "TitleScene":        SetColor(homeButton, activeColor);       break;
-            case "MissionsScene":     SetColor(missionsButton, activeColor);   break;
-            case "DictionaryScene":   SetColor(dictionaryButton, activeColor); break;
-            case "GarageScene":       SetColor(garageButton, activeColor);     break;
-            case "ShopScene":         SetColor(shopButton, activeColor);       break;
-            case "SettingsScene":     SetColor(settingsButton, activeColor);   break;
+            // Home and its sub-pages
+            case "TitleScene":
+            case "GarageScene":
+            case "SettingsScene":
+                SetColor(homeButton, activeColor);
+                break;
+
+            case "MissionsScene":
+            case "MissionZeroScene":
+                SetColor(missionsButton, activeColor);
+                break;
+
+            case "GlyphwayScene":
+                SetColor(glyphwayButton, activeColor);
+                break;
+
+            case "DictionaryScene":
+                SetColor(dictionaryButton, activeColor);
+                break;
+
+            case "ShopScene":
+                SetColor(shopButton, activeColor);
+                break;
         }
     }
 
@@ -84,8 +99,8 @@ public class NavBarManager : MonoBehaviour
     /* ---------- Navigation ---------- */
     public void GoToHome()       { SceneManager.LoadScene("TitleScene"); }
     public void GoToMissions()   { SceneManager.LoadScene("MissionsScene"); }
+    public void GoToGlyphway()   { SceneManager.LoadScene("GlyphwayScene"); }
     public void GoToDictionary() { SceneManager.LoadScene("DictionaryScene"); }
-    public void GoToGarage()     { SceneManager.LoadScene("GarageScene"); }
     public void GoToShop()       { SceneManager.LoadScene("ShopScene"); }
-    public void GoToSettings()   { SceneManager.LoadScene("SettingsScene"); }
+    public void GoToGarage() { SceneManager.LoadScene("GarageScene"); }
 }

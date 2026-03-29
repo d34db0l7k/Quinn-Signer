@@ -888,7 +888,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0.056069765, g: 0.59776944, b: 0.7924528, a: 0}
+  m_Color: {r: 0.18431373, g: 0.12156863, b: 0.94509804, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1088,5 +1088,5 @@ SceneRoots:
   - {fileID: 755726022}
   - {fileID: 170138257}
   - {fileID: 737584908}
-  - {fileID: 727998947}
   - {fileID: 210751644}
+  - {fileID: 727998947}
