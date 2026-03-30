@@ -6,11 +6,11 @@ using UnityEngine.UI;
 public class SplashManager : MonoBehaviour
 {
     [Header("Company Side")]
-    public Text companyLogo;
+    public Image companyLogo;
     public Text presentsText;
 
     [Header("Game Side")]
-    public Text gameLogo;
+    public Image gameLogo;
     public Text tapToPlayText;
 
     [Header("Effects")]
@@ -50,6 +50,8 @@ public class SplashManager : MonoBehaviour
 
     IEnumerator PlaySequence()
     {
+        yield return new WaitForSeconds(1f);
+
         yield return StartCoroutine(Fade(companyLogo, 0, 1));
 
         yield return new WaitForSeconds(1.5f);
