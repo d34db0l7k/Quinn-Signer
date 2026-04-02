@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 3267940441896166686}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 1}
+  m_LocalPosition: {x: -2, y: 1.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -332,7 +332,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2437718600
+  GlobalObjectIdHash: 1224492457
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -373,15 +373,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Multiplayer.NetworkRacePlayer
   ShowTopMostFoldoutHeaderGroup: 1
-  boostAmount: 4
+  boostAmount: 5
   visualMoveLerp: 10
-  laneX: 0
   shipVisual: {fileID: 7483950394711587598}
   cameraFollowTarget: {fileID: 4757413825378297036}
   swipeInputReader: {fileID: 5493391275912749218}
-  promptText: {fileID: 0}
   nameText: {fileID: 958778684419023814}
-  labelRoot: {fileID: 0}
+  SpawnPosition:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: {x: 0, y: 0, z: 0}
   Progress:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -464,11 +466,6 @@ MonoBehaviour:
         byte0059: 0
         byte0060: 0
         byte0061: 0
-  SpawnPosition:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: {x: 0, y: 0, z: 0}
 --- !u!1 &7703308759510195351
 GameObject:
   m_ObjectHideFlags: 0
@@ -493,14 +490,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7703308759510195351}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 1.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2404821531984148870}
   m_Father: {fileID: 5297349035270302867}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1001 &2496931489983500308
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -527,7 +524,7 @@ PrefabInstance:
     - target: {fileID: -4216859302048453862, guid: eadac7660e4969a4c91c550f10746636,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: eadac7660e4969a4c91c550f10746636,
         type: 3}
@@ -537,7 +534,7 @@ PrefabInstance:
     - target: {fileID: -4216859302048453862, guid: eadac7660e4969a4c91c550f10746636,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: eadac7660e4969a4c91c550f10746636,
         type: 3}
@@ -552,7 +549,7 @@ PrefabInstance:
     - target: {fileID: -4216859302048453862, guid: eadac7660e4969a4c91c550f10746636,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: eadac7660e4969a4c91c550f10746636,
         type: 3}

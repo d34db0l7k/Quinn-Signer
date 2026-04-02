@@ -6,37 +6,37 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SplashScene.unity
+    path: Assets/Scenes/TitleScene/SplashScene.unity
     guid: a5413ed8c49b0b54dacdee9dfdd8af05
   - enabled: 1
-    path: Assets/Scenes/TitleScene.unity
+    path: Assets/Scenes/TitleScene/TitleScene.unity
     guid: bb61d2ebfdce8413b90cfddb6f2043ee
   - enabled: 1
-    path: Assets/Scenes/DictionaryScene.unity
+    path: Assets/Scenes/MenuScenes/DictionaryScene.unity
     guid: 472ee5834a73738489fcfc847fb47ef0
   - enabled: 1
-    path: Assets/Scenes/TrainingScene.unity
+    path: Assets/Scenes/InfiniteRunnerScenes/TrainingScene.unity
     guid: d0a340a2876c945408b24e73c80dc621
   - enabled: 1
-    path: Assets/Scenes/GlyphwayScene.unity
+    path: Assets/Scenes/MultiplayerScenes/GlyphwayScene.unity
     guid: a51071cd5b8d8894b979ce13a00e4f9a
   - enabled: 1
-    path: Assets/Scenes/ShopScene.unity
+    path: Assets/Scenes/MenuScenes/ShopScene.unity
     guid: 0467c73adc9943b40b020f5947a69231
   - enabled: 1
-    path: Assets/Scenes/MissionsScene.unity
+    path: Assets/Scenes/MultiplayerScenes/MissionsScene.unity
     guid: 6ae5919111cb97944bf54fff5c3142d7
   - enabled: 1
-    path: Assets/Scenes/GarageScene.unity
+    path: Assets/Scenes/MenuScenes/GarageScene.unity
     guid: 730b861dcf459384aacb325ab4c4f521
   - enabled: 1
-    path: Assets/Scenes/WinScene.unity
+    path: Assets/Scenes/EndStateScenes/WinScene.unity
     guid: 881179ec7e4a941809df7351e35863b7
   - enabled: 1
-    path: Assets/Scenes/GameOverScene.unity
+    path: Assets/Scenes/EndStateScenes/GameOverScene.unity
     guid: 641751a123cc843d7ad9c028731692fc
   - enabled: 1
-    path: Assets/Scenes/RaceScene.unity
+    path: Assets/Scenes/MultiplayerScenes/RaceScene.unity
     guid: b891ed3a4f191724bbb4fe5f74ca68fb
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

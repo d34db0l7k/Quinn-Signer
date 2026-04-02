@@ -8,7 +8,7 @@ namespace Multiplayer
     public class NetworkRacePlayer : NetworkBehaviour
     {
         [Header("Movement")]
-        public float boostAmount = 4f;
+        public float boostAmount = 5f;
         public float visualMoveLerp = 10f;
 
         [Header("References")]
@@ -81,9 +81,9 @@ namespace Multiplayer
         private void Update()
         {
             Vector3 targetPos = new Vector3(
-                SpawnPosition.Value.x,
+                SpawnPosition.Value.x + Progress.Value,
                 SpawnPosition.Value.y,
-                SpawnPosition.Value.z + Progress.Value
+                SpawnPosition.Value.z
             );
 
             transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * visualMoveLerp);
