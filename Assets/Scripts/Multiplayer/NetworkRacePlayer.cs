@@ -7,12 +7,10 @@ namespace Multiplayer
 {
     public class NetworkRacePlayer : NetworkBehaviour
     {
-        [Header("Movement")]
-        public float boostAmount = 5f;
+        [Header("Movement")] public float boostAmount = 4f;
         public float visualMoveLerp = 10f;
 
-        [Header("References")]
-        public Transform shipVisual;
+        [Header("References")] public Transform shipVisual;
         public Transform cameraFollowTarget;
         public SwipeInputReader swipeInputReader;
         public TMP_Text nameText;
@@ -55,18 +53,13 @@ namespace Multiplayer
 
             UpdateNameUI(PlayerName.Value.ToString());
 
-            if (IsOwner)
-            {
-                _localHud = FindObjectOfType<RaceHUD>();
-                if (_localHud != null)
-                    _localHud.SetPrompt(CurrentPrompt.Value);
-            }
-
             if (IsServer)
             {
                 if (string.IsNullOrWhiteSpace(PlayerName.Value.ToString()) || PlayerName.Value.ToString() == "Player")
                     PlayerName.Value = $"Player {OwnerClientId + 1}";
             }
+
+            TryBindHud();
         }
 
         public override void OnNetworkDespawn()
@@ -81,12 +74,25 @@ namespace Multiplayer
         private void Update()
         {
             Vector3 targetPos = new Vector3(
-                SpawnPosition.Value.x + Progress.Value,
+                SpawnPosition.Value.x,
                 SpawnPosition.Value.y,
-                SpawnPosition.Value.z
+                SpawnPosition.Value.z + Progress.Value
             );
 
             transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * visualMoveLerp);
+
+            if (IsOwner && _localHud == null)
+                TryBindHud();
+        }
+
+        private void TryBindHud()
+        {
+            if (!IsOwner) return;
+
+            _localHud = FindObjectOfType<RaceHUD>(true);
+
+            if (_localHud != null)
+                _localHud.SetPrompt(CurrentPrompt.Value);
         }
 
         private void HandleLocalSwipe(SwipeDirection dir)
@@ -133,6 +139,10 @@ namespace Multiplayer
         private void OnPromptChanged(int oldValue, int newValue)
         {
             if (!IsOwner) return;
+
+            if (_localHud == null)
+                TryBindHud();
+
             if (_localHud != null)
                 _localHud.SetPrompt(newValue);
         }

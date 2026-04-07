@@ -21,6 +21,7 @@ namespace Multiplayer
         public TMP_InputField joinCodeInput;
         public TMP_Text joinCodeText;
         public TMP_Text statusText;
+        public RaceCanvasController raceCanvasController;
 
         [Header("Relay")]
         public int maxConnections = 1;
@@ -94,6 +95,8 @@ namespace Multiplayer
 
                 bool started = networkManager.StartHost();
                 SetStatus(started ? $"Host started. Code: {joinCode}" : "Host failed to start.");
+                if (started && raceCanvasController != null)
+                    raceCanvasController.ShowRaceHUD();
             }
             catch (Exception e)
             {
@@ -129,6 +132,8 @@ namespace Multiplayer
 
                 bool started = networkManager.StartClient();
                 SetStatus(started ? "Client joined successfully." : "Client failed to start.");
+                if (started && raceCanvasController != null)
+                    raceCanvasController.ShowRaceHUD();
             }
             catch (Exception e)
             {
