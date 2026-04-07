@@ -7,10 +7,12 @@ namespace Multiplayer
 {
     public class NetworkRacePlayer : NetworkBehaviour
     {
-        [Header("Movement")] public float boostAmount = 4f;
+        [Header("Movement")]
+        public float boostAmount = 4f;
         public float visualMoveLerp = 10f;
 
-        [Header("References")] public Transform shipVisual;
+        [Header("References")]
+        public Transform shipVisual;
         public Transform cameraFollowTarget;
         public SwipeInputReader swipeInputReader;
         public TMP_Text nameText;
@@ -52,14 +54,14 @@ namespace Multiplayer
                 swipeInputReader.OnSwipeDetected += HandleLocalSwipe;
 
             UpdateNameUI(PlayerName.Value.ToString());
+            TryBindHud();
 
             if (IsServer)
             {
-                if (string.IsNullOrWhiteSpace(PlayerName.Value.ToString()) || PlayerName.Value.ToString() == "Player")
+                string currentName = PlayerName.Value.ToString();
+                if (string.IsNullOrWhiteSpace(currentName) || currentName == "Player")
                     PlayerName.Value = $"Player {OwnerClientId + 1}";
             }
-
-            TryBindHud();
         }
 
         public override void OnNetworkDespawn()
@@ -74,9 +76,9 @@ namespace Multiplayer
         private void Update()
         {
             Vector3 targetPos = new Vector3(
-                SpawnPosition.Value.x,
+                SpawnPosition.Value.x + Progress.Value,
                 SpawnPosition.Value.y,
-                SpawnPosition.Value.z + Progress.Value
+                SpawnPosition.Value.z
             );
 
             transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * visualMoveLerp);
@@ -134,6 +136,15 @@ namespace Multiplayer
 
             SpawnPosition.Value = pos;
             transform.SetPositionAndRotation(pos, rot);
+        }
+
+        public void ServerResetForRace()
+        {
+            if (!IsServer) return;
+
+            Progress.Value = 0f;
+            CurrentPrompt.Value = 0;
+            transform.position = SpawnPosition.Value;
         }
 
         private void OnPromptChanged(int oldValue, int newValue)

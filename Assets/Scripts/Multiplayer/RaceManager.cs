@@ -10,19 +10,50 @@ namespace Multiplayer
         public static RaceManager Instance { get; private set; }
 
         [Header("Race")]
-        public float finishDistance = 50f;
-        public float countdownSeconds = 3f;
+        public float finishDistance = 100f;
+        public int countdownSeconds = 3;
 
         [Header("Spawns")]
         public Transform hostSpawn;
         public Transform clientSpawn;
 
         private readonly Dictionary<ulong, NetworkRacePlayer> _players = new();
-        private bool _countdownStarted = false;
 
-        public NetworkVariable<bool> RaceStarted = new(false);
-        public NetworkVariable<bool> RaceFinished = new(false);
-        public NetworkVariable<ulong> WinnerClientId = new(999999);
+        public NetworkVariable<bool> LobbyReady = new(
+            false,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
+        public NetworkVariable<bool> CountdownActive = new(
+            false,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
+        public NetworkVariable<bool> RaceStarted = new(
+            false,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
+        public NetworkVariable<bool> RaceFinished = new(
+            false,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
+        public NetworkVariable<int> CountdownValue = new(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
+        public NetworkVariable<ulong> WinnerClientId = new(
+            999999,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
 
         private void Awake()
         {
@@ -34,19 +65,35 @@ namespace Multiplayer
             if (!IsServer) return;
 
             NetworkManager.OnClientConnectedCallback += OnClientConnected;
+            NetworkManager.OnClientDisconnectCallback += OnClientDisconnected;
         }
 
         public override void OnNetworkDespawn()
         {
             if (NetworkManager != null && IsServer)
+            {
                 NetworkManager.OnClientConnectedCallback -= OnClientConnected;
+                NetworkManager.OnClientDisconnectCallback -= OnClientDisconnected;
+            }
         }
 
         private void OnClientConnected(ulong clientId)
         {
             if (!IsServer) return;
-
             StartCoroutine(RegisterPlayerNextFrame(clientId));
+        }
+
+        private void OnClientDisconnected(ulong clientId)
+        {
+            if (!IsServer) return;
+
+            if (_players.ContainsKey(clientId))
+                _players.Remove(clientId);
+
+            LobbyReady.Value = _players.Count >= 2;
+
+            if (_players.Count < 2 && !RaceStarted.Value)
+                CountdownActive.Value = false;
         }
 
         private IEnumerator RegisterPlayerNextFrame(ulong clientId)
@@ -65,20 +112,8 @@ namespace Multiplayer
 
             RegisterPlayer(racePlayer);
 
-            if (NetworkManager.ConnectedClientsList.Count >= 1 && !_countdownStarted && !RaceStarted.Value)
-            {
-                _countdownStarted = true;
-                StartCoroutine(BeginRaceRoutine());
-            }
-        }
-
-        public IEnumerator BeginRaceRoutine()
-        {
-            yield return new WaitForSeconds(countdownSeconds);
-            RaceStarted.Value = true;
-
-            foreach (var kvp in _players)
-                kvp.Value.ServerGenerateNextPrompt();
+            if (_players.Count >= 2)
+                LobbyReady.Value = true;
         }
 
         public void RegisterPlayer(NetworkRacePlayer player)
@@ -87,20 +122,71 @@ namespace Multiplayer
 
             _players[player.OwnerClientId] = player;
 
-            Transform spawn = player.OwnerClientId == 0 ? hostSpawn : clientSpawn;
+            Transform spawn = player.OwnerClientId == NetworkManager.ServerClientId ? hostSpawn : clientSpawn;
             if (spawn != null)
                 player.SetSpawnFromServer(spawn.position, spawn.rotation);
         }
 
+        [ServerRpc(RequireOwnership = false)]
+        public void RequestStartRaceServerRpc(ServerRpcParams rpcParams = default)
+        {
+            if (!IsServer) return;
+            if (!LobbyReady.Value) return;
+            if (CountdownActive.Value || RaceStarted.Value) return;
+
+            ulong senderId = rpcParams.Receive.SenderClientId;
+
+            // only host can start
+            if (senderId != NetworkManager.ServerClientId)
+                return;
+
+            StartCoroutine(BeginRaceRoutine());
+        }
+
+        private IEnumerator BeginRaceRoutine()
+        {
+            CountdownActive.Value = true;
+            RaceFinished.Value = false;
+            WinnerClientId.Value = 999999;
+
+            foreach (var kvp in _players)
+            {
+                kvp.Value.ServerResetForRace();
+            }
+
+            for (int i = countdownSeconds; i > 0; i--)
+            {
+                CountdownValue.Value = i;
+                yield return new WaitForSeconds(1f);
+            }
+
+            CountdownValue.Value = 0;
+            CountdownActive.Value = false;
+            RaceStarted.Value = true;
+
+            foreach (var kvp in _players)
+            {
+                kvp.Value.ServerGenerateNextPrompt();
+            }
+        }
+
         public void CheckForWinner(NetworkRacePlayer player)
         {
-            if (!IsServer || RaceFinished.Value) return;
+            if (!IsServer) return;
+            if (!RaceStarted.Value || RaceFinished.Value) return;
 
             if (player.Progress.Value >= finishDistance)
             {
                 RaceFinished.Value = true;
+                RaceStarted.Value = false;
+                CountdownActive.Value = false;
                 WinnerClientId.Value = player.OwnerClientId;
             }
+        }
+
+        public int GetPlayerCount()
+        {
+            return _players.Count;
         }
     }
 }

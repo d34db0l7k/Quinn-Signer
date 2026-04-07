@@ -5,56 +5,53 @@ namespace Multiplayer
 {
     public class RaceCanvasController : MonoBehaviour
     {
-        [Header("Canvas References")]
         public GameObject connectionCanvas;
+        public GameObject lobbyCanvas;
         public GameObject raceHudCanvas;
-
-        private bool _hasSwitchedToRaceUI = false;
 
         private void Start()
         {
-            if (connectionCanvas != null)
-                connectionCanvas.SetActive(true);
-
-            if (raceHudCanvas != null)
-                raceHudCanvas.SetActive(false);
+            ShowConnection();
         }
 
         private void Update()
         {
-            if (_hasSwitchedToRaceUI)
-                return;
-
             if (NetworkManager.Singleton == null || RaceManager.Instance == null)
                 return;
 
-            // swap once the local client is connected and the race has started
-            if (NetworkManager.Singleton.IsClient && RaceManager.Instance.RaceStarted.Value)
+            if (RaceManager.Instance.RaceStarted.Value || RaceManager.Instance.CountdownActive.Value || RaceManager.Instance.RaceFinished.Value)
             {
                 ShowRaceHUD();
             }
+            else if (NetworkManager.Singleton.IsHost || NetworkManager.Singleton.IsClient)
+            {
+                ShowLobby();
+            }
+            else
+            {
+                ShowConnection();
+            }
+        }
+
+        public void ShowConnection()
+        {
+            if (connectionCanvas != null) connectionCanvas.SetActive(true);
+            if (lobbyCanvas != null) lobbyCanvas.SetActive(false);
+            if (raceHudCanvas != null) raceHudCanvas.SetActive(false);
+        }
+
+        public void ShowLobby()
+        {
+            if (connectionCanvas != null) connectionCanvas.SetActive(false);
+            if (lobbyCanvas != null) lobbyCanvas.SetActive(true);
+            if (raceHudCanvas != null) raceHudCanvas.SetActive(false);
         }
 
         public void ShowRaceHUD()
         {
-            _hasSwitchedToRaceUI = true;
-
-            if (connectionCanvas != null)
-                connectionCanvas.SetActive(false);
-
-            if (raceHudCanvas != null)
-                raceHudCanvas.SetActive(true);
-        }
-
-        public void ShowConnectionUI()
-        {
-            _hasSwitchedToRaceUI = false;
-
-            if (connectionCanvas != null)
-                connectionCanvas.SetActive(true);
-
-            if (raceHudCanvas != null)
-                raceHudCanvas.SetActive(false);
+            if (connectionCanvas != null) connectionCanvas.SetActive(false);
+            if (lobbyCanvas != null) lobbyCanvas.SetActive(false);
+            if (raceHudCanvas != null) raceHudCanvas.SetActive(true);
         }
     }
 }
