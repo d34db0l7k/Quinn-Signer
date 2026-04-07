@@ -21,11 +21,12 @@ namespace Multiplayer
         public TMP_InputField joinCodeInput;
         public TMP_Text joinCodeText;
         public TMP_Text statusText;
-        public RaceCanvasController raceCanvasController;
 
         [Header("Relay")]
         public int maxConnections = 1;
         public string connectionType = "dtls";
+
+        public string CurrentJoinCode { get; private set; } = "";
 
         private async void Start()
         {
@@ -89,14 +90,13 @@ namespace Multiplayer
                 unityTransport.SetRelayServerData(AllocationUtils.ToRelayServerData(allocation, connectionType));
 
                 string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+                CurrentJoinCode = joinCode;
 
                 if (joinCodeText != null)
                     joinCodeText.text = joinCode;
 
                 bool started = networkManager.StartHost();
                 SetStatus(started ? $"Host started. Code: {joinCode}" : "Host failed to start.");
-                if (started && raceCanvasController != null)
-                    raceCanvasController.ShowRaceHUD();
             }
             catch (Exception e)
             {
@@ -130,10 +130,10 @@ namespace Multiplayer
                 JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
                 unityTransport.SetRelayServerData(AllocationUtils.ToRelayServerData(allocation, connectionType));
 
+                CurrentJoinCode = joinCode;
+
                 bool started = networkManager.StartClient();
                 SetStatus(started ? "Client joined successfully." : "Client failed to start.");
-                if (started && raceCanvasController != null)
-                    raceCanvasController.ShowRaceHUD();
             }
             catch (Exception e)
             {

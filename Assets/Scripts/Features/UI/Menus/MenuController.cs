@@ -128,6 +128,12 @@ namespace Features.UI.Menus
             if (manageTimeScale) Time.timeScale = 1f;
             SceneManager.LoadScene("TitleScene");
         }
+
+        public void StartMultiplayer()
+        {
+            if (manageTimeScale) Time.timeScale = 1f;
+            SceneManager.LoadScene("RaceScene");
+        }
         public void StartGame()
         {
             if (manageTimeScale) Time.timeScale = 1f;
