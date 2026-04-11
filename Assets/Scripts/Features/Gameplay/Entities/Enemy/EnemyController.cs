@@ -45,6 +45,8 @@ namespace Features.Gameplay.Entities.Enemy
             HideRenderer();
 
             NotifySignerAndPruneWord();
+            var hintMode = FindFirstObjectByType<Features.Signing.HintMode>(FindObjectsInactive.Include);
+            if (hintMode) hintMode.OnEnemyDestroyed();
 
             // 4) nuke labels IMMEDIATELY so win checks no longer see this enemy
             DestroyLabel();
@@ -67,6 +69,8 @@ namespace Features.Gameplay.Entities.Enemy
             DestroyLabel();
             TriggerDeathFX();
             DamagePlayer(1);
+            var hintMode = FindFirstObjectByType<Features.Signing.HintMode>(FindObjectsInactive.Include);
+            if (hintMode) hintMode.OnEnemyDestroyed();
             Destroy(gameObject, despawnDelay);
         }
 
