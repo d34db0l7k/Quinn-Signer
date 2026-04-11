@@ -11,6 +11,9 @@ namespace Features.Signing
         [SerializeField] private GameObject hintPanel;
         [SerializeField] private RawImage rawImage;
 
+        [Header("SLRTK")]
+        [SerializeField] private GameObject slrtkPanel;
+
         private VideoPlayer _videoPlayer;
         private RenderTexture _renderTexture;
         private bool _hintActive = false;
@@ -61,6 +64,7 @@ namespace Features.Signing
             _videoPlayer.Play();
 
             if (hintPanel) hintPanel.SetActive(true);
+            if (slrtkPanel) slrtkPanel.SetActive(false);
             _hintActive = true;
         }
 
@@ -68,6 +72,7 @@ namespace Features.Signing
         {
             _videoPlayer.Stop();
             if (hintPanel) hintPanel.SetActive(false);
+            if (slrtkPanel) slrtkPanel.SetActive(true);
             _hintActive = false;
         }
 
@@ -76,11 +81,11 @@ namespace Features.Signing
             if (_videoPlayer) { _videoPlayer.targetTexture = null; Destroy(_videoPlayer); }
             if (_renderTexture) Destroy(_renderTexture);
         }
+
         public void OnEnemyDestroyed()
         {
             if (_hintActive)
                 HideHint();
         }
     }
-
 }

@@ -944,6 +944,12 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 99092905}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &101302821 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4350865095916581199, guid: b055499373f889c478eafd754d10eead,
+    type: 3}
+  m_PrefabInstance: {fileID: 677488778}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &126026870
 GameObject:
   m_ObjectHideFlags: 0
@@ -1512,7 +1518,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 66, y: 652}
+  m_AnchoredPosition: {x: 164, y: 689}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &249566194
@@ -5244,7 +5250,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 50, y: 0.00009602308}
-  m_SizeDelta: {x: -50, y: 60}
+  m_SizeDelta: {x: -50, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &980506351
 MonoBehaviour:
@@ -6027,6 +6033,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Features.Signing.HintMode
   hintPanel: {fileID: 1448335534}
   rawImage: {fileID: 1524368504}
+  slrtkPanel: {fileID: 101302821}
 --- !u!1 &1113803713
 GameObject:
   m_ObjectHideFlags: 0
@@ -7605,7 +7612,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1448335535
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10691,7 +10698,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 66, y: 642}
+  m_AnchoredPosition: {x: 164, y: 679}
   m_SizeDelta: {x: 820, y: 1400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2138069016
