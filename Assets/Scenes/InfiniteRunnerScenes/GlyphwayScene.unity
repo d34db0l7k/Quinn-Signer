@@ -6076,7 +6076,6 @@ GameObject:
   - component: {fileID: 1077422347}
   - component: {fileID: 1077422348}
   - component: {fileID: 1077422349}
-  - component: {fileID: 1077422350}
   - component: {fileID: 1077422351}
   m_Layer: 0
   m_Name: GameManager
@@ -6195,21 +6194,6 @@ MonoBehaviour:
   slowTimeScale: 0.2
   trainingPanel: {fileID: 1662034371}
   trainingPanelObject: {fileID: 947932553}
---- !u!114 &1077422350
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1077422343}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d46f9082bc207d4a89d92af34129770, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Features.Signing.HintMode
-  hintPanel: {fileID: 1448335534}
-  rawImage: {fileID: 1524368504}
-  slrtkPanel: {fileID: 1195256255}
 --- !u!114 &1077422351
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6222,9 +6206,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b817298f9b4eab48acb15d206ada98f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Features.Signing.HintModeTyping
-  typingInput: {fileID: 1138296571}
-  submitButton: {fileID: 1893811359}
   hintPanel: {fileID: 1448335534}
+  rawImage: {fileID: 1524368504}
+  inputField: {fileID: 1138296571}
+  submitButton: {fileID: 1893811359}
+  slrtkPanel: {fileID: 1326888695}
   playerHealth: {fileID: 356517355}
 --- !u!1 &1113803713
 GameObject:
@@ -6959,12 +6945,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1195256255 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6636879212729511721, guid: b055499373f889c478eafd754d10eead,
-    type: 3}
-  m_PrefabInstance: {fileID: 677488778}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1259470091
 GameObject:
   m_ObjectHideFlags: 0
@@ -7459,6 +7439,12 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1293330119}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1326888695 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5002240846802208805, guid: b055499373f889c478eafd754d10eead,
+    type: 3}
+  m_PrefabInstance: {fileID: 677488778}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1337871005
 GameObject:
   m_ObjectHideFlags: 0
