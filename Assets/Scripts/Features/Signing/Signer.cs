@@ -28,11 +28,10 @@ namespace Features.Signing
         [Header("Win")]
         [SerializeField] private string winSceneName = "WinScene";
         [SerializeField] private float winDelaySeconds = 2f;
-        
+
         [Header("Player Data")]
         [SerializeField] private PlayerHealth playerHealth;
 
-        // internals
         private bool _hasExecuted = false;
         private SceneBindings _bindings;
         private readonly List<string> _filterWords = new();
@@ -62,11 +61,11 @@ namespace Features.Signing
 
             if (Input.GetKeyDown(KeyCode.Alpha1)) SimulateCorrectSign();
             if (Input.GetKeyDown(KeyCode.Alpha2)) SimulateIncorrectSign();
-            
+
             UserSigning();
         }
 
-        private void OnEnable()  => SceneManager.sceneLoaded += OnSceneLoaded;
+        private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
         private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -80,11 +79,11 @@ namespace Features.Signing
                 return;
             }
 
-            wordBank            = _bindings.wordBank;
-            engine              = _bindings.engine;
-            inferenceText       = _bindings.inferenceText;
+            wordBank = _bindings.wordBank;
+            engine = _bindings.engine;
+            inferenceText = _bindings.inferenceText;
             confidenceScoreText = _bindings.condifenceScoreText;
-            background          = _bindings.background;
+            background = _bindings.background;
 
             _hasExecuted = false;
 
@@ -151,7 +150,6 @@ namespace Features.Signing
             if (background) background.color = Color.black;
         }
 
-        // --- Desktop key handling (for testing) ---
         private void UserSigning()
         {
             if (Input.GetKeyDown(KeyCode.Return))
@@ -179,7 +177,6 @@ namespace Features.Signing
             }
         }
 
-        // --- Mobile button hooks --- \\
         public void BeginMobileSign()
         {
             if (engine && !_signingActive)
@@ -204,7 +201,11 @@ namespace Features.Signing
             }
         }
 
-        // --- DEV HELPERS --- \\
+        public void SimulateSign(string word)
+        {
+            OnSignRecognized(word, 1.0f);
+        }
+
         void SimulateCorrectSign()
         {
             var labels = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
@@ -223,7 +224,7 @@ namespace Features.Signing
         {
             OnSignRecognized("__dev_wrong__", 0.0f);
         }
-        
+
         private void OnSignRecognized(string rawInput, float confidenceScore)
         {
             var signed = (rawInput ?? "").Trim().ToLowerInvariant();
@@ -281,14 +282,12 @@ namespace Features.Signing
             if (string.IsNullOrEmpty(word)) return;
             var key = word.Trim().ToLowerInvariant();
 
-            // THIS is what actually tracks progress
             for (int i = _filterWords.Count - 1; i >= 0; i--)
             {
                 if (string.Equals(_filterWords[i], key, System.StringComparison.OrdinalIgnoreCase))
                     _filterWords.RemoveAt(i);
             }
 
-            // Optional (safe) remove from session list too
             if (sessionSelection != null && sessionSelection.words != null)
             {
                 for (int i = sessionSelection.words.Count - 1; i >= 0; i--)
@@ -299,7 +298,6 @@ namespace Features.Signing
                 }
             }
 
-            // Update recognizer so it only listens for remaining words
             if (engine != null && engine.recognizer != null)
             {
                 engine.recognizer.outputFilters.Clear();
@@ -307,7 +305,6 @@ namespace Features.Signing
                     engine.recognizer.outputFilters.Add(new FocusSublistFilter<string>(_filterWords));
             }
         }
-
 
         private IEnumerator CheckForWinNextFrame()
         {
@@ -318,7 +315,6 @@ namespace Features.Signing
             if (noWordsLeft)
                 TriggerWin();
         }
-
 
         private void TriggerWin()
         {
@@ -341,6 +337,7 @@ namespace Features.Signing
 
             StartCoroutine(CheckForWinNextFrame());
         }
+
         private List<string> GetDictionaryWords()
         {
             if (sessionSelection != null && sessionSelection.HasWords && sessionSelection.Words != null)
@@ -365,7 +362,7 @@ namespace Features.Signing
         private void ApplyRecognizerFilterToDictionaryWords()
         {
             if (engine == null) return;
-            if (engine.recognizer == null) return; // <- THIS is the important fix
+            if (engine.recognizer == null) return;
 
             var focus = GetDictionaryWords();
 
@@ -376,7 +373,5 @@ namespace Features.Signing
             _filterWords.Clear();
             _filterWords.AddRange(focus);
         }
-
-
     }
 }

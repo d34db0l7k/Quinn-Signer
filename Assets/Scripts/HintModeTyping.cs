@@ -11,43 +11,37 @@ namespace Features.Signing
         [SerializeField] private InputField typingInput;
         [SerializeField] private Button submitButton;
 
+        [Header("Hint Panel")]
+        [SerializeField] private GameObject hintPanel;
+
         [Header("Player")]
         [SerializeField] private PlayerHealth playerHealth;
 
-        [Header("Player Movement")]
-        [SerializeField] private InfinitePlayerMovement playerMovement;
+        private Signer _signer;
 
-        private bool _wasFocused = false;
-
-        private void Start()
+        private void OnEnable()
         {
+            _signer = FindFirstObjectByType<Signer>();
             if (submitButton) submitButton.onClick.AddListener(OnSubmit);
             if (typingInput) typingInput.onEndEdit.AddListener(OnEndEdit);
         }
 
-        private void Update()
+        private void OnDisable()
         {
-            if (typingInput == null) return;
-
-            bool isFocused = typingInput.isFocused;
-
-            if (isFocused && !_wasFocused)
-                if (playerMovement) playerMovement.enabled = false;
-
-            if (!isFocused && _wasFocused)
-                if (playerMovement) playerMovement.enabled = true;
-
-            _wasFocused = isFocused;
+            if (submitButton) submitButton.onClick.RemoveListener(OnSubmit);
+            if (typingInput) typingInput.onEndEdit.RemoveListener(OnEndEdit);
         }
 
         private void OnEndEdit(string value)
         {
+            if (!hintPanel || !hintPanel.activeSelf) return;
             if (Input.GetKeyDown(KeyCode.Return))
                 OnSubmit();
         }
 
         private void OnSubmit()
         {
+            if (!hintPanel || !hintPanel.activeSelf) return;
             if (typingInput == null) return;
 
             string typed = typingInput.text.Trim().ToLowerInvariant();
@@ -56,22 +50,14 @@ namespace Features.Signing
             if (string.IsNullOrEmpty(typed)) return;
 
             var enemyLabels = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
-            EnemyLabel match = null;
+            if (enemyLabels == null || enemyLabels.Length == 0) return;
 
-            foreach (var label in enemyLabels)
-            {
-                if (!label) continue;
-                if (string.Equals(label.targetWord, typed, System.StringComparison.OrdinalIgnoreCase))
-                {
-                    match = label;
-                    break;
-                }
-            }
+            string currentEnemyWord = enemyLabels[0].targetWord?.Trim().ToLowerInvariant();
 
-            if (match)
+            if (string.Equals(typed, currentEnemyWord, System.StringComparison.OrdinalIgnoreCase))
             {
-                var controller = match.GetComponentInParent<EnemyController>() ?? match.GetComponent<EnemyController>();
-                if (controller) controller.Explode(); else Destroy(match.gameObject);
+                if (_signer == null) _signer = FindFirstObjectByType<Signer>();
+                if (_signer) _signer.SimulateSign(typed);
             }
             else
             {
