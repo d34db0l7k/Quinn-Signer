@@ -20,7 +20,6 @@ namespace Features.Signing
         private VideoPlayer _videoPlayer;
         private RenderTexture _renderTexture;
 
-        private bool _hintModeActive = false;
         private EnemyLabel _currentTarget;
 
         private Signer _signer;
@@ -55,7 +54,7 @@ namespace Features.Signing
         {
             if (Input.GetKeyDown(KeyCode.B))
             {
-                if (_hintModeActive)
+                if (GameModeState.HintTypingModeActive)
                     DisableHintMode();
                 else
                     EnableHintMode();
@@ -64,43 +63,49 @@ namespace Features.Signing
 
         private void EnableHintMode()
         {
-            SelectNextTarget();
-            if (_currentTarget == null) return;
+            Debug.Log("[HintModeTyping] ENABLE");
 
-            PlayVideoForCurrent();
+            GameModeState.HintTypingModeActive = true;
+
+            SelectNextTarget();
+            if (_currentTarget == null)
+            {
+                Debug.Log("[HintModeTyping] No enemies found");
+                return;
+            }
+
+            PlayVideo();
 
             if (hintPanel) hintPanel.SetActive(true);
             if (slrtkPanel) slrtkPanel.SetActive(false);
-
-            _hintModeActive = true;
         }
 
         private void DisableHintMode()
         {
+            Debug.Log("[HintModeTyping] DISABLE");
+
+            GameModeState.HintTypingModeActive = false;
+
             _videoPlayer.Stop();
 
             if (hintPanel) hintPanel.SetActive(false);
             if (slrtkPanel) slrtkPanel.SetActive(true);
-
-            _hintModeActive = false;
         }
 
         private void SelectNextTarget()
         {
             var enemies = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
 
-            if (enemies == null || enemies.Length == 0)
-            {
-                _currentTarget = null;
-                return;
-            }
+            Debug.Log("[HintModeTyping] Enemy count: " + enemies.Length);
 
             _currentTarget = enemies
                 .Where(e => e != null && !string.IsNullOrEmpty(e.targetWord))
                 .FirstOrDefault();
+
+            Debug.Log("[HintModeTyping] Target: " + (_currentTarget ? _currentTarget.targetWord : "NULL"));
         }
 
-        private void PlayVideoForCurrent()
+        private void PlayVideo()
         {
             if (_currentTarget == null) return;
 
@@ -113,7 +118,9 @@ namespace Features.Signing
 
         public void OnSubmit()
         {
-            if (!_hintModeActive) return;
+            if (!GameModeState.HintTypingModeActive) return;
+
+            Debug.Log("[HintModeTyping] Submit pressed");
 
             if (_currentTarget == null)
             {
@@ -124,38 +131,37 @@ namespace Features.Signing
             string typed = Normalize(inputField.text);
             string correct = Normalize(_currentTarget.targetWord);
 
-            if (string.IsNullOrEmpty(typed)) return;
+            Debug.Log("[HintModeTyping] typed=" + typed + " correct=" + correct);
 
             if (typed == correct)
             {
+                Debug.Log("[HintModeTyping] CORRECT");
+
                 var controller = _currentTarget.GetComponentInParent<EnemyController>();
-
-                if (controller)
-                    controller.Explode();
-                else
-                    Destroy(_currentTarget.gameObject);
-
-                Invoke(nameof(AfterEnemyDestroyed), 0.05f);
+                if (controller) controller.Explode();
             }
             else
             {
-                if (playerHealth)
-                    playerHealth.Damage(1);
+                Debug.Log("[HintModeTyping] WRONG");
+                if (playerHealth) playerHealth.Damage(1);
             }
 
             inputField.text = "";
+
+            Invoke(nameof(Advance), 0.05f);
         }
 
-        private void AfterEnemyDestroyed()
+        private void Advance()
         {
             SelectNextTarget();
 
             if (_currentTarget != null)
             {
-                PlayVideoForCurrent();
+                PlayVideo();
             }
             else
             {
+                Debug.Log("[HintModeTyping] ALL ENEMIES CLEARED");
                 DisableHintMode();
             }
         }
@@ -163,18 +169,6 @@ namespace Features.Signing
         private string Normalize(string s)
         {
             return (s ?? "").Trim().ToLowerInvariant();
-        }
-
-        private void OnDestroy()
-        {
-            if (_videoPlayer)
-            {
-                _videoPlayer.targetTexture = null;
-                Destroy(_videoPlayer);
-            }
-
-            if (_renderTexture)
-                Destroy(_renderTexture);
         }
     }
 }

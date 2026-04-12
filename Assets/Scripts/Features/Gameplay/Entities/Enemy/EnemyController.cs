@@ -45,9 +45,17 @@ namespace Features.Gameplay.Entities.Enemy
             HideRenderer();
 
             NotifySignerAndPruneWord();
-            var hintMode = FindFirstObjectByType<Features.Signing.HintMode>(FindObjectsInactive.Include);
-            if (hintMode) hintMode.OnEnemyDestroyed();
-
+            if (Features.Signing.GameModeState.HintTypingModeActive)
+            {
+                var hintTyping = FindFirstObjectByType<Features.Signing.HintModeTyping>(FindObjectsInactive.Include);
+                if (hintTyping) Debug.Log("[EnemyController] Hint mode active - skipping Signer flow");
+            }
+            else
+            {
+                var signer = FindFirstObjectByType<Features.Signing.Signer>(FindObjectsInactive.Include);
+                if (signer && _labelCache)
+                    signer.HandleEnemyKilled(_labelCache);
+            }
             // 4) nuke labels IMMEDIATELY so win checks no longer see this enemy
             DestroyLabel();
 
