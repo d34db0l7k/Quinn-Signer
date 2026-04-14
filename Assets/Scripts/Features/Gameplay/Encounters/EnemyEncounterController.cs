@@ -186,9 +186,14 @@ namespace Features.Gameplay.Encounters
             locker.approachSpeed = 1.25f * (player ? player.GetComponent<Features.Gameplay.Entities.Player.InfinitePlayerMovement>()?.forwardSpeed ?? 40f : 40f);
 
             var tutorialBossController = _currentBoss.GetComponent<TutorialBossController>();
-            if (tutorialBossController)
+            if (tutorialBossController && sessionSelection)
             {
                 tutorialBossController.InitSession(sessionSelection);
+            }
+            var tutorialBossMovement = _currentBoss.GetComponent<TutorialBossMovement>();
+            if (tutorialBossMovement && player)
+            {
+                tutorialBossMovement.InitMovementRefs(player);
             }
 
             StartCoroutine(WaitTutorialBossDefeatedThenResume());

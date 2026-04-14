@@ -458,6 +458,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7862971710694152733}
   - component: {fileID: 8372519307144357670}
+  - component: {fileID: 7986149556237472350}
   m_Layer: 0
   m_Name: TutorialBoss
   m_TagString: Enemy
@@ -502,6 +503,22 @@ MonoBehaviour:
   despawnDelay: 2
   impasseThreshold: 0.25
   impossibleGlyph: Impossible
+--- !u!114 &7986149556237472350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8852511146641756017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3873360161de8484ba93c9fcecb4324a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TutorialBossMovement
+  moveCooldown: 1.5
+  attackDelay: 5
+  _preconditionFulfilled: 1
+  showDebugOverlay: 1
 --- !u!1001 &7918378015819456175
 PrefabInstance:
   m_ObjectHideFlags: 0
