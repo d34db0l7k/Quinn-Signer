@@ -21,11 +21,14 @@ EditorBuildSettings:
     path: Assets/Scenes/InfiniteRunnerScenes/GlyphwayScene.unity
     guid: 21393001073d03348b7d573f0c983b58
   - enabled: 1
+    path: Assets/Scenes/MissionsScenes/MissionsScene.unity
+    guid: 7244e34d149d9b544b9baa7271363953
+  - enabled: 1
+    path: Assets/Scenes/MultiplayerScenes/RaceScene.unity
+    guid: b891ed3a4f191724bbb4fe5f74ca68fb
+  - enabled: 1
     path: Assets/Scenes/MenuScenes/ShopScene.unity
     guid: 0467c73adc9943b40b020f5947a69231
-  - enabled: 0
-    path: Assets/Scenes/MultiplayerScenes/MissionsScene.unity
-    guid: 6ae5919111cb97944bf54fff5c3142d7
   - enabled: 1
     path: Assets/Scenes/MenuScenes/GarageScene.unity
     guid: 730b861dcf459384aacb325ab4c4f521
@@ -35,8 +38,5 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/EndStateScenes/GameOverScene.unity
     guid: 641751a123cc843d7ad9c028731692fc
-  - enabled: 1
-    path: Assets/Scenes/MultiplayerScenes/RaceScene.unity
-    guid: b891ed3a4f191724bbb4fe5f74ca68fb
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

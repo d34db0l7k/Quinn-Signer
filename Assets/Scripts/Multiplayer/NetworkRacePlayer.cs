@@ -8,7 +8,7 @@ namespace Multiplayer
     public class NetworkRacePlayer : NetworkBehaviour
     {
         [Header("Movement")]
-        public float boostAmount = 5f;
+        public float boostAmount = 4f;
         public float visualMoveLerp = 10f;
 
         [Header("References")]
@@ -54,17 +54,12 @@ namespace Multiplayer
                 swipeInputReader.OnSwipeDetected += HandleLocalSwipe;
 
             UpdateNameUI(PlayerName.Value.ToString());
-
-            if (IsOwner)
-            {
-                _localHud = FindObjectOfType<RaceHUD>();
-                if (_localHud != null)
-                    _localHud.SetPrompt(CurrentPrompt.Value);
-            }
+            TryBindHud();
 
             if (IsServer)
             {
-                if (string.IsNullOrWhiteSpace(PlayerName.Value.ToString()) || PlayerName.Value.ToString() == "Player")
+                string currentName = PlayerName.Value.ToString();
+                if (string.IsNullOrWhiteSpace(currentName) || currentName == "Player")
                     PlayerName.Value = $"Player {OwnerClientId + 1}";
             }
         }
@@ -87,6 +82,19 @@ namespace Multiplayer
             );
 
             transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * visualMoveLerp);
+
+            if (IsOwner && _localHud == null)
+                TryBindHud();
+        }
+
+        private void TryBindHud()
+        {
+            if (!IsOwner) return;
+
+            _localHud = FindObjectOfType<RaceHUD>(true);
+
+            if (_localHud != null)
+                _localHud.SetPrompt(CurrentPrompt.Value);
         }
 
         private void HandleLocalSwipe(SwipeDirection dir)
@@ -130,9 +138,22 @@ namespace Multiplayer
             transform.SetPositionAndRotation(pos, rot);
         }
 
+        public void ServerResetForRace()
+        {
+            if (!IsServer) return;
+
+            Progress.Value = 0f;
+            CurrentPrompt.Value = 0;
+            transform.position = SpawnPosition.Value;
+        }
+
         private void OnPromptChanged(int oldValue, int newValue)
         {
             if (!IsOwner) return;
+
+            if (_localHud == null)
+                TryBindHud();
+
             if (_localHud != null)
                 _localHud.SetPrompt(newValue);
         }

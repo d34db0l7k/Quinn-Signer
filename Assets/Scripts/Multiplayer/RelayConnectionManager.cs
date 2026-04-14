@@ -26,6 +26,8 @@ namespace Multiplayer
         public int maxConnections = 1;
         public string connectionType = "dtls";
 
+        public string CurrentJoinCode { get; private set; } = "";
+
         private async void Start()
         {
             if (networkManager == null)
@@ -88,6 +90,7 @@ namespace Multiplayer
                 unityTransport.SetRelayServerData(AllocationUtils.ToRelayServerData(allocation, connectionType));
 
                 string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+                CurrentJoinCode = joinCode;
 
                 if (joinCodeText != null)
                     joinCodeText.text = joinCode;
@@ -126,6 +129,8 @@ namespace Multiplayer
 
                 JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
                 unityTransport.SetRelayServerData(AllocationUtils.ToRelayServerData(allocation, connectionType));
+
+                CurrentJoinCode = joinCode;
 
                 bool started = networkManager.StartClient();
                 SetStatus(started ? "Client joined successfully." : "Client failed to start.");
