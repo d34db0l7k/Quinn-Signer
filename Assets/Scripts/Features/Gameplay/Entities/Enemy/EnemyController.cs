@@ -32,7 +32,18 @@ namespace Features.Gameplay.Entities.Enemy
 
         public void Explode()
         {
-            if (_isDead) return;
+            if (!TryDeath()) return;
+        }
+
+        public void Expire()
+        {
+            if (!TryDeath()) return;
+            DamagePlayer(1);
+        }
+
+        private bool TryDeath()
+        {
+            if (_isDead) return false;
             _isDead = true;
 
             // 1) stop behaviours
@@ -54,20 +65,8 @@ namespace Features.Gameplay.Entities.Enemy
 
             // 6) finally remove the whole enemy object
             Destroy(gameObject, despawnDelay);
-        }
 
-        public void Expire()
-        {
-            if (_isDead) return;
-            _isDead = true;
-
-            StopBehaviors();
-            StopPhysics();
-            HideRenderer();
-            DestroyLabel();
-            TriggerDeathFX();
-            DamagePlayer(1);
-            Destroy(gameObject, despawnDelay);
+            return true;
         }
 
         private void StopBehaviors()
