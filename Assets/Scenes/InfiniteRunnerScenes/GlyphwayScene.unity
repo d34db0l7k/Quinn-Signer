@@ -3855,6 +3855,12 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 677488778}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &677488780 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7287385780542945416, guid: b055499373f889c478eafd754d10eead,
+    type: 3}
+  m_PrefabInstance: {fileID: 677488778}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &691727987
 GameObject:
   m_ObjectHideFlags: 0
@@ -6351,6 +6357,7 @@ MonoBehaviour:
   rawImage: {fileID: 1524368504}
   inputField: {fileID: 1138296571}
   slrtkPanel: {fileID: 677488779}
+  extraTextPanel: {fileID: 677488780}
 --- !u!1 &1113803713
 GameObject:
   m_ObjectHideFlags: 0

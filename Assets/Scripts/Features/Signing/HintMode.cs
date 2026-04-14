@@ -11,7 +11,10 @@ namespace Features.Signing
         [SerializeField] private GameObject hintPanel;
         [SerializeField] private RawImage rawImage;
         [SerializeField] private InputField inputField;
+
+        [Header("Panels Disabled in Hint Mode")]
         [SerializeField] private GameObject slrtkPanel;
+        [SerializeField] private GameObject extraTextPanel;
 
         private VideoPlayer _videoPlayer;
         private RenderTexture _renderTexture;
@@ -25,7 +28,10 @@ namespace Features.Signing
         private void Awake()
         {
             _videoPlayer = GetComponent<VideoPlayer>();
-            if (!_videoPlayer) _videoPlayer = gameObject.AddComponent<VideoPlayer>();
+            if (!_videoPlayer)
+            {
+                _videoPlayer = gameObject.AddComponent<VideoPlayer>();
+            }
 
             _videoPlayer.playOnAwake = false;
             _videoPlayer.isLooping = true;
@@ -36,16 +42,47 @@ namespace Features.Signing
             _videoPlayer.renderMode = VideoRenderMode.RenderTexture;
             _videoPlayer.targetTexture = _renderTexture;
 
-            if (rawImage) rawImage.texture = _renderTexture;
+            if (rawImage)
+            {
+                rawImage.texture = _renderTexture;
+            }
 
-            if (hintPanel) hintPanel.SetActive(false);
-            if (slrtkPanel) slrtkPanel.SetActive(true);
+            if (hintPanel)
+            {
+                hintPanel.SetActive(false);
+            }
+
+            if (slrtkPanel)
+            {
+                slrtkPanel.SetActive(true);
+            }
+
+            if (extraTextPanel)
+            {
+                extraTextPanel.SetActive(true);
+            }
         }
 
         public void EnableHintMode()
         {
             _hintModeEnabled = true;
+
             Debug.Log("Hint mode enabled (button)");
+
+            if (slrtkPanel)
+            {
+                slrtkPanel.SetActive(false);
+            }
+
+            if (extraTextPanel)
+            {
+                extraTextPanel.SetActive(false);
+            }
+        }
+
+        public bool IsHintModeEnabled()
+        {
+            return _hintModeEnabled;
         }
 
         public void TryActivateHintForEnemy(GameObject enemyObj)
@@ -72,8 +109,20 @@ namespace Features.Signing
             _videoPlayer.url = url;
             _videoPlayer.Play();
 
-            if (hintPanel) hintPanel.SetActive(true);
-            if (slrtkPanel) slrtkPanel.SetActive(false);
+            if (hintPanel)
+            {
+                hintPanel.SetActive(true);
+            }
+
+            if (slrtkPanel)
+            {
+                slrtkPanel.SetActive(false);
+            }
+
+            if (extraTextPanel)
+            {
+                extraTextPanel.SetActive(false);
+            }
 
             _hintActive = true;
 
@@ -89,19 +138,37 @@ namespace Features.Signing
         {
             _videoPlayer.Stop();
 
-            if (hintPanel) hintPanel.SetActive(false);
-            if (slrtkPanel) slrtkPanel.SetActive(true);
+            if (hintPanel)
+            {
+                hintPanel.SetActive(false);
+            }
+
+            if (slrtkPanel && !_hintModeEnabled)
+            {
+                slrtkPanel.SetActive(true);
+            }
+
+            if (extraTextPanel && !_hintModeEnabled)
+            {
+                extraTextPanel.SetActive(true);
+            }
 
             _hintActive = false;
             _currentEnemy = null;
             _currentWord = null;
 
-            if (inputField) inputField.text = "";
+            if (inputField)
+            {
+                inputField.text = "";
+            }
         }
 
         public void OnEnemyDestroyed()
         {
-            if (_hintActive) HideHint();
+            if (_hintActive)
+            {
+                HideHint();
+            }
         }
 
         public void SubmitTypedAnswer()
@@ -112,7 +179,11 @@ namespace Features.Signing
 
             if (Normalize(raw) == Normalize(_currentWord))
             {
-                if (_currentEnemy) _currentEnemy.Explode();
+                if (_currentEnemy)
+                {
+                    _currentEnemy.Explode();
+                }
+
                 HideHint();
             }
         }
