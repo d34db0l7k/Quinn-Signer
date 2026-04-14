@@ -49,6 +49,8 @@ namespace Features.Gameplay.Entities.Player
         [Tooltip("Forward speed multiplier when 3+ fingers held")]
         public float slowMultiplier = 0.6f;
 
+        public int currentLane => _currentLane;
+
         // internal state
         private int _currentLane = 0;              // Start in the middle
         private bool _isTumbling = false;          // In edge penalty animation?
