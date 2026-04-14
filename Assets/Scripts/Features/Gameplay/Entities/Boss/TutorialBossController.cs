@@ -9,14 +9,14 @@ using UnityEngine;
 public class TutorialBossController : MonoBehaviour
 {
     [Header("Tutorial Boss Info")]
-    public string bossName { get; set; }
+    public string BossName { get; set; } = "Tutorial Boss";
 
     [Header("Tutorial Boss Stats")]
     [SerializeField] [Range(1, 10)] private int maxHealth = 10;
     [SerializeField] [Range(1, 5)] private int maxDamage = 5;
-    public int currentHealth { get; private set; }
+    public int CurrentHealth { get; private set; }
     // In case bosses support power ups or scaled damage?
-    public int currentDamage { get; private set; }
+    public int CurrentDamage { get; private set; }
 
     // Mostly same system as enemies other than multiple labels being possible
     [Header("Death FX")]
@@ -50,16 +50,16 @@ public class TutorialBossController : MonoBehaviour
 
     public void Damage(int amount = 1)
     {
-        if (currentHealth <= 0) return;
-        currentHealth = Mathf.Max(0, currentHealth - Mathf.Max(1, amount));
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
-        Toast.Instance.ShowToast($"Quinn dealt {amount} damage to {bossName}! HP: {currentHealth} / {maxHealth}", 1.5f, new Vector2(0f, 0f), new Vector2((Screen.width * 1.5f), 0f));
+        if (CurrentHealth <= 0) return;
+        CurrentHealth = Mathf.Max(0, CurrentHealth - Mathf.Max(1, amount));
+        OnHealthChanged?.Invoke(CurrentHealth, maxHealth);
+        Toast.Instance.ShowToast($"Quinn dealt {amount} damage to {BossName}! HP: {CurrentHealth} / {maxHealth}", 1.5f, new Vector2(0f, 0f), new Vector2((Screen.width * 1.5f), 0f));
     }
     
     public void Attack(bool showToast = true)
     {
         PlayerHealth health = FindFirstObjectByType<PlayerHealth>();
-        health.Damage(Mathf.Max(1, Mathf.Min(currentDamage, maxDamage)), showToast);
+        health.Damage(Mathf.Max(1, Mathf.Min(CurrentDamage, maxDamage)), showToast);
     }
 
     public void HandleSignedWord(EnemyLabel label, int damage)
@@ -68,20 +68,20 @@ public class TutorialBossController : MonoBehaviour
         else
         {
             Toast.Instance.ShowToast(
-                $"{bossName} dodged Quinn's attack!", 
+                $"{BossName} dodged Quinn's attack!", 
                 1.5f, new Vector2(0f, 0f),
                 new Vector2((Screen.width * 1.5f), 0f));
             return;
         }
 
-        if (currentHealth <= 0)
+        if (CurrentHealth <= 0)
         {
             // This should never occur but added just so that we can make sure nothing happens here.
             Debug.LogError("Tutorial Boss should never reach 0 hp");
             return;
         }
 
-        if (currentHealth <= impasseThreshold * maxHealth)
+        if (CurrentHealth <= impasseThreshold * maxHealth)
         {
             EnterImpossiblePhase(label);
             return;
@@ -124,8 +124,8 @@ public class TutorialBossController : MonoBehaviour
 
     private void InitHealth()
     {
-        currentHealth = Mathf.Clamp(maxHealth, 1, 10);
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        CurrentHealth = Mathf.Clamp(maxHealth, 1, 10);
+        OnHealthChanged?.Invoke(CurrentHealth, maxHealth);
     }
 
     private void CacheLabels()

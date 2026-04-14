@@ -64,7 +64,7 @@ public class TutorialBossMovement : MonoBehaviour
 
     private IEnumerator MoveAndAttack()
     {
-        while (_controller && _controller.currentHealth > 0)
+        while (_controller && _controller.CurrentHealth > 0)
         {
             int nextLane = _movementPattern[_currentLaneIndex];
             _currentLaneIndex = (_currentLaneIndex + 1) % _movementPattern.Length;
@@ -92,7 +92,7 @@ public class TutorialBossMovement : MonoBehaviour
                 _ => "illegal"
             };
             Toast.Instance.ShowToast(
-                $"{_controller.bossName} will attack the {laneValToStr} lane in {attackDelay} seconds!",
+                $"{_controller.BossName} will attack the {laneValToStr} lane in {attackDelay} seconds!",
                 1.5f,
                 new Vector2(0f, 0f),
                 new Vector2((Screen.width * 1.5f), 0f)
@@ -114,6 +114,6 @@ public class TutorialBossMovement : MonoBehaviour
 
     private int GetPlayerLane()
     {
-        return _playerMovement.currentLane;
+        return _playerMovement.CurrentLane;
     }
 }
