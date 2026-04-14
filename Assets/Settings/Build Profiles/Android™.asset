@@ -20,6 +20,7 @@ MonoBehaviour:
     rid: 1677494461193257033
   m_OverrideGlobalSceneList: 0
   m_Scenes: []
+  m_HasScriptingDefines: 0
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:
     m_Settings:
@@ -198,9 +199,10 @@ MonoBehaviour:
     - line: '|     tvOS: 0'
     - line: '|   overrideDefaultApplicationIdentifier: 0'
     - line: '|   AndroidBundleVersionCode: 1'
-    - line: '|   AndroidMinSdkVersion: 23'
+    - line: '|   AndroidMinSdkVersion: 25'
     - line: '|   AndroidTargetSdkVersion: 0'
     - line: '|   AndroidPreferredInstallLocation: 1'
+    - line: '|   AndroidPreferredDataLocation: 1'
     - line: '|   aotOptions: '
     - line: '|   stripEngineCode: 1'
     - line: '|   iPhoneStrippingLevel: 0'
@@ -289,6 +291,7 @@ MonoBehaviour:
     - line: '|   useCustomGradleSettingsTemplate: 0'
     - line: '|   useCustomProguardFile: 0'
     - line: '|   AndroidTargetArchitectures: 1'
+    - line: '|   AndroidAllowedArchitectures: -1'
     - line: '|   AndroidSplashScreenScale: 0'
     - line: '|   androidSplashScreen: {instanceID: 0}'
     - line: '|   AndroidKeystoreName: ''{inproject}: '''
@@ -1035,7 +1038,7 @@ MonoBehaviour:
     - line: '|   cloudProjectId: 64cfeee3-36c3-4bad-a2d2-bbc7d97a1c89'
     - line: '|   framebufferDepthMemorylessMode: 0'
     - line: '|   qualitySettingsNames: []'
-    - line: '|   projectName: Galactic Vagabond'
+    - line: '|   projectName: Quinn Signer'
     - line: '|   organizationId: ichabodkels'
     - line: '|   cloudEnabled: 0'
     - line: '|   legacyClampBlendShapeWeights: 0'
@@ -1047,6 +1050,7 @@ MonoBehaviour:
     - line: '|   androidVulkanAllowFilterList: []'
     - line: '|   androidVulkanDeviceFilterListAsset: {instanceID: 0}'
     - line: '|   d3d12DeviceFilterListAsset: {instanceID: 0}'
+    - line: '|   allowedHttpConnections: 3'
     - line: '| '
   references:
     version: 2
@@ -1067,6 +1071,7 @@ MonoBehaviour:
         m_InstallInBuildFolder: 0
         m_InsightsSettingsContainer:
           m_BuildProfileEngineDiagnosticsState: 2
+        m_AdaptivePerformanceEnabled: 0
         m_BuildSubtarget: 0
         m_BuildSystem: 1
         m_ExportAsGoogleAndroidProject: 0
