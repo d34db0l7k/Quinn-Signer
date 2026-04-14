@@ -10,24 +10,22 @@ namespace Features.Gameplay.Entities.Enemy
         [SerializeField] private ParticleSystem explodeVfx;
         [SerializeField] private AudioClip explodeSfx;
         [SerializeField] private float despawnDelay = 2f;
+
         private bool _isDead;
         private EnemyLabel _labelCache;
-        private bool _notifiedKill;
 
         private void Awake()
         {
-            // cache once; safe even if it’s on a child
             _labelCache = GetComponentInChildren<EnemyLabel>(true);
         }
 
-        private void NotifySignerAndPruneWord()
+        private void Start()
         {
-            if (_notifiedKill) return;
-            _notifiedKill = true;
-
-            var signer = FindFirstObjectByType<Features.Signing.Signer>(FindObjectsInactive.Include);
-            if (signer && _labelCache)
-                signer.HandleEnemyKilled(_labelCache);
+            var hintMode = FindFirstObjectByType<Features.Signing.HintMode>();
+            if (hintMode != null)
+            {
+                hintMode.TryActivateHintForEnemy(gameObject);
+            }
         }
 
         public void Explode()
@@ -35,34 +33,12 @@ namespace Features.Gameplay.Entities.Enemy
             if (_isDead) return;
             _isDead = true;
 
-            // 1) stop behaviours
             StopBehaviors();
-
-            // 2) stop physics/collisions
             StopPhysics();
-
-            // 3) hide renderers (so it looks gone even if we keep the root for VFX timing)
             HideRenderer();
-
-            NotifySignerAndPruneWord();
-            if (Features.Signing.GameModeState.HintTypingModeActive)
-            {
-                var hintTyping = FindFirstObjectByType<Features.Signing.HintModeTyping>(FindObjectsInactive.Include);
-                if (hintTyping) Debug.Log("[EnemyController] Hint mode active - skipping Signer flow");
-            }
-            else
-            {
-                var signer = FindFirstObjectByType<Features.Signing.Signer>(FindObjectsInactive.Include);
-                if (signer && _labelCache)
-                    signer.HandleEnemyKilled(_labelCache);
-            }
-            // 4) nuke labels IMMEDIATELY so win checks no longer see this enemy
             DestroyLabel();
-
-            //// 5) FX/SFX
             TriggerDeathFX();
 
-            // 6) finally remove the whole enemy object
             Destroy(gameObject, despawnDelay);
         }
 
@@ -76,9 +52,12 @@ namespace Features.Gameplay.Entities.Enemy
             HideRenderer();
             DestroyLabel();
             TriggerDeathFX();
+
             DamagePlayer(1);
-            var hintMode = FindFirstObjectByType<Features.Signing.HintMode>(FindObjectsInactive.Include);
+
+            var hintMode = FindFirstObjectByType<Features.Signing.HintMode>();
             if (hintMode) hintMode.OnEnemyDestroyed();
+
             Destroy(gameObject, despawnDelay);
         }
 
@@ -86,8 +65,7 @@ namespace Features.Gameplay.Entities.Enemy
         {
             foreach (var mb in GetComponentsInChildren<MonoBehaviour>(true))
             {
-                if (mb == this) continue;
-                mb.enabled = false;
+                if (mb != this) mb.enabled = false;
             }
         }
 
@@ -101,20 +79,28 @@ namespace Features.Gameplay.Entities.Enemy
                 rb.isKinematic = true;
                 rb.Sleep();
             }
+
             foreach (var col in GetComponentsInChildren<Collider>(true))
+            {
                 col.enabled = false;
+            }
         }
 
         private void HideRenderer()
         {
             foreach (var r in GetComponentsInChildren<Renderer>(true))
+            {
                 r.enabled = false;
+            }
         }
 
         private void DestroyLabel()
         {
             var labels = GetComponentsInChildren<EnemyLabel>(true);
-            foreach (var l in labels) Destroy(l.gameObject);
+            foreach (var l in labels)
+            {
+                Destroy(l.gameObject);
+            }
         }
 
         private void TriggerDeathFX()
@@ -123,15 +109,19 @@ namespace Features.Gameplay.Entities.Enemy
             {
                 var v = Instantiate(explodeVfx, transform.position, transform.rotation);
                 v.Play();
-                Destroy(v.gameObject, v.main.duration + v.main.startLifetime.constantMax + 0.25f);
+                Destroy(v.gameObject, v.main.duration + 0.5f);
             }
-            if (explodeSfx) AudioSource.PlayClipAtPoint(explodeSfx, transform.position);
+
+            if (explodeSfx)
+            {
+                AudioSource.PlayClipAtPoint(explodeSfx, transform.position);
+            }
         }
 
         private void DamagePlayer(int damage)
         {
-            PlayerHealth health = FindFirstObjectByType<PlayerHealth>();
-            health.Damage(damage);
+            var health = FindFirstObjectByType<PlayerHealth>();
+            if (health) health.Damage(damage);
         }
     }
 }
