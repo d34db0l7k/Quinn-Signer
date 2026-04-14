@@ -6076,7 +6076,7 @@ GameObject:
   - component: {fileID: 1077422347}
   - component: {fileID: 1077422348}
   - component: {fileID: 1077422349}
-  - component: {fileID: 1077422351}
+  - component: {fileID: 1077422350}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -6170,15 +6170,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 514134fe64f514afcac1e9aa822de7bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Features.Signing.Signer
-  engine: {fileID: 0}
-  wordBank: {fileID: 1077422347}
   inferenceText: {fileID: 0}
   confidenceScoreText: {fileID: 0}
   background: {fileID: 0}
   sessionSelection: {fileID: 11400000, guid: ffd61076f409d0a4fb50f7b442684b7f, type: 2}
+  playerHealth: {fileID: 356517355}
   winSceneName: WinScene
   winDelaySeconds: 2
-  playerHealth: {fileID: 356517355}
 --- !u!114 &1077422349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6194,7 +6192,7 @@ MonoBehaviour:
   slowTimeScale: 0.2
   trainingPanel: {fileID: 1662034371}
   trainingPanelObject: {fileID: 947932553}
---- !u!114 &1077422351
+--- !u!114 &1077422350
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6203,15 +6201,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1077422343}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b817298f9b4eab48acb15d206ada98f, type: 3}
+  m_Script: {fileID: 11500000, guid: 7d46f9082bc207d4a89d92af34129770, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Features.Signing.HintModeTyping
+  m_EditorClassIdentifier: Assembly-CSharp::Features.Signing.HintMode
   hintPanel: {fileID: 1448335534}
   rawImage: {fileID: 1524368504}
   inputField: {fileID: 1138296571}
-  submitButton: {fileID: 1893811359}
-  slrtkPanel: {fileID: 1326888695}
-  playerHealth: {fileID: 356517355}
+  slrtkPanel: {fileID: 0}
 --- !u!1 &1113803713
 GameObject:
   m_ObjectHideFlags: 0
@@ -6475,10 +6471,34 @@ MonoBehaviour:
   m_CharacterLimit: 0
   m_OnSubmit:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1077422350}
+        m_TargetAssemblyTypeName: Features.Signing.HintMode, Assembly-CSharp
+        m_MethodName: SubmitTypedAnswer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnDidEndEdit:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1077422350}
+        m_TargetAssemblyTypeName: Features.Signing.HintMode, Assembly-CSharp
+        m_MethodName: SubmitTypedAnswer
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -7439,12 +7459,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1293330119}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1326888695 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5002240846802208805, guid: b055499373f889c478eafd754d10eead,
-    type: 3}
-  m_PrefabInstance: {fileID: 677488778}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1337871005
 GameObject:
   m_ObjectHideFlags: 0
@@ -9947,7 +9961,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1893811360}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1077422350}
+        m_TargetAssemblyTypeName: Features.Signing.HintMode, Assembly-CSharp
+        m_MethodName: SubmitTypedAnswer
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1893811360
 MonoBehaviour:
   m_ObjectHideFlags: 0
