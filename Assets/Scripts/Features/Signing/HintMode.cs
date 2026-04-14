@@ -42,13 +42,10 @@ namespace Features.Signing
             if (slrtkPanel) slrtkPanel.SetActive(true);
         }
 
-        private void Update()
+        public void EnableHintMode()
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                _hintModeEnabled = true;
-                Debug.Log("Hint mode enabled");
-            }
+            _hintModeEnabled = true;
+            Debug.Log("Hint mode enabled (button)");
         }
 
         public void TryActivateHintForEnemy(GameObject enemyObj)
