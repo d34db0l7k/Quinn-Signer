@@ -6,6 +6,7 @@ namespace Features.Gameplay.Encounters
     using Features.Signing;
     using Features.Gameplay.Entities.Player;   // for InfinitePlayerMovement
     using Features.Gameplay.Entities.Enemy;
+    using UnityEngine.UI;
 
     public class EnemyEncounterController : MonoBehaviour
     {
@@ -15,6 +16,7 @@ namespace Features.Gameplay.Encounters
         [SerializeField] private SegmentGenerator segmentGen;
         [SerializeField] private SessionSelection sessionSelection;
         [SerializeField] private GameObject enemyPrefab;
+        [SerializeField] private GameObject bossPrefab;
 
         [Header("Timing")]
         [SerializeField] private float encounterIntervalSec = 15f; // time between encounters
@@ -30,6 +32,7 @@ namespace Features.Gameplay.Encounters
         [SerializeField] private float lockLeadZ = 30f;
 
         private GameObject _currentEnemy;
+        private GameObject _currentBoss;
         private float _timer;
         private bool _safeArmed;
 
@@ -64,7 +67,7 @@ namespace Features.Gameplay.Encounters
         void Update()
         {
             // If an enemy is alive: pause the timer and keep safe mode ON
-            if (_currentEnemy)
+            if (_currentBoss || _currentEnemy)
             {
                 if (segmentGen) segmentGen.SetForceSafeSegments(true);
                 return;
@@ -149,6 +152,78 @@ namespace Features.Gameplay.Encounters
             _timer = encounterIntervalSec;
             _currentEnemy = null;
             Debug.Log("Successfully expired the enemy.");
+        }
+
+        public void SpawnTutorialBoss()
+        {
+            if (!bossPrefab || !player) return;
+
+            if (segmentGen) segmentGen.SetForceSafeSegments(true);
+
+            var pos = player.position;
+            pos.z += spawnAheadZ;
+            pos.x += Random.Range(lateralX.x, lateralX.y);
+            pos.y += Random.Range(lateralY.x, lateralY.y);
+
+            _currentBoss = Instantiate(bossPrefab, pos, Quaternion.identity);
+
+            var face = _currentBoss.GetComponentInChildren<Features.CameraManagement.FaceCamera>();
+            if (!face) _currentBoss.AddComponent<Features.CameraManagement.FaceCamera>();
+
+            var labels = _currentBoss.GetComponentsInChildren<EnemyLabel>(true);
+            foreach (var label in labels)
+            {
+                if (sessionSelection && sessionSelection.HasWords && sessionSelection.TryPop(out var word))
+                    label.SetWord(word);
+                else
+                    label.SetWord("sign");
+            }
+
+            var locker = _currentBoss.GetComponent<EnemyLeadLock>();
+            if (!locker) locker = _currentBoss.AddComponent<EnemyLeadLock>();
+            locker.target = player;
+            locker.lockLeadZ = lockLeadZ;
+            locker.approachSpeed = 1.25f * (player ? player.GetComponent<Features.Gameplay.Entities.Player.InfinitePlayerMovement>()?.forwardSpeed ?? 40f : 40f);
+
+            // This portion subscribes the controller to the TutorialBoss's OnImpossiblePhaseChange event
+            // and nukes all existing labels then replaces it with the impossible glyph.
+            var tutorialBossController = _currentBoss.GetComponent<TutorialBossController>();
+            if (tutorialBossController)
+            {
+                tutorialBossController.OnImpossiblePhaseChange += () =>
+                {
+                    NukeCurrentBossLabels();
+                    RegisterImpossibleSign(tutorialBossController.impossibleGlyph);
+                };
+            }
+
+            StartCoroutine(WaitTutorialBossDefeatedThenResume());
+        }
+
+        private void NukeCurrentBossLabels()
+        {
+            var existingLabels = _currentBoss.GetComponentsInChildren<EnemyLabel>(true);
+            foreach (EnemyLabel l in existingLabels)
+                Destroy(l.gameObject);
+        }
+
+        private void RegisterImpossibleSign(string impossibleLabel)
+        {
+            var impossibleSignGO = new GameObject();
+            impossibleSignGO.transform.SetParent(_currentBoss.transform);
+            var label = impossibleSignGO.AddComponent<EnemyLabel>();
+            var textObj = impossibleSignGO.AddComponent<Text>();
+            label.label = textObj;
+            label.SetWord(impossibleLabel);
+        }
+
+        IEnumerator WaitTutorialBossDefeatedThenResume()
+        {
+            while (_currentBoss) yield return null;
+
+            _safeArmed = false;
+            if (segmentGen) segmentGen.SetForceSafeSegments(false);
+            _timer = encounterIntervalSec;
         }
     }
 }

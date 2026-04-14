@@ -3,14 +3,14 @@ using Features.Gameplay.Entities.Player;
 using System;
 using UnityEngine;
 
-public class BossEntity : MonoBehaviour
+public class TutorialBossController : MonoBehaviour
 {
-    [Header("Boss Info")]
-    private string bossName { get; set; }
+    [Header("Tutorial Boss Info")]
+    public string bossName { get; set; }
 
-    [Header("Boss Stats")]
-    [Range(1, 10)] private int maxHealth = 10;
-    [Range(1, 5)] private int maxDamage = 5;
+    [Header("Tutorial Boss Stats")]
+    [SerializeField] [Range(1, 10)] private int maxHealth = 10;
+    [SerializeField] [Range(1, 5)] private int maxDamage = 5;
     public int currentHealth { get; private set; }
     // In case bosses support power ups or scaled damage?
     public int currentDamage { get; private set; }
@@ -24,7 +24,11 @@ public class BossEntity : MonoBehaviour
     private EnemyLabel[] _labelsCache;
 
     public event Action<int, int> OnHealthChanged;
-    public event Action OnDeath;
+
+    [Header("Impossible Glyph (Sciprted Loss)")]
+    [SerializeField] private float impasseThreshold = 0.25f;
+    public string impossibleGlyph;
+    public event Action OnImpossiblePhaseChange;
 
     private void Awake()
     {
@@ -38,10 +42,9 @@ public class BossEntity : MonoBehaviour
         currentHealth = Mathf.Max(0, currentHealth - Mathf.Max(1, amount));
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
         Toast.Instance.ShowToast($"Quinn dealt {amount} damage to {bossName}!", 1.5f, new Vector2(0f, 0f), new Vector2((Screen.width * 1.5f), 0f));
-        if (currentHealth <= 0)
+        if (currentHealth <= impasseThreshold * maxHealth) // Simulate impossible sign
         {
-            OnDeath?.Invoke();
-            Explode();
+            OnImpossiblePhaseChange?.Invoke();
         }
     }
     
@@ -51,17 +54,10 @@ public class BossEntity : MonoBehaviour
         health.Damage(Mathf.Max(1, Mathf.Min(currentDamage, maxDamage)));
     }
 
-    public void Explode()
+    public void HandleSignedWord(EnemyLabel label, int damage)
     {
-        if (_isDead) return;
-        _isDead = true;
-
-        StopBehaviors();
-        StopPhysics();
-        HideRenderer();
-        DestroyLabels();
-        TriggerDeathFX();
-        Destroy(gameObject, despawnDelay);
+        if (label) Destroy(label.gameObject);
+        Damage(damage);
     }
 
     private void InitHealth()
@@ -75,10 +71,19 @@ public class BossEntity : MonoBehaviour
         _labelsCache = GetComponentsInChildren<EnemyLabel>(true);
     }
 
-    public void HandleSignedWord(EnemyLabel label, int damage)
+
+    // Explode calls the series of methods below it.
+    public void Explode()
     {
-        if (label) Destroy(label.gameObject);
-        Damage(damage);
+        if (_isDead) return;
+        _isDead = true;
+
+        StopBehaviors();
+        StopPhysics();
+        HideRenderer();
+        DestroyLabels();
+        TriggerDeathFX();
+        Destroy(gameObject, despawnDelay);
     }
 
     private void StopBehaviors()
@@ -129,3 +134,4 @@ public class BossEntity : MonoBehaviour
         if (explodeSfx) AudioSource.PlayClipAtPoint(explodeSfx, transform.position);
     }
 }
+

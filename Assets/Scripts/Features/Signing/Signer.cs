@@ -7,6 +7,7 @@ using Engine;
 using Features.Gameplay.Entities.Enemy;
 using Features.Gameplay.Entities.Player;
 using UnityEngine;
+using UnityEngine.ProBuilder.MeshOperations;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -62,7 +63,6 @@ namespace Features.Signing
 
             if (Input.GetKeyDown(KeyCode.Alpha1)) SimulateCorrectSign();
             if (Input.GetKeyDown(KeyCode.Alpha2)) SimulateIncorrectSign();
-            
             UserSigning();
         }
 
@@ -253,11 +253,16 @@ namespace Features.Signing
                 return;
             }
 
-            var controller = match.GetComponentInParent<EnemyController>() ?? match.GetComponent<EnemyController>();
-            if (controller) controller.Explode(); else Destroy(match.gameObject);
+            // The initial if statements in Update() within EnemyEncounterController should handle mutual exclusivity
+            // of boss and enemy appearances. So, in theory, only one of these controllers should have any valid
+            // reference during any encounter.
+            var enemyController = match.GetComponentInParent<EnemyController>() ?? match.GetComponent<EnemyController>();
+            var bossController = match.GetComponentInParent<TutorialBossController>() ?? match.GetComponent<TutorialBossController>();
+            if (enemyController) enemyController.Explode();
+            else if (bossController) bossController.HandleSignedWord(match, 1);
+            else Destroy(match.gameObject);
 
             SetInferenceTextFields(signed, normalizedScore, Color.green);
-
             RemoveWordFromList(signed);
             StartCoroutine(CheckForWinNextFrame());
         }
