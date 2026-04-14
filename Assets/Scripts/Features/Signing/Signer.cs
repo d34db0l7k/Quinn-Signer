@@ -47,6 +47,12 @@ namespace Features.Signing
 
         private void Start()
         {
+            if (sessionSelection && sessionSelection.HasWords)
+            {
+                _filterWords.Clear();
+                _filterWords.AddRange(sessionSelection.Words.Select(w => (w ?? "").Trim().ToLowerInvariant()));
+                //ApplyRecognizerFilterToDictionaryWords();
+            }
             StartCoroutine(AssignEnemyLabelsWhenReady());
             StartCoroutine(ForceEngineIdleAtLaunch());
         }
@@ -258,13 +264,22 @@ namespace Features.Signing
             // reference during any encounter.
             var enemyController = match.GetComponentInParent<EnemyController>() ?? match.GetComponent<EnemyController>();
             var bossController = match.GetComponentInParent<TutorialBossController>() ?? match.GetComponent<TutorialBossController>();
-            if (enemyController) enemyController.Explode();
-            else if (bossController) bossController.HandleSignedWord(match, 1);
+            if (enemyController) HandleEnemySign(match, enemyController, signed);
+            else if (bossController) HandleTutorialBossSign(match, bossController, signed);
             else Destroy(match.gameObject);
-
             SetInferenceTextFields(signed, normalizedScore, Color.green);
+        }
+
+        private void HandleEnemySign(EnemyLabel match, EnemyController cont, string signed)
+        {
+            cont.Explode();
             RemoveWordFromList(signed);
             StartCoroutine(CheckForWinNextFrame());
+        }
+
+        private void HandleTutorialBossSign(EnemyLabel match, TutorialBossController cont, string signed)
+        {
+            cont.HandleSignedWord(match, 1);
         }
 
         private void SetInferenceTextFields(string signed, int score, Color textColor)

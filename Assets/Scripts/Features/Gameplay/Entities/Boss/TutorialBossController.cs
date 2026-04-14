@@ -1,6 +1,9 @@
 using Features.Gameplay.Entities.Enemy;
 using Features.Gameplay.Entities.Player;
+using Features.Signing;
 using System;
+using System.Collections;
+using System.Text;
 using UnityEngine;
 
 public class TutorialBossController : MonoBehaviour
@@ -27,8 +30,11 @@ public class TutorialBossController : MonoBehaviour
 
     [Header("Impossible Glyph (Sciprted Loss)")]
     [SerializeField] private float impasseThreshold = 0.25f;
-    public string impossibleGlyph;
-    public event Action OnImpossiblePhaseChange;
+    public string impossibleGlyph = "Impossible";
+
+    private SessionSelection _sessionSelection;
+    private EnemyLabel _activeLabel;
+    private bool _inImpossiblePhase = false;
 
     private void Awake()
     {
@@ -36,28 +42,66 @@ public class TutorialBossController : MonoBehaviour
         CacheLabels();
     }
 
+    // Temp work around to allow multiple labels on one enemy.
+    public void InitSession(SessionSelection session)
+    {
+        _sessionSelection = session;
+    }
+
     public void Damage(int amount = 1)
     {
         if (currentHealth <= 0) return;
         currentHealth = Mathf.Max(0, currentHealth - Mathf.Max(1, amount));
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
-        Toast.Instance.ShowToast($"Quinn dealt {amount} damage to {bossName}!", 1.5f, new Vector2(0f, 0f), new Vector2((Screen.width * 1.5f), 0f));
-        if (currentHealth <= impasseThreshold * maxHealth) // Simulate impossible sign
-        {
-            OnImpossiblePhaseChange?.Invoke();
-        }
+        Toast.Instance.ShowToast($"Quinn dealt {amount} damage to {bossName}! HP: {currentHealth} / {maxHealth}", 1.5f, new Vector2(0f, 0f), new Vector2((Screen.width * 1.5f), 0f));
     }
     
-    public void Attack()
+    public void Attack(bool showToast = true)
     {
         PlayerHealth health = FindFirstObjectByType<PlayerHealth>();
-        health.Damage(Mathf.Max(1, Mathf.Min(currentDamage, maxDamage)));
+        health.Damage(Mathf.Max(1, Mathf.Min(currentDamage, maxDamage)), showToast);
     }
 
     public void HandleSignedWord(EnemyLabel label, int damage)
     {
-        if (label) Destroy(label.gameObject);
-        Damage(damage);
+        if (!_inImpossiblePhase) Damage(damage);
+        else Toast.Instance.ShowToast($"{bossName} dodged Quinn's attack!", 1.5f, new Vector2(0f, 0f), new Vector2((Screen.width * 1.5f), 0f));
+
+        if (currentHealth <= impasseThreshold * maxHealth) EnterImpossiblePhase(label);
+
+        if (label && _sessionSelection && _sessionSelection.TryPop(out var next))
+            label.SetWord(next);
+        else
+            EnterImpossiblePhase(label);
+    }
+
+    private void EnterImpossiblePhase(EnemyLabel label)
+    {
+        //Debug.Log("Triggering Impossible Phase");
+        _inImpossiblePhase = true;
+        _activeLabel = label;
+        StartCoroutine(CycleImpossibleGlyphs());
+    }
+
+    private IEnumerator CycleImpossibleGlyphs()
+    {
+        while (_inImpossiblePhase && _activeLabel)
+        {
+            _activeLabel.SetWord(GenerateRandomGlyph());
+            yield return new WaitForSeconds(0.75f);
+            Attack(showToast: false);
+        }
+    }
+
+    private string GenerateRandomGlyph()
+    {
+        string glyphPool = "0123456789)!#$%^&*(./;'[]<?\"\\{}";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < UnityEngine.Random.Range(2, 8); i++)
+        {
+            sb.Append(glyphPool[UnityEngine.Random.Range(0, glyphPool.Length)]);
+        }
+        return sb.ToString();
     }
 
     private void InitHealth()

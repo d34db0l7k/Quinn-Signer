@@ -6,7 +6,6 @@ namespace Features.Gameplay.Encounters
     using Features.Signing;
     using Features.Gameplay.Entities.Player;   // for InfinitePlayerMovement
     using Features.Gameplay.Entities.Enemy;
-    using UnityEngine.UI;
 
     public class EnemyEncounterController : MonoBehaviour
     {
@@ -94,6 +93,7 @@ namespace Features.Gameplay.Encounters
             if (_timer <= 0f)
             {
                 SpawnEnemy();
+                //SpawnTutorialBoss(); // For testing
                 // Timer stays paused while enemy exists
             }
         }
@@ -156,7 +156,7 @@ namespace Features.Gameplay.Encounters
 
         public void SpawnTutorialBoss()
         {
-            if (!bossPrefab || !player) return;
+            if (!bossPrefab || !player || sessionSelection.words.Count == 0) return;
 
             if (segmentGen) segmentGen.SetForceSafeSegments(true);
 
@@ -185,36 +185,13 @@ namespace Features.Gameplay.Encounters
             locker.lockLeadZ = lockLeadZ;
             locker.approachSpeed = 1.25f * (player ? player.GetComponent<Features.Gameplay.Entities.Player.InfinitePlayerMovement>()?.forwardSpeed ?? 40f : 40f);
 
-            // This portion subscribes the controller to the TutorialBoss's OnImpossiblePhaseChange event
-            // and nukes all existing labels then replaces it with the impossible glyph.
             var tutorialBossController = _currentBoss.GetComponent<TutorialBossController>();
             if (tutorialBossController)
             {
-                tutorialBossController.OnImpossiblePhaseChange += () =>
-                {
-                    NukeCurrentBossLabels();
-                    RegisterImpossibleSign(tutorialBossController.impossibleGlyph);
-                };
+                tutorialBossController.InitSession(sessionSelection);
             }
 
             StartCoroutine(WaitTutorialBossDefeatedThenResume());
-        }
-
-        private void NukeCurrentBossLabels()
-        {
-            var existingLabels = _currentBoss.GetComponentsInChildren<EnemyLabel>(true);
-            foreach (EnemyLabel l in existingLabels)
-                Destroy(l.gameObject);
-        }
-
-        private void RegisterImpossibleSign(string impossibleLabel)
-        {
-            var impossibleSignGO = new GameObject();
-            impossibleSignGO.transform.SetParent(_currentBoss.transform);
-            var label = impossibleSignGO.AddComponent<EnemyLabel>();
-            var textObj = impossibleSignGO.AddComponent<Text>();
-            label.label = textObj;
-            label.SetWord(impossibleLabel);
         }
 
         IEnumerator WaitTutorialBossDefeatedThenResume()
