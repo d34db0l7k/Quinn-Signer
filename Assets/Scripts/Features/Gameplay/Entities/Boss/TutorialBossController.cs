@@ -65,9 +65,27 @@ public class TutorialBossController : MonoBehaviour
     public void HandleSignedWord(EnemyLabel label, int damage)
     {
         if (!_inImpossiblePhase) Damage(damage);
-        else Toast.Instance.ShowToast($"{bossName} dodged Quinn's attack!", 1.5f, new Vector2(0f, 0f), new Vector2((Screen.width * 1.5f), 0f));
+        else
+        {
+            Toast.Instance.ShowToast(
+                $"{bossName} dodged Quinn's attack!", 
+                1.5f, new Vector2(0f, 0f),
+                new Vector2((Screen.width * 1.5f), 0f));
+            return;
+        }
 
-        if (currentHealth <= impasseThreshold * maxHealth) EnterImpossiblePhase(label);
+        if (currentHealth <= 0)
+        {
+            // This should never occur but added just so that we can make sure nothing happens here.
+            Debug.LogError("Tutorial Boss should never reach 0 hp");
+            return;
+        }
+
+        if (currentHealth <= impasseThreshold * maxHealth)
+        {
+            EnterImpossiblePhase(label);
+            return;
+        }
 
         if (label && _sessionSelection && _sessionSelection.TryPop(out var next))
             label.SetWord(next);
