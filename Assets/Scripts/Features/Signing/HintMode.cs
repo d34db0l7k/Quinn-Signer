@@ -19,7 +19,7 @@ namespace Features.Signing
         private VideoPlayer _videoPlayer;
         private RenderTexture _renderTexture;
 
-        private bool _hintModeEnabled;
+        public bool _hintModeEnabled;
         private bool _hintActive;
 
         private EnemyController _currentEnemy;
@@ -43,24 +43,16 @@ namespace Features.Signing
             _videoPlayer.targetTexture = _renderTexture;
 
             if (rawImage)
-            {
                 rawImage.texture = _renderTexture;
-            }
 
             if (hintPanel)
-            {
                 hintPanel.SetActive(false);
-            }
 
             if (slrtkPanel)
-            {
                 slrtkPanel.SetActive(true);
-            }
 
             if (extraTextPanel)
-            {
                 extraTextPanel.SetActive(true);
-            }
         }
 
         public void EnableHintMode()
@@ -70,14 +62,10 @@ namespace Features.Signing
             Debug.Log("Hint mode enabled (button)");
 
             if (slrtkPanel)
-            {
                 slrtkPanel.SetActive(false);
-            }
 
             if (extraTextPanel)
-            {
                 extraTextPanel.SetActive(false);
-            }
         }
 
         public bool IsHintModeEnabled()
@@ -110,21 +98,19 @@ namespace Features.Signing
             _videoPlayer.Play();
 
             if (hintPanel)
-            {
                 hintPanel.SetActive(true);
-            }
 
             if (slrtkPanel)
-            {
                 slrtkPanel.SetActive(false);
-            }
 
             if (extraTextPanel)
-            {
                 extraTextPanel.SetActive(false);
-            }
 
             _hintActive = true;
+
+            // Hide the floating label so the video is the only hint
+            EnemyLabel label = _currentEnemy.GetComponentInChildren<EnemyLabel>(true);
+            if (label) label.SetLabelVisible(false);
 
             if (inputField)
             {
@@ -139,18 +125,19 @@ namespace Features.Signing
             _videoPlayer.Stop();
 
             if (hintPanel)
-            {
                 hintPanel.SetActive(false);
-            }
 
             if (slrtkPanel && !_hintModeEnabled)
-            {
                 slrtkPanel.SetActive(true);
-            }
 
             if (extraTextPanel && !_hintModeEnabled)
-            {
                 extraTextPanel.SetActive(true);
+
+            // Restore label visibility before clearing the reference
+            if (_currentEnemy)
+            {
+                EnemyLabel label = _currentEnemy.GetComponentInChildren<EnemyLabel>(true);
+                if (label) label.SetLabelVisible(true);
             }
 
             _hintActive = false;
@@ -158,17 +145,13 @@ namespace Features.Signing
             _currentWord = null;
 
             if (inputField)
-            {
                 inputField.text = "";
-            }
         }
 
         public void OnEnemyDestroyed()
         {
             if (_hintActive)
-            {
                 HideHint();
-            }
         }
 
         public void SubmitTypedAnswer()
@@ -180,9 +163,7 @@ namespace Features.Signing
             if (Normalize(raw) == Normalize(_currentWord))
             {
                 if (_currentEnemy)
-                {
                     _currentEnemy.Explode();
-                }
 
                 HideHint();
             }
