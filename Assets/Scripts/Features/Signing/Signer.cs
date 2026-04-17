@@ -1,48 +1,39 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Common;
-using Core.SceneManagement;
-using Engine;
-using Features.Gameplay.Entities.Enemy;
-using Features.Gameplay.Entities.Player;
 using UnityEngine;
 using UnityEngine.ProBuilder.MeshOperations;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using Features.Gameplay.Entities.Enemy;
+using Features.Gameplay.Entities.Player;
 
 namespace Features.Signing
 {
     public class Signer : MonoBehaviour
     {
-        [Header("SLRTK Overhead")]
-        public SimpleExecutionEngine engine;
-
-        [Header("Plug in")]
-        public WordBank wordBank;
+        [Header("UI")]
         public Text inferenceText;
         public Text confidenceScoreText;
         public Image background;
 
+        [Header("Session")]
         [SerializeField] private SessionSelection sessionSelection;
+
+        [Header("Player")]
+        [SerializeField] private PlayerHealth playerHealth;
 
         [Header("Win")]
         [SerializeField] private string winSceneName = "WinScene";
         [SerializeField] private float winDelaySeconds = 2f;
-        
-        [Header("Player Data")]
-        [SerializeField] private PlayerHealth playerHealth;
 
-        // internals
-        private bool _hasExecuted = false;
-        private SceneBindings _bindings;
         private readonly List<string> _filterWords = new();
-        private bool _signingActive = false;
+        private bool _initialized;
 
         private void Awake()
         {
             if (background) background.color = Color.black;
-            if (engine) engine.Toggle();
         }
 
         private void Start()
@@ -54,7 +45,6 @@ namespace Features.Signing
                 //ApplyRecognizerFilterToDictionaryWords();
             }
             StartCoroutine(AssignEnemyLabelsWhenReady());
-            StartCoroutine(ForceEngineIdleAtLaunch());
         }
 
         private void Update()
@@ -97,164 +87,68 @@ namespace Features.Signing
             if (background) background.color = Color.black;
             if (engine && !engine.enabled) engine.enabled = false;
 
+            _initialized = true;
             ApplyRecognizerFilterToDictionaryWords();
-
-            StartCoroutine(AssignEnemyLabelsWhenReady());
         }
 
         private IEnumerator AssignEnemyLabelsWhenReady()
         {
             yield return null;
 
-            var enemyLabels = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
-            if (enemyLabels == null || enemyLabels.Length == 0) yield break;
+            var enemies = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
 
-            List<string> chosen;
-            if (sessionSelection && sessionSelection.HasWords)
-            {
-                chosen = new List<string>(sessionSelection.Words)
-                    .Take(enemyLabels.Length)
-                    .Select(w => (w ?? "").Trim().ToLowerInvariant())
-                    .ToList();
-            }
-            else if (wordBank)
-            {
-                chosen = wordBank.GetRandomWords(enemyLabels.Length, unique: true);
-            }
-            else
-            {
-                chosen = new List<string>();
-            }
+            if (enemies == null || enemies.Length == 0)
+                yield break;
+
+            List<string> chosen = new();
+
+            if (sessionSelection != null && sessionSelection.HasWords)
+                chosen = sessionSelection.Words.ToList();
 
             _filterWords.Clear();
             _filterWords.AddRange(chosen);
-            ApplyRecognizerFilterToDictionaryWords();
 
-            if (engine)
+            int count = Mathf.Min(enemies.Length, chosen.Count);
+
+            for (int i = 0; i < count; i++)
             {
-                engine.recognizer.outputFilters.Clear();
-                if (_filterWords.Count > 0)
-                    engine.recognizer.outputFilters.Add(new FocusSublistFilter<string>(_filterWords));
-            }
-
-            for (int i = 0; i < enemyLabels.Length && i < _filterWords.Count; i++)
-                SafeSetEnemyWord(enemyLabels[i], _filterWords[i]);
-        }
-
-        private static void SafeSetEnemyWord(EnemyLabel label, string word)
-        {
-            if (!label || !label.label) return;
-            label.SetWord(word);
-        }
-
-        private IEnumerator ForceEngineIdleAtLaunch()
-        {
-            yield return null;
-            if (!engine) yield break;
-
-            engine.Toggle();
-            _signingActive = false;
-            if (background) background.color = Color.black;
-        }
-
-        // --- Desktop key handling (for testing) ---
-        private void UserSigning()
-        {
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                if (engine && !_signingActive)
-                {
-                    engine.enabled = true;
-                    _signingActive = true;
-                }
-                if (background) background.color = Color.white;
-                engine.Toggle();
-            }
-
-            if (Input.GetKeyUp(KeyCode.Return))
-            {
-                if (engine) engine.buffer.TriggerCallbacks();
-                engine.Toggle();
-                if (background) background.color = Color.black;
-
-                if (engine && _signingActive)
-                {
-                    _signingActive = false;
-                    engine.enabled = false;
-                }
+                if (enemies[i] != null)
+                    enemies[i].SetWord(chosen[i]);
             }
         }
 
-        // --- Mobile button hooks --- \\
-        public void BeginMobileSign()
+        public void HandleEnemyKilled(EnemyLabel label)
         {
-            if (engine && !_signingActive)
+            if (GameModeState.HintTypingModeActive)
             {
-                engine.enabled = true;
-                _signingActive = true;
-            }
-            if (background) background.color = Color.white;
-            if (engine) engine.Toggle();
-        }
-
-        public void EndMobileSign()
-        {
-            if (engine) engine.buffer.TriggerCallbacks();
-            if (engine) engine.Toggle();
-            if (background) background.color = Color.black;
-
-            if (engine && _signingActive)
-            {
-                _signingActive = false;
-                engine.enabled = false;
-            }
-        }
-
-        // --- DEV HELPERS --- \\
-        void SimulateCorrectSign()
-        {
-            var labels = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
-            foreach (var l in labels)
-            {
-                if (!string.IsNullOrEmpty(l.targetWord))
-                {
-                    OnSignRecognized(l.targetWord, 1.0f);
-                    return;
-                }
-            }
-            OnSignRecognized("dev_correct_missing", 1.0f);
-        }
-
-        void SimulateIncorrectSign()
-        {
-            OnSignRecognized("__dev_wrong__", 0.0f);
-        }
-        
-        private void OnSignRecognized(string rawInput, float confidenceScore)
-        {
-            var signed = (rawInput ?? "").Trim().ToLowerInvariant();
-            var normalizedScore = Mathf.RoundToInt(confidenceScore * 100f);
-            if (string.IsNullOrEmpty(signed))
-            {
-                SetInferenceTextFields(signed, normalizedScore, Color.red);
                 return;
             }
 
-            var labels = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
-            EnemyLabel match = null;
-            foreach (var label in labels)
+            if (label == null || string.IsNullOrEmpty(label.targetWord))
+                return;
+
+            string word = label.targetWord.Trim().ToLowerInvariant();
+
+            if (_filterWords.Contains(word))
+                _filterWords.Remove(word);
+
+            CheckWin();
+        }
+
+        public void OnSignRecognized(string rawInput, float confidence)
+        {
+            if (GameModeState.HintTypingModeActive)
             {
-                if (!label) continue;
-                if (string.Equals(label.targetWord, signed, System.StringComparison.OrdinalIgnoreCase))
-                {
-                    match = label;
-                    break;
-                }
+                return;
             }
+
+            string signed = (rawInput ?? "").Trim().ToLowerInvariant();
+
+            var match = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None)
+                .FirstOrDefault(e => e != null && e.targetWord == signed);
 
             if (!match)
             {
-                SetInferenceTextFields(signed, normalizedScore, Color.red);
                 if (playerHealth) playerHealth.Damage(1);
                 return;
             }
@@ -296,107 +190,51 @@ namespace Features.Signing
             }
         }
 
-        private void RemoveWordFromList(string word)
+        private void RemoveWord(string word)
         {
-            if (string.IsNullOrEmpty(word)) return;
-            var key = word.Trim().ToLowerInvariant();
-
-            // THIS is what actually tracks progress
             for (int i = _filterWords.Count - 1; i >= 0; i--)
             {
-                if (string.Equals(_filterWords[i], key, System.StringComparison.OrdinalIgnoreCase))
+                if (_filterWords[i] == word)
                     _filterWords.RemoveAt(i);
             }
+        }
 
-            // Optional (safe) remove from session list too
-            if (sessionSelection != null && sessionSelection.words != null)
-            {
-                for (int i = sessionSelection.words.Count - 1; i >= 0; i--)
-                {
-                    var s = sessionSelection.words[i];
-                    if (string.Equals(s?.Trim().ToLowerInvariant(), key, System.StringComparison.OrdinalIgnoreCase))
-                        sessionSelection.words.RemoveAt(i);
-                }
-            }
+        private void CheckWin()
+        {
+            var aliveEnemies = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None)
+                .Where(e => e != null && !string.IsNullOrEmpty(e.targetWord))
+                .ToList();
 
-            // Update recognizer so it only listens for remaining words
-            if (engine != null && engine.recognizer != null)
+            if (aliveEnemies.Count == 0)
             {
-                engine.recognizer.outputFilters.Clear();
-                if (_filterWords.Count > 0)
-                    engine.recognizer.outputFilters.Add(new FocusSublistFilter<string>(_filterWords));
+                StartCoroutine(LoadWin());
             }
         }
 
-
-        private IEnumerator CheckForWinNextFrame()
-        {
-            yield return null;
-
-            bool noWordsLeft = _filterWords == null || _filterWords.Count == 0;
-
-            if (noWordsLeft)
-                TriggerWin();
-        }
-
-
-        private void TriggerWin()
-        {
-            if (engine) engine.enabled = false;
-            if (background) background.color = Color.black;
-            StartCoroutine(LoadWinAfterDelay());
-        }
-
-        private IEnumerator LoadWinAfterDelay()
+        private IEnumerator LoadWin()
         {
             yield return new WaitForSeconds(winDelaySeconds);
-            if (!string.IsNullOrEmpty(winSceneName))
-                SceneManager.LoadScene(winSceneName, LoadSceneMode.Single);
-        }
-
-        public void HandleEnemyKilled(EnemyLabel label)
-        {
-            if (label && !string.IsNullOrEmpty(label.targetWord))
-                RemoveWordFromList(label.targetWord.ToLowerInvariant());
-
-            StartCoroutine(CheckForWinNextFrame());
-        }
-        private List<string> GetDictionaryWords()
-        {
-            if (sessionSelection != null && sessionSelection.HasWords && sessionSelection.Words != null)
-                return Normalize(sessionSelection.Words);
-
-            return new List<string>();
-        }
-
-        private static List<string> Normalize(IEnumerable<string> raw)
-        {
-            if (raw == null) return new List<string>();
-            var list = new List<string>();
-            foreach (var w in raw)
-            {
-                var s = (w ?? "").Trim().ToLowerInvariant();
-                if (!string.IsNullOrEmpty(s) && !list.Contains(s))
-                    list.Add(s);
-            }
-            return list;
+            SceneManager.LoadScene(winSceneName);
         }
 
         private void ApplyRecognizerFilterToDictionaryWords()
         {
-            if (engine == null) return;
-            if (engine.recognizer == null) return; // <- THIS is the important fix
-
-            var focus = GetDictionaryWords();
-
-            engine.recognizer.outputFilters.Clear();
-            if (focus.Count > 0)
-                engine.recognizer.outputFilters.Add(new FocusSublistFilter<string>(focus));
-
-            _filterWords.Clear();
-            _filterWords.AddRange(focus);
         }
 
+        public void BeginMobileSign()
+        {
+            if (GameModeState.HintTypingModeActive)
+                return;
 
+            if (background) background.color = Color.white;
+        }
+
+        public void EndMobileSign()
+        {
+            if (GameModeState.HintTypingModeActive)
+                return;
+
+            if (background) background.color = Color.black;
+        }
     }
 }
