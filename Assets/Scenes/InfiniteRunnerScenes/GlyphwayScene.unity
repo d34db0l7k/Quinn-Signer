@@ -6408,6 +6408,8 @@ MonoBehaviour:
   sessionSelection: {fileID: 11400000, guid: ffd61076f409d0a4fb50f7b442684b7f, type: 2}
   enemyPrefab: {fileID: 8852511146641756017, guid: 0885bca5d538c4fdaa90432bfb56e7a6,
     type: 3}
+  bossPrefab: {fileID: 8852511146641756017, guid: f582d63f39a5d404a8f7f0c6a1957cc8,
+    type: 3}
   encounterIntervalSec: 15
   preSafeLeadSec: 3
   lifeDuration: 10

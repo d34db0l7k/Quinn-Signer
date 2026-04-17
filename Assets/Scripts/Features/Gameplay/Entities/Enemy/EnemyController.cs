@@ -30,21 +30,18 @@ namespace Features.Gameplay.Entities.Enemy
 
         public void Explode()
         {
-            if (_isDead) return;
-            _isDead = true;
-
-            StopBehaviors();
-            StopPhysics();
-            HideRenderer();
-            DestroyLabel();
-            TriggerDeathFX();
-
-            Destroy(gameObject, despawnDelay);
+            if (!TryDeath()) return;
         }
 
         public void Expire()
         {
-            if (_isDead) return;
+            if (!TryDeath()) return;
+            DamagePlayer(1);
+        }
+
+        private bool TryDeath()
+        {
+            if (_isDead) return false;
             _isDead = true;
 
             StopBehaviors();
@@ -53,12 +50,9 @@ namespace Features.Gameplay.Entities.Enemy
             DestroyLabel();
             TriggerDeathFX();
 
-            DamagePlayer(1);
-
-            var hintMode = FindFirstObjectByType<Features.Signing.HintMode>();
-            if (hintMode) hintMode.OnEnemyDestroyed();
-
             Destroy(gameObject, despawnDelay);
+
+            return true;
         }
 
         private void StopBehaviors()

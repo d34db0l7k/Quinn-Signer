@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.ProBuilder.MeshOperations;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Features.Gameplay.Entities.Enemy;
@@ -36,12 +38,54 @@ namespace Features.Signing
 
         private void Start()
         {
+            if (sessionSelection && sessionSelection.HasWords)
+            {
+                _filterWords.Clear();
+                _filterWords.AddRange(sessionSelection.Words.Select(w => (w ?? "").Trim().ToLowerInvariant()));
+                //ApplyRecognizerFilterToDictionaryWords();
+            }
             StartCoroutine(AssignEnemyLabelsWhenReady());
         }
 
         private void Update()
         {
-            if (_initialized) return;
+            if (!_hasExecuted && engine)
+            {
+                engine.recognizer.AddCallback("check", (word) => OnSignRecognized(word, 1.0f));
+                engine.recognizer.outputFilters.Clear();
+                ApplyRecognizerFilterToDictionaryWords();
+                _hasExecuted = true;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha1)) SimulateCorrectSign();
+            if (Input.GetKeyDown(KeyCode.Alpha2)) SimulateIncorrectSign();
+            UserSigning();
+        }
+
+        private void OnEnable()  => SceneManager.sceneLoaded += OnSceneLoaded;
+        private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            _bindings = FindFirstObjectByType<SceneBindings>(FindObjectsInactive.Include);
+
+            if (!_bindings)
+            {
+                _hasExecuted = false;
+                _filterWords.Clear();
+                return;
+            }
+
+            wordBank            = _bindings.wordBank;
+            engine              = _bindings.engine;
+            inferenceText       = _bindings.inferenceText;
+            confidenceScoreText = _bindings.condifenceScoreText;
+            background          = _bindings.background;
+
+            _hasExecuted = false;
+
+            if (background) background.color = Color.black;
+            if (engine && !engine.enabled) engine.enabled = false;
 
             _initialized = true;
             ApplyRecognizerFilterToDictionaryWords();
@@ -109,9 +153,41 @@ namespace Features.Signing
                 return;
             }
 
-            var controller = match.GetComponentInParent<EnemyController>();
-            if (controller)
-                controller.Explode();
+            // The initial if statements in Update() within EnemyEncounterController should handle mutual exclusivity
+            // of boss and enemy appearances. So, in theory, only one of these controllers should have any valid
+            // reference during any encounter.
+            var enemyController = match.GetComponentInParent<EnemyController>() ?? match.GetComponent<EnemyController>();
+            var bossController = match.GetComponentInParent<TutorialBossController>() ?? match.GetComponent<TutorialBossController>();
+            if (enemyController) HandleEnemySign(match, enemyController, signed);
+            else if (bossController) HandleTutorialBossSign(match, bossController, signed);
+            else Destroy(match.gameObject);
+            SetInferenceTextFields(signed, normalizedScore, Color.green);
+        }
+
+        private void HandleEnemySign(EnemyLabel match, EnemyController cont, string signed)
+        {
+            cont.Explode();
+            RemoveWordFromList(signed);
+            StartCoroutine(CheckForWinNextFrame());
+        }
+
+        private void HandleTutorialBossSign(EnemyLabel match, TutorialBossController cont, string signed)
+        {
+            cont.HandleSignedWord(match, 1);
+        }
+
+        private void SetInferenceTextFields(string signed, int score, Color textColor)
+        {
+            if (inferenceText)
+            {
+                inferenceText.text = signed;
+                inferenceText.color = textColor;
+                if (score >= 0f && score <= 100)
+                {
+                    confidenceScoreText.text = score.ToString() + "%";
+                    confidenceScoreText.color = textColor;
+                }
+            }
         }
 
         private void RemoveWord(string word)
