@@ -4837,7 +4837,7 @@ ParticleSystem:
     vectorLabel1_3: W
 --- !u!199 &5927887576892226950
 ParticleSystemRenderer:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4883,6 +4883,7 @@ ParticleSystemRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -4914,7 +4915,6 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
-  m_MaskInteraction: 0
 --- !u!1 &2140251175905116047
 GameObject:
   m_ObjectHideFlags: 0
@@ -4949,7 +4949,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: -90}
 --- !u!96 &2217699155234852401
 TrailRenderer:
-  serializedVersion: 3
+  serializedVersion: 4
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -4995,6 +4995,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Time: 0.5
   m_PreviewTimeScale: 1
   m_Parameters:
@@ -5053,7 +5054,6 @@ TrailRenderer:
     shadowBias: 0.5
     generateLightingData: 0
   m_MinVertexDistance: 0.01
-  m_MaskInteraction: 0
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 0
@@ -9885,7 +9885,7 @@ ParticleSystem:
     vectorLabel1_3: W
 --- !u!199 &3280652138861996172
 ParticleSystemRenderer:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -9931,6 +9931,7 @@ ParticleSystemRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -9962,7 +9963,6 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
-  m_MaskInteraction: 0
 --- !u!1 &4113162210362195747
 GameObject:
   m_ObjectHideFlags: 0
@@ -10118,7 +10118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bd9e16fe3c6497cbd8e155a1d8ed2ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Features.Gameplay.Entities.Player.PlayerHealth
-  maxHealth: 3
+  maxHealth: 10
 --- !u!114 &718283278733002957
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10223,14 +10223,14 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4250531561949830042}
   m_Enabled: 1
-  serializedVersion: 11
+  serializedVersion: 12
   m_Type: 0
   m_Color: {r: 1, g: 0.5169237, b: 0, a: 1}
   m_Intensity: 5
   m_Range: 10
   m_SpotAngle: 45
   m_InnerSpotAngle: 1
-  m_CookieSize: 10
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 0
     m_Resolution: -1
@@ -10320,14 +10320,14 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4316982757481239145}
   m_Enabled: 1
-  serializedVersion: 11
+  serializedVersion: 12
   m_Type: 0
   m_Color: {r: 1, g: 0.5169237, b: 0, a: 1}
   m_Intensity: 5
   m_Range: 10
   m_SpotAngle: 45
   m_InnerSpotAngle: 4
-  m_CookieSize: 10
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 0
     m_Resolution: -1
@@ -10417,14 +10417,14 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4329021093471159707}
   m_Enabled: 1
-  serializedVersion: 11
+  serializedVersion: 12
   m_Type: 0
   m_Color: {r: 1, g: 0.5169237, b: 0, a: 1}
   m_Intensity: 5
   m_Range: 5
   m_SpotAngle: 60
   m_InnerSpotAngle: 4
-  m_CookieSize: 10
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 0
     m_Resolution: -1
@@ -10508,7 +10508,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: -90}
 --- !u!96 &3761825072395270583
 TrailRenderer:
-  serializedVersion: 3
+  serializedVersion: 4
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -10554,6 +10554,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Time: 0.5
   m_PreviewTimeScale: 1
   m_Parameters:
@@ -10612,7 +10613,6 @@ TrailRenderer:
     shadowBias: 0.5
     generateLightingData: 0
   m_MinVertexDistance: 0.01
-  m_MaskInteraction: 0
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 0
@@ -15386,7 +15386,7 @@ ParticleSystem:
     vectorLabel1_3: W
 --- !u!199 &8539033074667865986
 ParticleSystemRenderer:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -15432,6 +15432,7 @@ ParticleSystemRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -15463,7 +15464,6 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
-  m_MaskInteraction: 0
 --- !u!1 &6820000089993043225
 GameObject:
   m_ObjectHideFlags: 0
@@ -15539,14 +15539,14 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6972462252515123822}
   m_Enabled: 1
-  serializedVersion: 11
+  serializedVersion: 12
   m_Type: 0
   m_Color: {r: 1, g: 0.5169237, b: 0, a: 1}
   m_Intensity: 5
   m_Range: 10
   m_SpotAngle: 45
   m_InnerSpotAngle: 1
-  m_CookieSize: 10
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 0
     m_Resolution: -1
@@ -15632,7 +15632,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!96 &4556398215936254844
 TrailRenderer:
-  serializedVersion: 3
+  serializedVersion: 4
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -15678,6 +15678,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Time: 0.6
   m_PreviewTimeScale: 1
   m_Parameters:
@@ -15736,7 +15737,6 @@ TrailRenderer:
     shadowBias: 0.5
     generateLightingData: 0
   m_MinVertexDistance: 0.1
-  m_MaskInteraction: 0
   m_Autodestruct: 0
   m_Emitting: 0
   m_ApplyActiveColorSpace: 0
@@ -20477,7 +20477,7 @@ ParticleSystem:
     vectorLabel1_3: W
 --- !u!199 &9037686334728442436
 ParticleSystemRenderer:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -20523,6 +20523,7 @@ ParticleSystemRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -20554,7 +20555,6 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
-  m_MaskInteraction: 0
 --- !u!1 &7846164454614773233
 GameObject:
   m_ObjectHideFlags: 0
