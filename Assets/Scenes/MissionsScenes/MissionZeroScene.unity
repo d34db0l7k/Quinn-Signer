@@ -5031,7 +5031,7 @@ PrefabInstance:
     - target: {fileID: 7136557034240669661, guid: 38d17c969802c7a42b412a140d2f1e52,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -1210
+      value: -481
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8698,8 +8698,11 @@ MonoBehaviour:
   - triggerZ: 20
     dialogue: Quinn Signer reporting. I crash-landed here. Swipe LEFT or RIGHT to
       help me navigate the terrain!
-  - triggerZ: 100
+  - triggerZ: 90
     dialogue: Enemy ship incoming! Get ready!
+  - triggerZ: 100
+    dialogue: Hold sign button to sign and release instantly when finishing that
+      sign.
 --- !u!1001 &1178424559
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9689,7 +9692,7 @@ MonoBehaviour:
   firstEnemySpawnDistance: 90
   enemySpawnDistanceAhead: 120
   lockLeadZ: 40
-  enemiesPerSection: 1
+  enemiesPerSection: 3
   enemySpawnDelay: 1
   bossPrefab: {fileID: 8852511146641756017, guid: f582d63f39a5d404a8f7f0c6a1957cc8,
     type: 3}

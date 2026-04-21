@@ -168,5 +168,11 @@ namespace Features.UI.Menus
                 Application.Quit();
             #endif
         }
+
+        public void StartMissionZero()
+        {
+            if (manageTimeScale) Time.timeScale = 1f;
+            SceneManager.LoadScene("MissionZeroScene");
+        }
     }
 }
