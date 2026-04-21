@@ -200,6 +200,14 @@ public class SegmentManagerMissionZero : MonoBehaviour
             if (missionHUD != null) missionHUD.enemy = enemy;
         }
 
+        var bossController = boss.GetComponent<TutorialBossController>();
+        if (bossController != null)
+            bossController.InitSession(missionZeroSession);
+
+        var bossMovement = boss.GetComponent<TutorialBossMovement>();
+        if (bossMovement != null)
+            bossMovement.InitMovementRefs(player);
+
         Debug.Log("[MissionZero] Boss spawned!");
     }
 
@@ -207,16 +215,22 @@ public class SegmentManagerMissionZero : MonoBehaviour
     {
         if (missionZeroSession == null) return;
 
+        if (_currentSection == Section.Boss)
+        {
+            missionZeroSession.SetWords(new List<string> { "hello", "bye", "thankyou" });
+            return;
+        }
+
         string word = _currentSection switch
         {
-            Section.Mountain => "apple",
-            Section.Flower   => "apple",
-            Section.Forest   => "apple",
-            Section.Boss     => "apple",
+            Section.Mountain => "hello",
+            Section.Flower   => "bye",
+            Section.Forest   => "thankyou",
             _                => "hello"
         };
 
         missionZeroSession.SetWords(new List<string> { word });
+        Debug.Log($"[MissionZero] Session word set to: {word}");
     }
 
     private void AdvanceSection()

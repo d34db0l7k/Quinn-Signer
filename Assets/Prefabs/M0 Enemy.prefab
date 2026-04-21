@@ -283,7 +283,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Word
+  m_Text: 
 --- !u!1 &5139449080139762985
 GameObject:
   m_ObjectHideFlags: 0

@@ -53,7 +53,8 @@ public class TutorialBossController : MonoBehaviour
         if (CurrentHealth <= 0) return;
         CurrentHealth = Mathf.Max(0, CurrentHealth - Mathf.Max(1, amount));
         OnHealthChanged?.Invoke(CurrentHealth, maxHealth);
-        Toast.Instance.ShowToast($"Quinn dealt {amount} damage to {BossName}! HP: {CurrentHealth} / {maxHealth}", 1.5f, new Vector2(0f, 0f), new Vector2((Screen.width * 1.5f), 0f));
+        if (Toast.Instance != null)
+            Toast.Instance.ShowToast($"Quinn dealt {amount} damage to {BossName}! HP: {CurrentHealth} / {maxHealth}", 1.5f, new Vector2(0f, 0f), new Vector2((Screen.width * 1.5f), 0f));
     }
     
     public void Attack(bool showToast = true)

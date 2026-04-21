@@ -63,6 +63,17 @@ public class EnemyControllerMissionZero : MonoBehaviour
 
     private void TriggerDestroy()
     {
+        if (isBoss)
+        {
+            var bossController = GetComponent<TutorialBossController>() 
+                            ?? GetComponentInParent<TutorialBossController>();
+            if (bossController != null)
+            {
+                bossController.Damage(1);
+                return;
+            }
+        }
+
         var controller = GetComponent<Features.Gameplay.Entities.Enemy.EnemyController>();
         if (controller != null)
             controller.Explode();
