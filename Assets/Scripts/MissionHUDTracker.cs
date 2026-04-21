@@ -17,6 +17,9 @@ public class MissionHUDTracker : MonoBehaviour
     public InfinitePlayerMovement playerMovement;
     public CameraFollow cameraFollow;
 
+    [Header("Enemy")]
+    public EnemyControllerMissionZero enemy;
+
     [Header("HUD")]
     public Text dialogueText;
     public GameObject hudPanel;
@@ -73,6 +76,9 @@ public class MissionHUDTracker : MonoBehaviour
         if (cameraFollow != null)
             cameraFollow.enabled = false;
 
+        if (enemy != null)
+            enemy.enabled = false;
+
         if (continueText != null)
         {
             continueText.gameObject.SetActive(true);
@@ -93,5 +99,8 @@ public class MissionHUDTracker : MonoBehaviour
 
         if (cameraFollow != null)
             cameraFollow.enabled = true;
+
+        if (enemy != null)
+            enemy.enabled = true;
     }
 }

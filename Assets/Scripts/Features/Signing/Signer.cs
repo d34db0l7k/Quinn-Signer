@@ -52,7 +52,7 @@ namespace Features.Signing
 
         private void Update()
         {
-            if (!_hasExecuted && engine)
+            if (!_hasExecuted && engine && engine.recognizer != null)
             {
                 engine.recognizer.AddCallback("check", (word) => OnSignRecognized(word, 1.0f));
                 engine.recognizer.outputFilters.Clear();
@@ -96,6 +96,11 @@ namespace Features.Signing
             StartCoroutine(AssignEnemyLabelsWhenReady());
         }
 
+        public void RefreshEnemyLabels()
+        {
+            StartCoroutine(AssignEnemyLabelsWhenReady());
+        }
+
         private IEnumerator AssignEnemyLabelsWhenReady()
         {
             yield return null;
@@ -124,7 +129,7 @@ namespace Features.Signing
             _filterWords.AddRange(chosen);
             ApplyRecognizerFilterToDictionaryWords();
 
-            if (engine)
+            if (engine && engine.recognizer != null)
             {
                 engine.recognizer.outputFilters.Clear();
                 if (_filterWords.Count > 0)
@@ -292,7 +297,7 @@ namespace Features.Signing
             {
                 inferenceText.text = signed;
                 inferenceText.color = textColor;
-                if (score >= 0f && score <= 100)
+                if (confidenceScoreText && score >= 0f && score <= 100)
                 {
                     confidenceScoreText.text = score.ToString() + "%";
                     confidenceScoreText.color = textColor;

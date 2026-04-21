@@ -283,7 +283,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Word
+  m_Text: 
 --- !u!1 &5139449080139762985
 GameObject:
   m_ObjectHideFlags: 0
@@ -443,8 +443,9 @@ GameObject:
   - component: {fileID: 7862971710694152733}
   - component: {fileID: 4455176334324869105}
   - component: {fileID: 1544972394085677974}
+  - component: {fileID: 1128919703045393914}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: M0 Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -498,6 +499,25 @@ MonoBehaviour:
   label: {fileID: 3049525801725219112}
   targetWord: 
   defaultText: Word
+--- !u!114 &1128919703045393914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8852511146641756017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bae9ee939574614a82fd5f0331acac0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyControllerMissionZero
+  segmentManager: {fileID: 0}
+  lockLeadZ: 30
+  signingOverlay: {fileID: 0}
+  isBoss: 0
+  approachSpeed: 30
+  flyInHeight: 20
+  flyInDuration: 1.5
 --- !u!1001 &7918378015819456175
 PrefabInstance:
   m_ObjectHideFlags: 0

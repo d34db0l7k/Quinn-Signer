@@ -316,17 +316,8 @@ namespace Features.UI.Menus
             panelScaler.dynamicPixelsPerUnit = sourceScaler.dynamicPixelsPerUnit;
         }
 
-        private static void EnsureImageSprite(Image image)
-        {
-            if (image == null || image.sprite != null) return;
+        private static void EnsureImageSprite(Image image) { }
 
-            var uiSprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
-            if (uiSprite != null)
-            {
-                image.sprite = uiSprite;
-                image.type = Image.Type.Sliced;
-            }
-        }
 
         public void ChangeGameMode()
         {
