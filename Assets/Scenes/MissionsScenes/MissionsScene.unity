@@ -1346,7 +1346,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 25
+  m_AdditionalShaderChannelsFlag: -1
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -1385,7 +1385,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Features.UI.Menus.MenuController
   target: {fileID: 0}
-  autoHideOnStart: 1
+  autoHideOnStart: 0
   listenForPauseInputs: 1
   manageTimeScale: 1
   enableDoubleTapToPause: 1
@@ -1639,6 +1639,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 1400396149}
   - {fileID: 1831924536}
-  - {fileID: 14611901}
   - {fileID: 1407744795}
+  - {fileID: 14611901}
   - {fileID: 30935336}

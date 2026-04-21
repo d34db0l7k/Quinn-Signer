@@ -1,50 +1,53 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.ProBuilder.MeshOperations;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
+using Common;
+using Core.SceneManagement;
+using Engine;
 using Features.Gameplay.Entities.Enemy;
 using Features.Gameplay.Entities.Player;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace Features.Signing
 {
     public class Signer : MonoBehaviour
     {
-        [Header("UI")]
+        [Header("SLRTK Overhead")]
+        public SimpleExecutionEngine engine;
+
+        [Header("Plug in")]
+        public WordBank wordBank;
         public Text inferenceText;
         public Text confidenceScoreText;
         public Image background;
 
-        [Header("Session")]
         [SerializeField] private SessionSelection sessionSelection;
-
-        [Header("Player")]
-        [SerializeField] private PlayerHealth playerHealth;
 
         [Header("Win")]
         [SerializeField] private string winSceneName = "WinScene";
         [SerializeField] private float winDelaySeconds = 2f;
+        
+        [Header("Player Data")]
+        [SerializeField] private PlayerHealth playerHealth;
 
+        // internals
+        private bool _hasExecuted = false;
+        private SceneBindings _bindings;
         private readonly List<string> _filterWords = new();
-        private bool _initialized;
+        private bool _signingActive = false;
 
         private void Awake()
         {
             if (background) background.color = Color.black;
+            if (engine) engine.Toggle();
         }
 
         private void Start()
         {
-            if (sessionSelection && sessionSelection.HasWords)
-            {
-                _filterWords.Clear();
-                _filterWords.AddRange(sessionSelection.Words.Select(w => (w ?? "").Trim().ToLowerInvariant()));
-                //ApplyRecognizerFilterToDictionaryWords();
-            }
             StartCoroutine(AssignEnemyLabelsWhenReady());
+            StartCoroutine(ForceEngineIdleAtLaunch());
         }
 
         private void Update()
@@ -59,6 +62,7 @@ namespace Features.Signing
 
             if (Input.GetKeyDown(KeyCode.Alpha1)) SimulateCorrectSign();
             if (Input.GetKeyDown(KeyCode.Alpha2)) SimulateIncorrectSign();
+            
             UserSigning();
         }
 
@@ -87,93 +91,199 @@ namespace Features.Signing
             if (background) background.color = Color.black;
             if (engine && !engine.enabled) engine.enabled = false;
 
-            _initialized = true;
             ApplyRecognizerFilterToDictionaryWords();
+
+            StartCoroutine(AssignEnemyLabelsWhenReady());
         }
 
         private IEnumerator AssignEnemyLabelsWhenReady()
         {
             yield return null;
 
-            var enemies = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
+            var enemyLabels = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
+            if (enemyLabels == null || enemyLabels.Length == 0) yield break;
 
-            if (enemies == null || enemies.Length == 0)
-                yield break;
-
-            List<string> chosen = new();
-
-            if (sessionSelection != null && sessionSelection.HasWords)
-                chosen = sessionSelection.Words.ToList();
+            List<string> chosen;
+            if (sessionSelection && sessionSelection.HasWords)
+            {
+                chosen = new List<string>(sessionSelection.Words)
+                    .Take(enemyLabels.Length)
+                    .Select(w => (w ?? "").Trim().ToLowerInvariant())
+                    .ToList();
+            }
+            else if (wordBank)
+            {
+                chosen = wordBank.GetRandomWords(enemyLabels.Length, unique: true);
+            }
+            else
+            {
+                chosen = new List<string>();
+            }
 
             _filterWords.Clear();
             _filterWords.AddRange(chosen);
+            ApplyRecognizerFilterToDictionaryWords();
 
-            int count = Mathf.Min(enemies.Length, chosen.Count);
-
-            for (int i = 0; i < count; i++)
+            if (engine)
             {
-                if (enemies[i] != null)
-                    enemies[i].SetWord(chosen[i]);
+                engine.recognizer.outputFilters.Clear();
+                if (_filterWords.Count > 0)
+                    engine.recognizer.outputFilters.Add(new FocusSublistFilter<string>(_filterWords));
+            }
+
+            for (int i = 0; i < enemyLabels.Length && i < _filterWords.Count; i++)
+                SafeSetEnemyWord(enemyLabels[i], _filterWords[i]);
+        }
+
+        private static void SafeSetEnemyWord(EnemyLabel label, string word)
+        {
+            if (!label || !label.label) return;
+            label.SetWord(word);
+        }
+
+        private IEnumerator ForceEngineIdleAtLaunch()
+        {
+            yield return null;
+            if (!engine) yield break;
+
+            engine.Toggle();
+            _signingActive = false;
+            if (background) background.color = Color.black;
+        }
+
+        private void UserSigning()
+        {
+            if (GameModeState.HintTypingModeActive)
+                return;
+
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                if (engine && !_signingActive)
+                {
+                    engine.enabled = true;
+                    _signingActive = true;
+                }
+                if (background) background.color = Color.white;
+                engine.Toggle();
+            }
+
+            if (Input.GetKeyUp(KeyCode.Return))
+            {
+                if (engine) engine.buffer.TriggerCallbacks();
+                engine.Toggle();
+                if (background) background.color = Color.black;
+
+                if (engine && _signingActive)
+                {
+                    _signingActive = false;
+                    engine.enabled = false;
+                }
             }
         }
 
-        public void HandleEnemyKilled(EnemyLabel label)
+        public void BeginMobileSign()
         {
             if (GameModeState.HintTypingModeActive)
+                return;
+
+            if (engine && !_signingActive)
             {
-                return;
+                engine.enabled = true;
+                _signingActive = true;
             }
-
-            if (label == null || string.IsNullOrEmpty(label.targetWord))
-                return;
-
-            string word = label.targetWord.Trim().ToLowerInvariant();
-
-            if (_filterWords.Contains(word))
-                _filterWords.Remove(word);
-
-            CheckWin();
+            if (background) background.color = Color.white;
+            if (engine) engine.Toggle();
         }
 
-        public void OnSignRecognized(string rawInput, float confidence)
+        public void EndMobileSign()
         {
             if (GameModeState.HintTypingModeActive)
+                return;
+
+            if (engine) engine.buffer.TriggerCallbacks();
+            if (engine) engine.Toggle();
+            if (background) background.color = Color.black;
+
+            if (engine && _signingActive)
             {
+                _signingActive = false;
+                engine.enabled = false;
+            }
+        }
+
+        void SimulateCorrectSign()
+        {
+            var labels = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
+            foreach (var l in labels)
+            {
+                if (!string.IsNullOrEmpty(l.targetWord))
+                {
+                    OnSignRecognized(l.targetWord, 1.0f);
+                    return;
+                }
+            }
+            OnSignRecognized("dev_correct_missing", 1.0f);
+        }
+
+        void SimulateIncorrectSign()
+        {
+            OnSignRecognized("__dev_wrong__", 0.0f);
+        }
+        
+        private void OnSignRecognized(string rawInput, float confidenceScore)
+        {
+            if (GameModeState.HintTypingModeActive)
+                return;
+
+            var signed = (rawInput ?? "").Trim().ToLowerInvariant();
+            var normalizedScore = Mathf.RoundToInt(confidenceScore * 100f);
+            if (string.IsNullOrEmpty(signed))
+            {
+                SetInferenceTextFields(signed, normalizedScore, Color.red);
                 return;
             }
 
-            string signed = (rawInput ?? "").Trim().ToLowerInvariant();
-
-            var match = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None)
-                .FirstOrDefault(e => e != null && e.targetWord == signed);
+            var labels = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None);
+            EnemyLabel match = null;
+            foreach (var label in labels)
+            {
+                if (!label) continue;
+                if (string.Equals(label.targetWord, signed, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    match = label;
+                    break;
+                }
+            }
 
             if (!match)
             {
+                SetInferenceTextFields(signed, normalizedScore, Color.red);
                 if (playerHealth) playerHealth.Damage(1);
                 return;
             }
 
-            // The initial if statements in Update() within EnemyEncounterController should handle mutual exclusivity
-            // of boss and enemy appearances. So, in theory, only one of these controllers should have any valid
-            // reference during any encounter.
             var enemyController = match.GetComponentInParent<EnemyController>() ?? match.GetComponent<EnemyController>();
-            var bossController = match.GetComponentInParent<TutorialBossController>() ?? match.GetComponent<TutorialBossController>();
-            if (enemyController) HandleEnemySign(match, enemyController, signed);
-            else if (bossController) HandleTutorialBossSign(match, bossController, signed);
-            else Destroy(match.gameObject);
-            SetInferenceTextFields(signed, normalizedScore, Color.green);
-        }
+            var bossController  = match.GetComponentInParent<TutorialBossController>() ?? match.GetComponent<TutorialBossController>();
 
-        private void HandleEnemySign(EnemyLabel match, EnemyController cont, string signed)
-        {
-            cont.Explode();
-            RemoveWordFromList(signed);
-            StartCoroutine(CheckForWinNextFrame());
-        }
-
-        private void HandleTutorialBossSign(EnemyLabel match, TutorialBossController cont, string signed)
-        {
-            cont.HandleSignedWord(match, 1);
+            if (enemyController)
+            {
+                enemyController.Explode();
+                SetInferenceTextFields(signed, normalizedScore, Color.green);
+                RemoveWordFromList(signed);
+                StartCoroutine(CheckForWinNextFrame());
+            }
+            else if (bossController)
+            {
+                bossController.HandleSignedWord(match, 1);
+                SetInferenceTextFields(signed, normalizedScore, Color.green);
+            }
+            else
+            {
+                Destroy(match.gameObject);
+                SetInferenceTextFields(signed, normalizedScore, Color.green);
+                RemoveWordFromList(signed);
+                StartCoroutine(CheckForWinNextFrame());
+            }
         }
 
         private void SetInferenceTextFields(string signed, int score, Color textColor)
@@ -190,51 +300,104 @@ namespace Features.Signing
             }
         }
 
-        private void RemoveWord(string word)
+        private void RemoveWordFromList(string word)
         {
+            if (string.IsNullOrEmpty(word)) return;
+            var key = word.Trim().ToLowerInvariant();
+
             for (int i = _filterWords.Count - 1; i >= 0; i--)
             {
-                if (_filterWords[i] == word)
+                if (string.Equals(_filterWords[i], key, System.StringComparison.OrdinalIgnoreCase))
                     _filterWords.RemoveAt(i);
             }
-        }
 
-        private void CheckWin()
-        {
-            var aliveEnemies = FindObjectsByType<EnemyLabel>(FindObjectsSortMode.None)
-                .Where(e => e != null && !string.IsNullOrEmpty(e.targetWord))
-                .ToList();
-
-            if (aliveEnemies.Count == 0)
+            if (sessionSelection != null && sessionSelection.words != null)
             {
-                StartCoroutine(LoadWin());
+                for (int i = sessionSelection.words.Count - 1; i >= 0; i--)
+                {
+                    var s = sessionSelection.words[i];
+                    if (string.Equals(s?.Trim().ToLowerInvariant(), key, System.StringComparison.OrdinalIgnoreCase))
+                        sessionSelection.words.RemoveAt(i);
+                }
+            }
+
+            if (engine != null && engine.recognizer != null)
+            {
+                engine.recognizer.outputFilters.Clear();
+                if (_filterWords.Count > 0)
+                    engine.recognizer.outputFilters.Add(new FocusSublistFilter<string>(_filterWords));
             }
         }
 
-        private IEnumerator LoadWin()
+        private IEnumerator CheckForWinNextFrame()
+        {
+            yield return null;
+
+            bool noWordsLeft = _filterWords == null || _filterWords.Count == 0;
+
+            if (noWordsLeft)
+                TriggerWin();
+        }
+
+        private void TriggerWin()
+        {
+            if (engine) engine.enabled = false;
+            if (background) background.color = Color.black;
+            StartCoroutine(LoadWinAfterDelay());
+        }
+
+        private IEnumerator LoadWinAfterDelay()
         {
             yield return new WaitForSeconds(winDelaySeconds);
-            SceneManager.LoadScene(winSceneName);
+            if (!string.IsNullOrEmpty(winSceneName))
+                SceneManager.LoadScene(winSceneName, LoadSceneMode.Single);
+        }
+
+        public void HandleEnemyKilled(EnemyLabel label)
+        {
+            if (GameModeState.HintTypingModeActive)
+                return;
+
+            if (label && !string.IsNullOrEmpty(label.targetWord))
+                RemoveWordFromList(label.targetWord.ToLowerInvariant());
+
+            StartCoroutine(CheckForWinNextFrame());
+        }
+
+        private List<string> GetDictionaryWords()
+        {
+            if (sessionSelection != null && sessionSelection.HasWords && sessionSelection.Words != null)
+                return Normalize(sessionSelection.Words);
+
+            return new List<string>();
+        }
+
+        private static List<string> Normalize(IEnumerable<string> raw)
+        {
+            if (raw == null) return new List<string>();
+            var list = new List<string>();
+            foreach (var w in raw)
+            {
+                var s = (w ?? "").Trim().ToLowerInvariant();
+                if (!string.IsNullOrEmpty(s) && !list.Contains(s))
+                    list.Add(s);
+            }
+            return list;
         }
 
         private void ApplyRecognizerFilterToDictionaryWords()
         {
-        }
+            if (engine == null) return;
+            if (engine.recognizer == null) return;
 
-        public void BeginMobileSign()
-        {
-            if (GameModeState.HintTypingModeActive)
-                return;
+            var focus = GetDictionaryWords();
 
-            if (background) background.color = Color.white;
-        }
+            engine.recognizer.outputFilters.Clear();
+            if (focus.Count > 0)
+                engine.recognizer.outputFilters.Add(new FocusSublistFilter<string>(focus));
 
-        public void EndMobileSign()
-        {
-            if (GameModeState.HintTypingModeActive)
-                return;
-
-            if (background) background.color = Color.black;
+            _filterWords.Clear();
+            _filterWords.AddRange(focus);
         }
     }
 }

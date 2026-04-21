@@ -24,6 +24,9 @@ EditorBuildSettings:
     path: Assets/Scenes/MissionsScenes/MissionsScene.unity
     guid: 7244e34d149d9b544b9baa7271363953
   - enabled: 1
+    path: Assets/Scenes/MissionsScenes/MissionZeroScene.unity
+    guid: 360cfa0302c0ae447867d2842a2bc1f6
+  - enabled: 1
     path: Assets/Scenes/MultiplayerScenes/RaceScene.unity
     guid: b891ed3a4f191724bbb4fe5f74ca68fb
   - enabled: 1
