@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
 using Features.Gameplay.Entities.Enemy;
+using Features.Gameplay.Entities.Player;
 
 namespace Features.Signing
 {
@@ -157,6 +158,14 @@ namespace Features.Signing
             {
                 if (_currentEnemy)
                     _currentEnemy.Explode();
+
+                HideHint();
+            }
+            else
+            {
+                // Wrong answer = hurt player health and hide hint panel
+                PlayerHealth playerHealth = FindFirstObjectByType<PlayerHealth>();
+                if (playerHealth) playerHealth.Damage(1);
 
                 HideHint();
             }
