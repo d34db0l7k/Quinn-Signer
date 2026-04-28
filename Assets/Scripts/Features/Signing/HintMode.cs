@@ -29,9 +29,7 @@ namespace Features.Signing
         {
             _videoPlayer = GetComponent<VideoPlayer>();
             if (!_videoPlayer)
-            {
                 _videoPlayer = gameObject.AddComponent<VideoPlayer>();
-            }
 
             _videoPlayer.playOnAwake = false;
             _videoPlayer.isLooping = true;
@@ -42,30 +40,35 @@ namespace Features.Signing
             _videoPlayer.renderMode = VideoRenderMode.RenderTexture;
             _videoPlayer.targetTexture = _renderTexture;
 
-            if (rawImage)
-                rawImage.texture = _renderTexture;
+            if (rawImage) rawImage.texture = _renderTexture;
+            if (hintPanel) hintPanel.SetActive(false);
+            if (slrtkPanel) slrtkPanel.SetActive(true);
+            if (extraTextPanel) extraTextPanel.SetActive(true);
 
-            if (hintPanel)
-                hintPanel.SetActive(false);
-
-            if (slrtkPanel)
-                slrtkPanel.SetActive(true);
-
-            if (extraTextPanel)
-                extraTextPanel.SetActive(true);
+            // Make sure we start in signing mode
+            GameModeState.HintTypingModeActive = false;
         }
 
         public void EnableHintMode()
         {
             _hintModeEnabled = true;
+            GameModeState.HintTypingModeActive = true; // stops Signer.UserSigning()
 
-            Debug.Log("Hint mode enabled (button)");
+            if (slrtkPanel) slrtkPanel.SetActive(false);
+            if (extraTextPanel) extraTextPanel.SetActive(false);
 
-            if (slrtkPanel)
-                slrtkPanel.SetActive(false);
+            Debug.Log("Hint mode enabled - typing mode active");
+        }
 
-            if (extraTextPanel)
-                extraTextPanel.SetActive(false);
+        public void DisableHintMode()
+        {
+            _hintModeEnabled = false;
+            GameModeState.HintTypingModeActive = false; // lets Signer.UserSigning() run again
+
+            if (slrtkPanel) slrtkPanel.SetActive(true);
+            if (extraTextPanel) extraTextPanel.SetActive(true);
+
+            Debug.Log("Hint mode disabled - signing mode active");
         }
 
         public bool IsHintModeEnabled()
@@ -97,18 +100,12 @@ namespace Features.Signing
             _videoPlayer.url = url;
             _videoPlayer.Play();
 
-            if (hintPanel)
-                hintPanel.SetActive(true);
-
-            if (slrtkPanel)
-                slrtkPanel.SetActive(false);
-
-            if (extraTextPanel)
-                extraTextPanel.SetActive(false);
+            if (hintPanel) hintPanel.SetActive(true);
+            if (slrtkPanel) slrtkPanel.SetActive(false);
+            if (extraTextPanel) extraTextPanel.SetActive(false);
 
             _hintActive = true;
 
-            // Hide the floating label so the video is the only hint
             EnemyLabel label = _currentEnemy.GetComponentInChildren<EnemyLabel>(true);
             if (label) label.SetLabelVisible(false);
 
@@ -124,34 +121,30 @@ namespace Features.Signing
         {
             _videoPlayer.Stop();
 
-            if (hintPanel)
-                hintPanel.SetActive(false);
+            if (hintPanel) hintPanel.SetActive(false);
 
-            if (slrtkPanel && !_hintModeEnabled)
-                slrtkPanel.SetActive(true);
-
-            if (extraTextPanel && !_hintModeEnabled)
-                extraTextPanel.SetActive(true);
-
-            // Restore label visibility before clearing the reference
             if (_currentEnemy)
             {
                 EnemyLabel label = _currentEnemy.GetComponentInChildren<EnemyLabel>(true);
                 if (label) label.SetLabelVisible(true);
             }
 
+            if (slrtkPanel && _hintModeEnabled) slrtkPanel.SetActive(false);
+            else if (slrtkPanel) slrtkPanel.SetActive(true);
+
+            if (extraTextPanel && _hintModeEnabled) extraTextPanel.SetActive(false);
+            else if (extraTextPanel) extraTextPanel.SetActive(true);
+
             _hintActive = false;
             _currentEnemy = null;
             _currentWord = null;
 
-            if (inputField)
-                inputField.text = "";
+            if (inputField) inputField.text = "";
         }
 
         public void OnEnemyDestroyed()
         {
-            if (_hintActive)
-                HideHint();
+            if (_hintActive) HideHint();
         }
 
         public void SubmitTypedAnswer()
@@ -172,7 +165,6 @@ namespace Features.Signing
         private string Normalize(string s)
         {
             if (string.IsNullOrEmpty(s)) return "";
-
             return s.Trim().ToLower()
                 .Replace(" ", "")
                 .Replace("\n", "")
