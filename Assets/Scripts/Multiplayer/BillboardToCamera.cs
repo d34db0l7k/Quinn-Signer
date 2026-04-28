@@ -8,14 +8,13 @@ namespace Multiplayer
 
         private void LateUpdate()
         {
-            if (!_cam)
+            if (_cam == null)
                 _cam = UnityEngine.Camera.main;
 
-            if (!_cam)
+            if (_cam == null)
                 return;
 
-            var toCam = transform.position - _cam.transform.position;
-            transform.rotation = Quaternion.LookRotation(toCam);
+            transform.forward = _cam.transform.forward;
         }
     }
 }

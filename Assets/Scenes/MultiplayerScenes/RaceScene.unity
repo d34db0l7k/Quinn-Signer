@@ -168,7 +168,7 @@ MonoBehaviour:
   joinCodeInput: {fileID: 2140614054}
   joinCodeText: {fileID: 2109048032}
   statusText: {fileID: 1429517499}
-  maxConnections: 1
+  maxConnections: 3
   connectionType: dtls
 --- !u!1 &108106673
 GameObject:
@@ -317,7 +317,7 @@ GameObject:
   m_Component:
   - component: {fileID: 111356445}
   m_Layer: 0
-  m_Name: ClientSpawn
+  m_Name: Spawn_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -332,7 +332,7 @@ Transform:
   m_GameObject: {fileID: 111356444}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2, y: 0, z: -2}
+  m_LocalPosition: {x: 2, y: 0, z: -1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1102,6 +1102,7 @@ MonoBehaviour:
   lobbyStatusText: {fileID: 241947075}
   playerCountText: {fileID: 1753950490}
   joinCodeText: {fileID: 610985810}
+  playerListText: {fileID: 0}
   startRaceButton: {fileID: 1034984318}
   playerNameInput: {fileID: 435070393}
 --- !u!1 &356937686
@@ -1177,8 +1178,13 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   finishDistance: 150
   countdownSeconds: 3
-  hostSpawn: {fileID: 1121704937}
-  clientSpawn: {fileID: 111356445}
+  minPlayersToStart: 2
+  maxPlayers: 4
+  spawnPoints:
+  - {fileID: 1021544485}
+  - {fileID: 1121704937}
+  - {fileID: 111356445}
+  - {fileID: 1917266527}
   LobbyReady:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -2420,6 +2426,37 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1021544484
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1021544485}
+  m_Layer: 0
+  m_Name: Spawn_0
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1021544485
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1021544484}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2, y: 0, z: 4.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1893859127}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1034984316
 GameObject:
   m_ObjectHideFlags: 0
@@ -2721,7 +2758,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1121704937}
   m_Layer: 0
-  m_Name: HostSpawn
+  m_Name: Spawn_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2736,7 +2773,7 @@ Transform:
   m_GameObject: {fileID: 1121704936}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2, y: 0, z: 2}
+  m_LocalPosition: {x: 2, y: 0, z: 1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3331,7 +3368,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 328607372}
         m_TargetAssemblyTypeName: Multiplayer.LobbyUIController, Assembly-CSharp
         m_MethodName: OnApplyNamePressed
         m_Mode: 1
@@ -4641,8 +4678,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1021544485}
   - {fileID: 1121704937}
   - {fileID: 111356445}
+  - {fileID: 1917266527}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1899135489
@@ -4691,6 +4730,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1917266526
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1917266527}
+  m_Layer: 0
+  m_Name: Spawn_3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1917266527
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1917266526}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2, y: 0, z: -4.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1893859127}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1928211499
 GameObject:

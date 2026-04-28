@@ -8,8 +8,6 @@ public class CosmeticsButton : MonoBehaviour
 
     public void OnButtonClick()
     {
-        CosmeticManager.Instance.currentShipColor = buttonColor;
-
         if (garageModelRenderer != null)
         {
             garageModelRenderer.material.color = buttonColor;

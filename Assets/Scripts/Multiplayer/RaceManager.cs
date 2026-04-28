@@ -12,12 +12,14 @@ namespace Multiplayer
         [Header("Race")]
         public float finishDistance = 100f;
         public int countdownSeconds = 3;
+        public int minPlayersToStart = 2;
+        public int maxPlayers = 4;
 
-        [Header("Spawns")]
-        public Transform hostSpawn;
-        public Transform clientSpawn;
+        [Header("Spawn Points")]
+        public Transform[] spawnPoints;
 
         private readonly Dictionary<ulong, NetworkRacePlayer> _players = new();
+        private readonly List<ulong> _playerOrder = new();
 
         public NetworkVariable<bool> LobbyReady = new(
             false,
@@ -90,39 +92,77 @@ namespace Multiplayer
             if (_players.ContainsKey(clientId))
                 _players.Remove(clientId);
 
-            LobbyReady.Value = _players.Count >= 2;
+            _playerOrder.Remove(clientId);
 
-            if (_players.Count < 2 && !RaceStarted.Value)
+            LobbyReady.Value = _players.Count >= minPlayersToStart;
+
+            if (_players.Count < minPlayersToStart && !RaceStarted.Value)
                 CountdownActive.Value = false;
+
+            ReassignSpawnPoints();
         }
 
         private IEnumerator RegisterPlayerNextFrame(ulong clientId)
         {
             yield return null;
 
-            if (!NetworkManager.ConnectedClients.TryGetValue(clientId, out var client))
-                yield break;
+            if (!_players.ContainsKey(clientId))
+            {
+                if (!NetworkManager.ConnectedClients.TryGetValue(clientId, out var client))
+                    yield break;
 
-            if (client.PlayerObject == null)
-                yield break;
+                if (client.PlayerObject == null)
+                    yield break;
 
-            NetworkRacePlayer racePlayer = client.PlayerObject.GetComponent<NetworkRacePlayer>();
-            if (racePlayer == null)
-                yield break;
+                NetworkRacePlayer racePlayer = client.PlayerObject.GetComponent<NetworkRacePlayer>();
+                if (racePlayer == null)
+                    yield break;
 
-            RegisterPlayer(racePlayer);
+                RegisterPlayer(racePlayer);
+            }
 
-            if (_players.Count >= 2)
-                LobbyReady.Value = true;
+            LobbyReady.Value = _players.Count >= minPlayersToStart;
         }
 
         public void RegisterPlayer(NetworkRacePlayer player)
         {
             if (!IsServer) return;
+            if (_players.ContainsKey(player.OwnerClientId)) return;
+
+            if (_players.Count >= maxPlayers)
+            {
+                Debug.LogWarning("Tried to register player beyond maxPlayers.");
+                return;
+            }
 
             _players[player.OwnerClientId] = player;
+            _playerOrder.Add(player.OwnerClientId);
 
-            Transform spawn = player.OwnerClientId == NetworkManager.ServerClientId ? hostSpawn : clientSpawn;
+            AssignSpawnPoint(player, _playerOrder.Count - 1);
+        }
+
+        private void ReassignSpawnPoints()
+        {
+            if (!IsServer) return;
+
+            for (int i = 0; i < _playerOrder.Count; i++)
+            {
+                ulong clientId = _playerOrder[i];
+
+                if (_players.TryGetValue(clientId, out var player))
+                {
+                    AssignSpawnPoint(player, i);
+                }
+            }
+        }
+
+        private void AssignSpawnPoint(NetworkRacePlayer player, int index)
+        {
+            if (!IsServer) return;
+            if (spawnPoints == null || spawnPoints.Length == 0) return;
+            if (index < 0 || index >= spawnPoints.Length) return;
+
+            Transform spawn = spawnPoints[index];
             if (spawn != null)
                 player.SetSpawnFromServer(spawn.position, spawn.rotation);
         }
@@ -131,12 +171,11 @@ namespace Multiplayer
         public void RequestStartRaceServerRpc(ServerRpcParams rpcParams = default)
         {
             if (!IsServer) return;
-            if (!LobbyReady.Value) return;
+            if (_players.Count < minPlayersToStart) return;
             if (CountdownActive.Value || RaceStarted.Value) return;
 
             ulong senderId = rpcParams.Receive.SenderClientId;
 
-            // only host can start
             if (senderId != NetworkManager.ServerClientId)
                 return;
 
@@ -149,9 +188,14 @@ namespace Multiplayer
             RaceFinished.Value = false;
             WinnerClientId.Value = 999999;
 
-            foreach (var kvp in _players)
+            for (int i = 0; i < _playerOrder.Count; i++)
             {
-                kvp.Value.ServerResetForRace();
+                ulong clientId = _playerOrder[i];
+                if (_players.TryGetValue(clientId, out var player))
+                {
+                    AssignSpawnPoint(player, i);
+                    player.ServerResetForRace();
+                }
             }
 
             for (int i = countdownSeconds; i > 0; i--)
@@ -187,6 +231,20 @@ namespace Multiplayer
         public int GetPlayerCount()
         {
             return _players.Count;
+        }
+
+        public List<NetworkRacePlayer> GetPlayersInOrder()
+        {
+            List<NetworkRacePlayer> orderedPlayers = new();
+
+            for (int i = 0; i < _playerOrder.Count; i++)
+            {
+                ulong clientId = _playerOrder[i];
+                if (_players.TryGetValue(clientId, out var player))
+                    orderedPlayers.Add(player);
+            }
+
+            return orderedPlayers;
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +12,7 @@ namespace Multiplayer
         public TMP_Text lobbyStatusText;
         public TMP_Text playerCountText;
         public TMP_Text joinCodeText;
+        public TMP_Text playerListText;
         public Button startRaceButton;
 
         [Header("Optional")]
@@ -29,15 +31,16 @@ namespace Multiplayer
                 return;
 
             bool isHost = NetworkManager.Singleton.IsHost;
+            int playerCount = RaceManager.Instance.GetPlayerCount();
 
             if (startRaceButton != null)
             {
                 startRaceButton.gameObject.SetActive(isHost);
-                startRaceButton.interactable = isHost && RaceManager.Instance.LobbyReady.Value;
+                startRaceButton.interactable = isHost && playerCount >= 2;
             }
 
             if (playerCountText != null)
-                playerCountText.text = $"Players: {RaceManager.Instance.GetPlayerCount()}/2";
+                playerCountText.text = $"Players: {playerCount}/4";
 
             if (joinCodeText != null)
             {
@@ -47,20 +50,27 @@ namespace Multiplayer
                     joinCodeText.text = "Join Code: ----";
             }
 
+            if (playerListText != null)
+            {
+                var orderedPlayers = RaceManager.Instance.GetPlayersInOrder();
+                StringBuilder sb = new StringBuilder();
+
+                for (int i = 0; i < orderedPlayers.Count; i++)
+                {
+                    sb.AppendLine($"{i + 1}. {orderedPlayers[i].GetPlayerName()}");
+                }
+
+                playerListText.text = sb.ToString();
+            }
+
             if (lobbyStatusText != null)
             {
-                if (!RaceManager.Instance.LobbyReady.Value)
-                {
-                    lobbyStatusText.text = "Waiting for another player...";
-                }
+                if (playerCount < 2)
+                    lobbyStatusText.text = "Waiting for more players...";
                 else if (isHost)
-                {
-                    lobbyStatusText.text = "Both players joined. Press Start Race.";
-                }
+                    lobbyStatusText.text = "Ready to start. You can begin with 2 to 4 players.";
                 else
-                {
-                    lobbyStatusText.text = "Both players joined. Waiting for host to start.";
-                }
+                    lobbyStatusText.text = "Waiting for host to start.";
             }
         }
 

@@ -8,7 +8,7 @@ namespace Multiplayer
     public class NetworkRacePlayer : NetworkBehaviour
     {
         [Header("Movement")]
-        public float boostAmount = 4f;
+        public float boostAmount = 5f;
         public float visualMoveLerp = 10f;
 
         [Header("References")]
@@ -53,15 +53,15 @@ namespace Multiplayer
             if (IsOwner && swipeInputReader != null)
                 swipeInputReader.OnSwipeDetected += HandleLocalSwipe;
 
-            UpdateNameUI(PlayerName.Value.ToString());
-            TryBindHud();
-
             if (IsServer)
             {
                 string currentName = PlayerName.Value.ToString();
                 if (string.IsNullOrWhiteSpace(currentName) || currentName == "Player")
                     PlayerName.Value = $"Player {OwnerClientId + 1}";
             }
+
+            RefreshNameLabel();
+            TryBindHud();
         }
 
         public override void OnNetworkDespawn()
@@ -160,13 +160,13 @@ namespace Multiplayer
 
         private void OnPlayerNameChanged(FixedString64Bytes oldValue, FixedString64Bytes newValue)
         {
-            UpdateNameUI(newValue.ToString());
+            RefreshNameLabel();
         }
 
-        private void UpdateNameUI(string newName)
+        private void RefreshNameLabel()
         {
             if (nameText != null)
-                nameText.text = newName;
+                nameText.text = PlayerName.Value.ToString();
         }
 
         [ServerRpc]
@@ -175,10 +175,17 @@ namespace Multiplayer
             if (string.IsNullOrWhiteSpace(chosenName))
                 chosenName = $"Player {OwnerClientId + 1}";
 
+            chosenName = chosenName.Trim();
+
             if (chosenName.Length > 20)
                 chosenName = chosenName.Substring(0, 20);
 
             PlayerName.Value = chosenName;
+        }
+
+        public string GetPlayerName()
+        {
+            return PlayerName.Value.ToString();
         }
     }
 }

@@ -7,7 +7,7 @@ public class NavBarManager : MonoBehaviour
     private static NavBarManager _instance;
 
     [Header("Hide On Scenes")]
-    private string[] hideOnScenes = { "GameOverScene", "TrainingScene", "WinScene", "SplashScene", "MissionZeroScene" };
+    private string[] hideOnScenes = { "GameOverScene", "WinScene", "SplashScene", "MissionZeroScene" };
 
     [Header("Nav Buttons")]
     public Button homeButton;

@@ -23,7 +23,7 @@ namespace Multiplayer
         public TMP_Text statusText;
 
         [Header("Relay")]
-        public int maxConnections = 1;
+        public int maxConnections = 4;
         public string connectionType = "dtls";
 
         public string CurrentJoinCode { get; private set; } = "";

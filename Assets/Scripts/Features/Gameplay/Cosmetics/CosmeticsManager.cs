@@ -1,20 +1,60 @@
-using UnityEngine;
-
-public class CosmeticManager : MonoBehaviour
+namespace Features.Gameplay.Cosmetics
 {
-    public static CosmeticManager Instance;
-    public Color currentShipColor = Color.white;
+    using UnityEngine;
 
-    void Awake()
+    public class CosmeticManager : MonoBehaviour
     {
-        if (Instance == null)
+        public static CosmeticManager Instance;
+
+        public Color currentShipColor = Color.white;
+
+        private void Awake()
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
-        else
+
+        private void SetShipColor(Color newColor)
         {
-            Destroy(gameObject);
+            currentShipColor = newColor;
+            
+            ShipColorPreview preview = FindFirstObjectByType<ShipColorPreview>();
+            if (preview != null)
+            {
+                preview.ApplyCurrentColor();
+            }
+        }
+
+        public void SetShipColorWhite()
+        {
+            SetShipColor(Color.white);
+        }
+
+        public void SetShipColorRed()
+        {
+            SetShipColor(Color.red);
+        }
+
+        public void SetShipColorBlue()
+        {
+            SetShipColor(Color.blue);
+        }
+
+        public void SetShipColorGreen()
+        {
+            SetShipColor(Color.green);
+        }
+
+        public void SetShipColorYellow()
+        {
+            SetShipColor(Color.yellow);
         }
     }
 }

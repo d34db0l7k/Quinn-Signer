@@ -570,7 +570,6 @@ GameObject:
   - component: {fileID: 277517993}
   - component: {fileID: 277517992}
   - component: {fileID: 277517991}
-  - component: {fileID: 277517994}
   m_Layer: 0
   m_Name: ShipSelButton (8)
   m_TagString: Untagged
@@ -655,7 +654,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.20754719, g: 0.20754719, b: 0.20754719, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -680,20 +679,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 277517989}
   m_CullTransparentMesh: 1
---- !u!114 &277517994
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 277517989}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b1cc18e64ed54a3a909edb0d8652cce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CosmeticsButton
-  buttonColor: {r: 0, g: 0, b: 0, a: 0}
-  garageModelRenderer: {fileID: 0}
 --- !u!1 &320279999
 GameObject:
   m_ObjectHideFlags: 0
@@ -796,7 +781,6 @@ GameObject:
   - component: {fileID: 439881030}
   - component: {fileID: 439881029}
   - component: {fileID: 439881028}
-  - component: {fileID: 439881031}
   m_Layer: 0
   m_Name: ShipSelButton (10)
   m_TagString: Untagged
@@ -881,7 +865,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.20754719, g: 0.20754719, b: 0.20754719, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -906,20 +890,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 439881026}
   m_CullTransparentMesh: 1
---- !u!114 &439881031
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 439881026}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b1cc18e64ed54a3a909edb0d8652cce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CosmeticsButton
-  buttonColor: {r: 0, g: 0, b: 0, a: 0}
-  garageModelRenderer: {fileID: 0}
 --- !u!1 &601887217
 GameObject:
   m_ObjectHideFlags: 0
@@ -1029,7 +999,6 @@ GameObject:
   - component: {fileID: 627048458}
   - component: {fileID: 627048457}
   - component: {fileID: 627048456}
-  - component: {fileID: 627048459}
   m_Layer: 0
   m_Name: ShipSelButton (7)
   m_TagString: Untagged
@@ -1114,7 +1083,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.20754719, g: 0.20754719, b: 0.20754719, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1139,20 +1108,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 627048454}
   m_CullTransparentMesh: 1
---- !u!114 &627048459
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 627048454}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b1cc18e64ed54a3a909edb0d8652cce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CosmeticsButton
-  buttonColor: {r: 0, g: 0, b: 0, a: 0}
-  garageModelRenderer: {fileID: 0}
 --- !u!1 &703566744
 GameObject:
   m_ObjectHideFlags: 0
@@ -1165,7 +1120,6 @@ GameObject:
   - component: {fileID: 703566748}
   - component: {fileID: 703566747}
   - component: {fileID: 703566746}
-  - component: {fileID: 703566749}
   m_Layer: 0
   m_Name: ShipSelButton (12)
   m_TagString: Untagged
@@ -1250,7 +1204,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.20754719, g: 0.20754719, b: 0.20754719, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1275,20 +1229,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 703566744}
   m_CullTransparentMesh: 1
---- !u!114 &703566749
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 703566744}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b1cc18e64ed54a3a909edb0d8652cce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CosmeticsButton
-  buttonColor: {r: 0, g: 0, b: 0, a: 0}
-  garageModelRenderer: {fileID: 0}
 --- !u!1 &747027097
 GameObject:
   m_ObjectHideFlags: 0
@@ -1447,6 +1387,19 @@ MonoBehaviour:
   sensitivity: 0.5
   smoothing: 5
   autoRotationSpeed: 20
+--- !u!114 &810569929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810569926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39b8d79622178e44a95ed70f862963d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShipColorPreview
+  targetRenderer: {fileID: 1367539902}
 --- !u!1 &854908693
 GameObject:
   m_ObjectHideFlags: 0
@@ -1504,7 +1457,6 @@ GameObject:
   - component: {fileID: 887305085}
   - component: {fileID: 887305084}
   - component: {fileID: 887305083}
-  - component: {fileID: 887305086}
   m_Layer: 0
   m_Name: Red
   m_TagString: Untagged
@@ -1575,13 +1527,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 854908694}
+        m_TargetAssemblyTypeName: CosmeticManager, Assembly-CSharp
+        m_MethodName: SetShipColorRed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1625,20 +1577,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 887305081}
   m_CullTransparentMesh: 1
---- !u!114 &887305086
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 887305081}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b1cc18e64ed54a3a909edb0d8652cce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CosmeticsButton
-  buttonColor: {r: 0, g: 0, b: 0, a: 0}
-  garageModelRenderer: {fileID: 0}
 --- !u!1 &995743162
 GameObject:
   m_ObjectHideFlags: 0
@@ -1651,9 +1589,8 @@ GameObject:
   - component: {fileID: 995743166}
   - component: {fileID: 995743165}
   - component: {fileID: 995743164}
-  - component: {fileID: 995743167}
   m_Layer: 0
-  m_Name: ShipSelButton (1)
+  m_Name: Green
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1721,7 +1658,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 995743165}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 854908694}
+        m_TargetAssemblyTypeName: CosmeticManager, Assembly-CSharp
+        m_MethodName: SetShipColorGreen
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &995743165
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1760,20 +1709,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 995743162}
   m_CullTransparentMesh: 1
---- !u!114 &995743167
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 995743162}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b1cc18e64ed54a3a909edb0d8652cce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CosmeticsButton
-  buttonColor: {r: 0, g: 0, b: 0, a: 0}
-  garageModelRenderer: {fileID: 0}
 --- !u!1 &1027607996
 GameObject:
   m_ObjectHideFlags: 0
@@ -1786,7 +1721,6 @@ GameObject:
   - component: {fileID: 1027608000}
   - component: {fileID: 1027607999}
   - component: {fileID: 1027607998}
-  - component: {fileID: 1027608001}
   m_Layer: 0
   m_Name: ShipSelButton (6)
   m_TagString: Untagged
@@ -1871,7 +1805,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.20754719, g: 0.20754719, b: 0.20754719, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1896,20 +1830,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1027607996}
   m_CullTransparentMesh: 1
---- !u!114 &1027608001
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1027607996}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b1cc18e64ed54a3a909edb0d8652cce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CosmeticsButton
-  buttonColor: {r: 0, g: 0, b: 0, a: 0}
-  garageModelRenderer: {fileID: 0}
 --- !u!1 &1151117117
 GameObject:
   m_ObjectHideFlags: 0
@@ -2046,143 +1966,6 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1151117117}
-  m_CullTransparentMesh: 1
---- !u!1 &1155258272
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1155258273}
-  - component: {fileID: 1155258275}
-  - component: {fileID: 1155258274}
-  m_Layer: 0
-  m_Name: Text (TMP)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1155258273
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1155258272}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2034966379}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1155258274
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1155258272}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_text: Button
-  m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
-  m_fontMaterial: {fileID: 0}
-  m_fontMaterials: []
-  m_fontColor32:
-    serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
-  m_enableVertexGradient: 0
-  m_colorMode: 3
-  m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 0}
-  m_tintAllSprites: 0
-  m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: -1183493901
-  m_overrideHtmlColors: 0
-  m_faceColor:
-    serializedVersion: 2
-    rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
-  m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
-  m_fontStyle: 0
-  m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
-  m_textAlignment: 65535
-  m_characterSpacing: 0
-  m_characterHorizontalScale: 1
-  m_wordSpacing: 0
-  m_lineSpacing: 0
-  m_lineSpacingMax: 0
-  m_paragraphSpacing: 0
-  m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
-  m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
-  m_linkedTextComponent: {fileID: 0}
-  parentLinkedComponent: {fileID: 0}
-  m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
-  checkPaddingRequired: 0
-  m_isRichText: 1
-  m_EmojiFallbackSupport: 1
-  m_parseCtrlCharacters: 1
-  m_isOrthographic: 1
-  m_isCullingEnabled: 0
-  m_horizontalMapping: 0
-  m_verticalMapping: 0
-  m_uvLineOffset: 0
-  m_geometrySortingOrder: 0
-  m_IsTextObjectScaleStatic: 0
-  m_VertexBufferAutoSizeReduction: 0
-  m_useMaxVisibleDescender: 1
-  m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
-  m_isUsingLegacyAnimationComponent: 0
-  m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
-  m_baseMaterial: {fileID: 0}
-  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!222 &1155258275
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1155258272}
   m_CullTransparentMesh: 1
 --- !u!4 &1219858273 stripped
 Transform:
@@ -2339,9 +2122,8 @@ GameObject:
   - component: {fileID: 1302963862}
   - component: {fileID: 1302963861}
   - component: {fileID: 1302963860}
-  - component: {fileID: 1302963863}
   m_Layer: 0
-  m_Name: ShipSelButton (2)
+  m_Name: Blue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2409,7 +2191,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1302963861}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 854908694}
+        m_TargetAssemblyTypeName: CosmeticManager, Assembly-CSharp
+        m_MethodName: SetShipColorBlue
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1302963861
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2423,7 +2217,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.27467543, g: 0.17225882, b: 0.46226418, a: 1}
+  m_Color: {r: 0.19971518, g: 0.22196715, b: 0.8301887, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2448,20 +2242,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1302963858}
   m_CullTransparentMesh: 1
---- !u!114 &1302963863
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1302963858}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b1cc18e64ed54a3a909edb0d8652cce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CosmeticsButton
-  buttonColor: {r: 0, g: 0, b: 0, a: 0}
-  garageModelRenderer: {fileID: 0}
 --- !u!1 &1335764090
 GameObject:
   m_ObjectHideFlags: 0
@@ -2691,7 +2471,17 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 810569928}
+    - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: eadac7660e4969a4c91c550f10746636,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 810569929}
   m_SourcePrefab: {fileID: 100100000, guid: eadac7660e4969a4c91c550f10746636, type: 3}
+--- !u!23 &1367539902 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 7666613528706681730, guid: eadac7660e4969a4c91c550f10746636,
+    type: 3}
+  m_PrefabInstance: {fileID: 1367539901}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1395822717
 GameObject:
   m_ObjectHideFlags: 0
@@ -2801,7 +2591,6 @@ GameObject:
   - component: {fileID: 1448418911}
   - component: {fileID: 1448418910}
   - component: {fileID: 1448418909}
-  - component: {fileID: 1448418912}
   m_Layer: 0
   m_Name: ShipSelButton (11)
   m_TagString: Untagged
@@ -2886,7 +2675,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.20754719, g: 0.20754719, b: 0.20754719, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2911,20 +2700,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1448418907}
   m_CullTransparentMesh: 1
---- !u!114 &1448418912
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1448418907}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b1cc18e64ed54a3a909edb0d8652cce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CosmeticsButton
-  buttonColor: {r: 0, g: 0, b: 0, a: 0}
-  garageModelRenderer: {fileID: 0}
 --- !u!1 &1480934569
 GameObject:
   m_ObjectHideFlags: 0
@@ -3171,7 +2946,6 @@ GameObject:
   - component: {fileID: 1633283996}
   - component: {fileID: 1633283995}
   - component: {fileID: 1633283994}
-  - component: {fileID: 1633283997}
   m_Layer: 0
   m_Name: ShipSelButton (5)
   m_TagString: Untagged
@@ -3256,7 +3030,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.20754719, g: 0.20754719, b: 0.20754719, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3281,20 +3055,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1633283992}
   m_CullTransparentMesh: 1
---- !u!114 &1633283997
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1633283992}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b1cc18e64ed54a3a909edb0d8652cce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CosmeticsButton
-  buttonColor: {r: 0, g: 0, b: 0, a: 0}
-  garageModelRenderer: {fileID: 0}
 --- !u!1 &1799318014
 GameObject:
   m_ObjectHideFlags: 0
@@ -3705,7 +3465,6 @@ GameObject:
   - component: {fileID: 1954645944}
   - component: {fileID: 1954645943}
   - component: {fileID: 1954645942}
-  - component: {fileID: 1954645945}
   m_Layer: 0
   m_Name: ShipSelButton (9)
   m_TagString: Untagged
@@ -3790,7 +3549,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.20754719, g: 0.20754719, b: 0.20754719, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3815,20 +3574,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1954645940}
   m_CullTransparentMesh: 1
---- !u!114 &1954645945
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1954645940}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b1cc18e64ed54a3a909edb0d8652cce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CosmeticsButton
-  buttonColor: {r: 0, g: 0, b: 0, a: 0}
-  garageModelRenderer: {fileID: 0}
 --- !u!1 &1984232351
 GameObject:
   m_ObjectHideFlags: 0
@@ -3841,9 +3586,8 @@ GameObject:
   - component: {fileID: 1984232355}
   - component: {fileID: 1984232354}
   - component: {fileID: 1984232353}
-  - component: {fileID: 1984232356}
   m_Layer: 0
-  m_Name: ShipSelButton (3)
+  m_Name: White
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3911,7 +3655,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1984232354}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 854908694}
+        m_TargetAssemblyTypeName: CosmeticManager, Assembly-CSharp
+        m_MethodName: SetShipColorWhite
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1984232354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3925,7 +3681,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.045033824, g: 0.2535134, b: 0.8679245, a: 1}
+  m_Color: {r: 0.9056604, g: 0.9056604, b: 0.9056604, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3950,20 +3706,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1984232351}
   m_CullTransparentMesh: 1
---- !u!114 &1984232356
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1984232351}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b1cc18e64ed54a3a909edb0d8652cce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CosmeticsButton
-  buttonColor: {r: 0, g: 0, b: 0, a: 0}
-  garageModelRenderer: {fileID: 0}
 --- !u!1 &2033947520
 GameObject:
   m_ObjectHideFlags: 0
@@ -4113,9 +3855,8 @@ GameObject:
   - component: {fileID: 2034966382}
   - component: {fileID: 2034966381}
   - component: {fileID: 2034966380}
-  - component: {fileID: 2034966383}
   m_Layer: 0
-  m_Name: ShipSelButton (4)
+  m_Name: Yellow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4132,8 +3873,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1155258273}
+  m_Children: []
   m_Father: {fileID: 320280000}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4184,7 +3924,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2034966381}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 854908694}
+        m_TargetAssemblyTypeName: CosmeticManager, Assembly-CSharp
+        m_MethodName: SetShipColorYellow
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2034966381
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4198,7 +3950,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.8490566, g: 0.84052837, b: 0.12415449, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4223,20 +3975,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2034966378}
   m_CullTransparentMesh: 1
---- !u!114 &2034966383
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2034966378}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b1cc18e64ed54a3a909edb0d8652cce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CosmeticsButton
-  buttonColor: {r: 0, g: 0, b: 0, a: 0}
-  garageModelRenderer: {fileID: 0}
 --- !u!1 &2040602715
 GameObject:
   m_ObjectHideFlags: 0
