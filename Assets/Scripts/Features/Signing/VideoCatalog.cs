@@ -1,10 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
+
 namespace Features.Signing
 {
-    using System.Collections.Generic;
-    using System.IO;
-    using UnityEngine;
-    using System;
-
     public static class VideoCatalog
     {
         static string Norm(string s) => (s ?? "").Trim().ToLowerInvariant();
@@ -12,44 +12,46 @@ namespace Features.Signing
         public static HashSet<string> IndexWordsWithVideos(string subfolder = "Reference Videos")
         {
             var set = new HashSet<string>();
-            var root = Path.Combine(Application.streamingAssetsPath, subfolder);
-            if (!Directory.Exists(root)) { Debug.LogWarning($"[VideoCatalog] Missing: {root}"); return set; }
 
-            var exts = new HashSet<string> { ".mp4", ".mov", ".m4v", ".webm", ".avi" };
-            foreach (var path in Directory.GetFiles(root))
+            TextAsset manifest = Resources.Load<TextAsset>("video_manifest");
+            if (manifest == null)
             {
-                var ext = Path.GetExtension(path).ToLowerInvariant();
-                if (!exts.Contains(ext)) continue;
-                var name = Path.GetFileNameWithoutExtension(path);
-                set.Add(Norm(name));
+                Debug.LogWarning("[VideoCatalog] Could not load Resources/video_manifest.txt");
+                return set;
             }
+
+            var lines = manifest.text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in lines)
+            {
+                var word = Norm(line);
+                if (!string.IsNullOrEmpty(word))
+                    set.Add(word);
+            }
+
             return set;
         }
 
         public static string GetVideoPathForWord(string word, string subfolder = "Reference Videos")
         {
-            var root = Path.Combine(Application.streamingAssetsPath, subfolder);
-            var norm = Norm(word);
-            if (!Directory.Exists(root)) return null;
-
-            foreach (var file in Directory.GetFiles(root))
-            {
-                var nameNoExt = Norm(Path.GetFileNameWithoutExtension(file));
-                if (nameNoExt == norm) return file;
-            }
-            return null;
+            var norm = (word ?? "").Trim().ToLowerInvariant();
+            return Path.Combine(Application.streamingAssetsPath, subfolder, norm + ".mp4");
         }
+
         public static string GetVideoUrlForWord(string word, string subfolder = "Reference Videos")
         {
             var path = GetVideoPathForWord(word, subfolder);
             if (string.IsNullOrEmpty(path)) return null;
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+            return path;
+#else
             return new Uri(path).AbsoluteUri;
+#endif
         }
+
         public static List<string> ListAllVideoWords(string subfolder = "Reference Videos")
         {
-            var set = IndexWordsWithVideos(subfolder);
-            return new List<string>(set);
+            return new List<string>(IndexWordsWithVideos(subfolder));
         }
     }
-
 }

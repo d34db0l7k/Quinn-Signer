@@ -22,7 +22,7 @@ public class SplashManager : MonoBehaviour
     public Color gameBackgroundColor = Color.white;
 
     [Header("Timing")]
-    public float fadeSpeed = 1.5f;
+    public float fadeSpeed = 1f;
 
     private bool canTap = false;
 

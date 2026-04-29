@@ -114,6 +114,7 @@ PlayerSettings:
   xboxEnableGuest: 0
   xboxEnablePIXSampling: 0
   metalFramebufferOnly: 0
+  metalUseMetalDisplayLink: 0
   xboxOneResolution: 0
   xboxOneSResolution: 0
   xboxOneXResolution: 3
@@ -299,7 +300,7 @@ PlayerSettings:
   - m_BuildTarget: 
     m_Icons:
     - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: 62cdbe51843a71c4db50983d8c68394a, type: 3}
+      m_Icon: {fileID: 2800000, guid: 4782bb3dd2e4d99499ab95c2ac1dcbff, type: 3}
       m_Width: 128
       m_Height: 128
       m_Kind: 0
@@ -377,7 +378,7 @@ PlayerSettings:
       m_Kind: 2
       m_SubKind: iPad
     - m_Textures:
-      - {fileID: 2800000, guid: 62cdbe51843a71c4db50983d8c68394a, type: 3}
+      - {fileID: 0}
       m_Width: 180
       m_Height: 180
       m_Kind: 0
@@ -389,7 +390,7 @@ PlayerSettings:
       m_Kind: 0
       m_SubKind: iPhone
     - m_Textures:
-      - {fileID: 2800000, guid: 62cdbe51843a71c4db50983d8c68394a, type: 3}
+      - {fileID: 0}
       m_Width: 167
       m_Height: 167
       m_Kind: 0
@@ -409,8 +410,8 @@ PlayerSettings:
   - m_BuildTarget: Android
     m_Icons:
     - m_Textures:
-      - {fileID: 2800000, guid: 62cdbe51843a71c4db50983d8c68394a, type: 3}
-      - {fileID: 2800000, guid: 62cdbe51843a71c4db50983d8c68394a, type: 3}
+      - {fileID: 2800000, guid: 4782bb3dd2e4d99499ab95c2ac1dcbff, type: 3}
+      - {fileID: 2800000, guid: 4782bb3dd2e4d99499ab95c2ac1dcbff, type: 3}
       m_Width: 432
       m_Height: 432
       m_Kind: 2
@@ -441,7 +442,7 @@ PlayerSettings:
       m_Kind: 2
       m_SubKind: 
     - m_Textures:
-      - {fileID: 2800000, guid: 62cdbe51843a71c4db50983d8c68394a, type: 3}
+      - {fileID: 2800000, guid: 4782bb3dd2e4d99499ab95c2ac1dcbff, type: 3}
       m_Width: 192
       m_Height: 192
       m_Kind: 1
@@ -472,7 +473,7 @@ PlayerSettings:
       m_Kind: 1
       m_SubKind: 
     - m_Textures:
-      - {fileID: 2800000, guid: 62cdbe51843a71c4db50983d8c68394a, type: 3}
+      - {fileID: 2800000, guid: 4782bb3dd2e4d99499ab95c2ac1dcbff, type: 3}
       m_Width: 192
       m_Height: 192
       m_Kind: 0

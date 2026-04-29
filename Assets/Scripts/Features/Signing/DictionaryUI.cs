@@ -35,20 +35,38 @@ namespace Features.Signing
                 return;
             }
 
+            var videoSet = VideoCatalog.IndexWordsWithVideos(videosSubfolder);
+            var pool = BuildPool(wordBank, videoSet);
+            
+            if (pool.Count == 0)
+            {
+                Debug.LogWarning("[DictionaryUI] No valid dictionary words with videos were found.");
+            }
+
             List<string> twenty;
 
             if (sessionSelection.HasCandidates20)
             {
-                twenty = new List<string>(sessionSelection.Candidates20);
-                Debug.Log($"[DictionaryUI] Using persisted 20 candidates from SessionSelection ({twenty.Count}).");
+                twenty = sessionSelection.Candidates20
+                    .Select(w => (w ?? "").Trim().ToLowerInvariant())
+                    .Where(w => !string.IsNullOrEmpty(w) && videoSet.Contains(w))
+                    .Distinct()
+                    .ToList();
             }
             else
             {
-                var videoSet = VideoCatalog.IndexWordsWithVideos(videosSubfolder);
-                var pool     = BuildPool(wordBank, videoSet);
-                twenty       = TakeRandom(pool, showCount);
-                Debug.Log($"[DictionaryUI] Generated {twenty.Count} initial candidates.");
+                twenty = new List<string>();
             }
+
+            if (twenty.Count < showCount)
+            {
+                var extras = pool.Where(w => !twenty.Contains(w)).ToList();
+                extras = TakeRandom(extras, showCount - twenty.Count);
+                twenty.AddRange(extras);
+            }
+
+            if (twenty.Count > showCount)
+                twenty = twenty.Take(showCount).ToList();
 
             _selected.Clear();
             if (sessionSelection && sessionSelection.HasWords)
@@ -56,13 +74,13 @@ namespace Features.Signing
                 foreach (var w in sessionSelection.Words)
                 {
                     var k = (w ?? "").Trim().ToLowerInvariant();
-                    if (!string.IsNullOrEmpty(k)) _selected.Add(k);
+                    if (!string.IsNullOrEmpty(k) && videoSet.Contains(k))
+                        _selected.Add(k);
                 }
             }
 
-            EnsureSelectedInCandidates(twenty);
+            EnsureSelectedInCandidates(twenty, videoSet);
             sessionSelection.SetCandidates20(twenty);
-
             BuildList(twenty);
 
             if (saveAndExitButton)
@@ -74,9 +92,10 @@ namespace Features.Signing
             UpdateSelectionUI();
         }
         
-        void EnsureSelectedInCandidates(List<string> candidates)
+        void EnsureSelectedInCandidates(List<string> candidates, HashSet<string> videoSet)
         {
             if (candidates == null) return;
+
             for (int i = 0; i < candidates.Count; i++)
                 candidates[i] = (candidates[i] ?? "").Trim().ToLowerInvariant();
 
@@ -89,10 +108,10 @@ namespace Features.Signing
                     if (!string.IsNullOrEmpty(k)) required.Add(k);
                 }
             }
-            
+
             foreach (var r in required)
             {
-                if (!candidates.Contains(r))
+                if (videoSet.Contains(r) && !candidates.Contains(r))
                     candidates.Add(r);
             }
 
@@ -106,12 +125,13 @@ namespace Features.Signing
                     (extras[i], extras[j]) = (extras[j], extras[i]);
                 }
 
-                var final = new List<string>(required);
+                var final = new List<string>(required.Where(videoSet.Contains));
                 foreach (var e in extras)
                 {
                     if (final.Count >= showCount) break;
                     if (!final.Contains(e)) final.Add(e);
                 }
+
                 candidates.Clear();
                 candidates.AddRange(final);
             }
@@ -123,7 +143,11 @@ namespace Features.Signing
             var pool     = BuildPool(wordBank, videoSet);
             var twenty   = TakeRandom(pool, showCount);
 
-            EnsureSelectedInCandidates(twenty);
+            EnsureSelectedInCandidates(twenty, videoSet);
+
+            if (twenty.Count > showCount)
+                twenty = twenty.Take(showCount).ToList();
+
             sessionSelection.SetCandidates20(twenty);
             BuildList(twenty);
         }
